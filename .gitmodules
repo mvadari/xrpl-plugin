@@ -1,0 +1,3 @@
+[submodule "external/rippled"]
+	path = external/rippled
+	url = https://github.com/XRPLF/rippled.git
