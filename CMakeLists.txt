@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.22)
 project(try-xrpl)
 
 find_package(SOCI REQUIRED)
+FIND_PACKAGE(PythonInterp 3.7)
+FIND_PACKAGE(PythonLibs 3.7)
+
 
 add_subdirectory(external/rippled EXCLUDE_FROM_ALL)
 target_link_libraries(xrpl_core PUBLIC soci::soci)
@@ -20,6 +23,5 @@ target_link_libraries(lib PUBLIC
 
 target_include_directories(lib PRIVATE ${Python3_INCLUDE_DIRS})
 
-add_executable(main)
-target_sources(main PRIVATE src/main.cpp)
-target_link_libraries(main PUBLIC lib)
+PYTHON_ADD_MODULE(plugin_lib src/lib.cpp)
+target_link_libraries(plugin_lib PUBLIC lib)
