@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 3.22)
-project(try-xrpl)
+project(plugin_transactor)
 
 find_package(SOCI REQUIRED)
+find_package(pybind11 REQUIRED)
+
 
 add_subdirectory(external/rippled EXCLUDE_FROM_ALL)
 target_link_libraries(xrpl_core PUBLIC soci::soci)
@@ -20,6 +22,6 @@ target_link_libraries(lib PUBLIC
 
 target_include_directories(lib PRIVATE ${Python3_INCLUDE_DIRS})
 
-add_executable(main)
-target_sources(main PRIVATE src/main.cpp)
-target_link_libraries(main PUBLIC lib)
+pybind11_add_module(plugin_transactor src/main.cpp)
+target_compile_definitions(plugin_transactor
+                           PRIVATE VERSION_INFO=${EXAMPLE_VERSION_INFO})
