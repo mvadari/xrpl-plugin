@@ -1,8 +1,3 @@
-from build.plugin_lib import World
+import plugin_transactor
 
-t = World()
-t.set("bom dia!")
-print(t.greet())
-
-t.many(['Good Morning', 'Buon giorno', 'Kali mera'])
-print(t.greet())
+print(plugin_transactor.cpp_fib(10))
