@@ -1,7 +1,7 @@
 #include <vector>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-// #include <ripple/app/tx/impl/Transactor.h>
+#include <ripple/app/tx/impl/Transactor.h>
 #include <ripple/protocol/STTx.h>
 
 #define STRINGIFY(x) #x
@@ -10,6 +10,8 @@
 namespace py = pybind11;
 
 PYBIND11_MODULE(plugin_transactor, m) {
-    py::class_<STTx> STTx(m, "STTx");
-        .def("getTransactionID", &STTx::getTransactionID);
+    py::class_<ripple::STTx> STTx(m, "STTx");
+
+    STTx
+        .def("getTransactionID", &ripple::STTx::getTransactionID);
 }
