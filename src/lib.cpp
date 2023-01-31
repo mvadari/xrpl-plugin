@@ -1,25 +1,3 @@
-// #include <Python.h>
-// #include <boost/python.hpp>
-// #include <ripple/app/tx/impl/Transactor.h>
-// #include <ripple/protocol/STTx.h>
-
-/*
-Application& app;
-STTx const& tx;
-Rules const rules;
-ApplyFlags flags;
-beast::Journal const j;
-*/
-
-
-// using namespace boost::python;
-
-// BOOST_PYTHON_MODULE(pylib)
-// {
-//     class_<ripple::STTx>("STTx", no_init)
-//       .def("getTransactionID", &ripple::STTx::getTransactionID)
-//     ;
-// }
 
 #include <boost/python.hpp>
 #include <boost/python/list.hpp>
@@ -47,7 +25,7 @@ struct World
 
 using namespace boost::python;
 
-BOOST_PYTHON_MODULE(classes)
+BOOST_PYTHON_MODULE(plugin_lib)
 {
     class_<World>("World")
         .def("greet", &World::greet)
