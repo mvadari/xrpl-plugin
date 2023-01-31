@@ -1,36 +1,27 @@
 cmake_minimum_required(VERSION 3.22)
-project(try-xrpl)
+project(plugin_transactor)
+
+find_package(SOCI REQUIRED)
+find_package(pybind11 REQUIRED)
+
+
+add_subdirectory(external/rippled EXCLUDE_FROM_ALL)
+target_link_libraries(xrpl_core PUBLIC soci::soci)
 
 find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
 
-if (Python3_FOUND)
-  if (UNIX AND NOT APPLE)
-    if (PYTHON_VERSION_MAJOR EQUAL 3)
-        FIND_PACKAGE(Boost COMPONENTS python${PYTHON_VERSION_SUFFIX})
-        FIND_PACKAGE(Python3)
-        FIND_PACKAGE(PythonLibs 3 REQUIRED)
-    else()
-        FIND_PACKAGE(Boost COMPONENTS python)
-        FIND_PACKAGE(Python3)
-        FIND_PACKAGE(PythonLibs REQUIRED)
-    endif()
-  else()	
-    if (PYTHON_VERSION_MAJOR EQUAL 3)
-        FIND_PACKAGE(Boost COMPONENTS python${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR})
-        FIND_PACKAGE(Python3)
-        FIND_PACKAGE(PythonLibs 3 REQUIRED)
-    else()
-        FIND_PACKAGE(Boost COMPONENTS python${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR})
-        FIND_PACKAGE(Python)
-        FIND_PACKAGE(PythonLibs REQUIRED)
-    endif()
-  endif()
-else()
-    message("Python not found")
-endif()
+add_library(lib)
+target_sources(lib PRIVATE 
+  src/lib.cpp
+  ${PYTHON_LIBRARIES}
+)
+target_link_libraries(lib PUBLIC
+  xrpl_core
+  ${Python3_LIBRARIES}
+)
 
-INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS})
-LINK_LIBRARIES(${Boost_LIBRARIES} ${PYTHON_LIBRARIES}) # Deprecated but so convenient!
+target_include_directories(lib PRIVATE ${Python3_INCLUDE_DIRS})
 
-find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
-PYTHON3_ADD_LIBRARY(plugin_lib src/lib.cpp)
+pybind11_add_module(plugin_transactor src/main.cpp)
+target_compile_definitions(plugin_transactor
+                           PRIVATE VERSION_INFO=${EXAMPLE_VERSION_INFO})
