@@ -1,7 +1,7 @@
 from plugin_transactor import STTx
 
-print(dir(STTx))
 
-
-def preflight(tx: STTx):
-    print(tx.getTransactionID())
+def preflight(tx):
+    print(tx)
+    print(dir(tx))
+    print(tx.getTxnType())
