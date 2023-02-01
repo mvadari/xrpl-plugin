@@ -94,6 +94,12 @@
         "source_location": "cpp",
         "utility": "cpp",
         "stop_token": "cpp",
-        "cinttypes": "cpp"
-    }
+        "cinttypes": "cpp",
+        "*.ipp": "cpp"
+    },
+    "cSpell.words": [
+        "NFTOKEN",
+        "Optionaled",
+        "PAYCHAN"
+    ]
 }
