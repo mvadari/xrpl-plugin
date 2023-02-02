@@ -96,5 +96,10 @@
         "stop_token": "cpp",
         "cinttypes": "cpp",
         "*.ipp": "cpp"
-    }
+    },
+    "cSpell.words": [
+        "NFTOKEN",
+        "Optionaled",
+        "PAYCHAN"
+    ]
 }
