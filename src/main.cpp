@@ -11,7 +11,7 @@
 
 namespace py = pybind11;
 
-const DumbWrapper<ripple::SF_ACCOUNT> sfAccount = new DumbWrapper<ripple::SF_ACCOUNT>(&ripple::sfAccount);
+const ripple::SF_ACCOUNT* SF::sfAccount = &ripple::sfAccount;
 
 PYBIND11_MODULE(plugin_transactor, m) {
     py::enum_<ripple::TxType>(m, "TxType")
@@ -108,6 +108,6 @@ PYBIND11_MODULE(plugin_transactor, m) {
 
     py::class_<SF> SF(m, "SF");
     SF
-        .def_property_readonly_static("sfAccount", [](py::object /* self */) { return &ripple::sfAccount });
+        .def_readonly_static("sfAccount", &SF::sfAccount);
     
 }
