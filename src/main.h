@@ -1,7 +1,16 @@
-#include <ripple/protocol/st.h>
+class Class {
+public:
+    Class();
+    Class(Class const&) = delete;
+    Class&
+    operator=(Class const&) = delete;
+    Class(Class&&) = delete;
+    Class&
+    operator=(Class&&) = delete;
+};
 
-template<class T>
-struct DumbWrapper {
-   T* wrapped_;
-   T& get(){ return wrapped_;}
-}
+class Class2 {
+public:
+    Class2();
+    static const Class* var;
+};
