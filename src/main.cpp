@@ -108,6 +108,6 @@ PYBIND11_MODULE(plugin_transactor, m) {
 
     py::class_<SF> SF(m, "SF");
     SF
-        .def_readonly_static("sfAccount", &SF::sfAccount);
+        .def_readonly_static("sfAccount", &SF::sfAccount, py::return_value_policy::reference);
     
 }
