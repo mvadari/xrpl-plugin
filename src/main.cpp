@@ -2,14 +2,16 @@
 #include <pybind11/stl.h>
 #include <pybind11/operators.h>
 
-#include <ripple/protocol/STTx.h>
-#include <ripple/protocol/TxFormats.h>
-#include <ripple/protocol/STAccount.h>
+#include <ripple/app/tx/impl/Transactor.h>
+#include <ripple/protocol/st.h>
+#include "main.h"
 
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 
 namespace py = pybind11;
+
+const DumbWrapper<ripple::SF_ACCOUNT> sfAccount = new DumbWrapper<ripple::SF_ACCOUNT>(&ripple::sfAccount);
 
 PYBIND11_MODULE(plugin_transactor, m) {
     py::enum_<ripple::TxType>(m, "TxType")
@@ -103,6 +105,9 @@ PYBIND11_MODULE(plugin_transactor, m) {
 
     // declare_at<ripple::STAccount>("STAccount");
     // declare_at<ripple::STBlob>("STBlob");
+
+    py::class_<SF> SF(m, "SF");
+    SF
+        .def_property_readonly_static("sfAccount", [](py::object /* self */) { return &ripple::sfAccount });
     
-//     m.attr("sfAccount") = ripple::sfAccount;
 }
