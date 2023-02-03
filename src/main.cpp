@@ -3,13 +3,6 @@
 #include <pybind11/operators.h>
 
 #include <ripple/app/tx/impl/Transactor.h>
-#include <ripple/basics/Log.h>
-#include <ripple/basics/XRPAmount.h>
-#include <ripple/ledger/ApplyView.h>
-#include <ripple/ledger/View.h>
-#include <ripple/protocol/Feature.h>
-#include <ripple/protocol/TER.h>
-#include <ripple/protocol/TxFlags.h>
 #include <ripple/protocol/st.h>
 
 #define STRINGIFY(x) #x
@@ -69,7 +62,7 @@ PYBIND11_MODULE(plugin_transactor, m) {
 
     py::class_<ripple::STObject> STObject(m, "STObject");
     STObject
-        .def("getAccount",
+        .def_property_readonly("Account",
             [](const ripple::STObject &obj) {
                 return obj[ripple::sfAccount];
             }
