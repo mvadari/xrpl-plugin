@@ -4,14 +4,17 @@
 
 #include <ripple/app/tx/impl/Transactor.h>
 #include <ripple/protocol/st.h>
-#include "main.h"
 
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 
 namespace py = pybind11;
 
-const ripple::SF_ACCOUNT* SF::sfAccount = &ripple::sfAccount;
+ripple::AccountID
+getAccount(ripple::STObject obj) {
+    py::print(obj);
+    return obj[ripple::sfAccount];
+}
 
 PYBIND11_MODULE(plugin_transactor, m) {
     py::enum_<ripple::TxType>(m, "TxType")
@@ -51,28 +54,8 @@ PYBIND11_MODULE(plugin_transactor, m) {
     py::class_<ripple::STAccount> STAccount(m, "STAccount");
     // STAccount
     //     .def(py::init<>());
-    
-    // py::class_<
-    //     ripple::TypedField<ripple::STAccount>,
-    //     std::shared_ptr< ripple::TypedField<ripple::STAccount> >,
-    //     ripple::SField
-    // >(m, "TypedFieldSTAccount");
-    //  py::class_<
-    //     ripple::TypedField<ripple::STBlob>,
-    //     std::shared_ptr< ripple::TypedField<ripple::STBlob> >,
-    //     ripple::SField
-    // >(m, "TypedFieldSTBlob");
 
-    // py::class_<
-    //     ripple::OptionaledField<ripple::STAccount>,
-    //     std::shared_ptr< ripple::OptionaledField<ripple::STAccount> >,
-    //     ripple::SField
-    // >(m, "OptionaledFieldSTAccount");
-    //  py::class_<
-    //     ripple::OptionaledField<ripple::STBlob>,
-    //     std::shared_ptr< ripple::OptionaledField<ripple::STBlob> >,
-    //     ripple::SField
-    // >(m, "OptionaledFieldSTBlob");
+    py::class_<ripple::AccountID> AccountID(m, "AccountID");
 
     py::class_<ripple::STObject> STObject(m, "STObject");
     STObject
@@ -92,22 +75,5 @@ PYBIND11_MODULE(plugin_transactor, m) {
     STTx
         .def("getTxnType", &ripple::STTx::getTxnType);
     
-    // template<typename T>
-    // void declare_at(std::string &typestr) {
-    //     using TF = ripple::TypedField<T>;
-    //     std::string pyclass_name = std::string("TypedField") + typestr;
-    //     STTx
-    //         .def(
-    //             "at",
-    //             py::overload_cast<TF>(&ripple::STTx::at)
-    //         )
-    // }
-
-    // declare_at<ripple::STAccount>("STAccount");
-    // declare_at<ripple::STBlob>("STBlob");
-
-    py::class_<SF> SF(m, "SF");
-    SF
-        .def_readonly_static("sfAccount", &SF::sfAccount, py::return_value_policy::reference);
-    
+    m.def("getAccount", &getAccount, py::return_value_policy::reference);
 }
