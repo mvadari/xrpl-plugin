@@ -3,18 +3,19 @@
 #include <pybind11/operators.h>
 
 #include <ripple/app/tx/impl/Transactor.h>
+#include <ripple/basics/Log.h>
+#include <ripple/basics/XRPAmount.h>
+#include <ripple/ledger/ApplyView.h>
+#include <ripple/ledger/View.h>
+#include <ripple/protocol/Feature.h>
+#include <ripple/protocol/TER.h>
+#include <ripple/protocol/TxFlags.h>
 #include <ripple/protocol/st.h>
 
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 
 namespace py = pybind11;
-
-ripple::AccountID
-getAccount(ripple::STObject obj) {
-    py::print(obj);
-    return obj[ripple::sfAccount];
-}
 
 PYBIND11_MODULE(plugin_transactor, m) {
     py::enum_<ripple::TxType>(m, "TxType")
@@ -52,28 +53,29 @@ PYBIND11_MODULE(plugin_transactor, m) {
     py::class_<ripple::SField> SField(m, "SField");
 
     py::class_<ripple::STAccount> STAccount(m, "STAccount");
-    // STAccount
-    //     .def(py::init<>());
 
     py::class_<ripple::AccountID> AccountID(m, "AccountID");
+    AccountID
+        .def("toBase58",
+            [](const ripple::AccountID &a) {
+                return ripple::toBase58(a);
+            }
+        )
+        .def("__repr__",
+            [](const ripple::AccountID &a) {
+                return "<AccountID:'" + ripple::toBase58(a) + "'>";
+            }
+        );
 
     py::class_<ripple::STObject> STObject(m, "STObject");
     STObject
-        .def(
-            "at",
-            (
-                typename ripple::STAccount::value_type // return type
-                (ripple::STObject::*) // class pointer?
-                (const ripple::TypedField<ripple::STAccount> &) // param type
-                const // const
-            )
-            &ripple::STObject::at, // function name
-            py::arg("f") // arg name
+        .def("getAccount",
+            [](const ripple::STObject &obj) {
+                return obj[ripple::sfAccount];
+            }
         );
 
     py::class_<ripple::STTx, ripple::STObject> STTx(m, "STTx");
     STTx
         .def("getTxnType", &ripple::STTx::getTxnType);
-    
-    m.def("getAccount", &getAccount, py::return_value_policy::reference);
 }
