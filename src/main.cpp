@@ -71,4 +71,36 @@ PYBIND11_MODULE(plugin_transactor, m) {
     py::class_<ripple::STTx, ripple::STObject> STTx(m, "STTx");
     STTx
         .def("getTxnType", &ripple::STTx::getTxnType);
+    
+    py::class_<ripple::Rules> Rules(m, "Rules");
+    Rules
+        .def("enabled", &ripple::Rules::enabled);
+    
+    py::class_<ripple::PreflightContext> PreflightContext(m, "PreflightContext");
+    PreflightContext
+        .def_property_readonly("tx",
+            [](const ripple::PreflightContext &ctx) {
+                return ctx.tx;
+            }
+        )
+        .def_property_readonly("rules",
+            [](const ripple::PreflightContext &ctx) {
+                return ctx.rules;
+            }
+        );
+    
+    // py::class_<ripple::ApplyView> ApplyView(m, "ApplyView");
+
+    py::class_<ripple::ApplyContext> ApplyContext(m, "ApplyContext");
+    // ApplyContext
+    //     .def_property_readonly("tx",
+    //         [](const ripple::ApplyContext &ctx) {
+    //             return ctx.tx;
+    //         }
+    //     );
+        // .def("view", &ripple::ApplyContext::view);
+    
+    // m
+    //     .def("preflight1", &ripple::preflight1)
+    //     .def("preflight2", &ripple::preflight2);
 }
