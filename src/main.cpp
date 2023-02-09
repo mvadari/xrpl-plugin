@@ -94,7 +94,13 @@ PYBIND11_MODULE(plugin_transactor, m) {
         .def("getTxnType", &ripple::STTx::getTxnType);
 
     py::class_<ripple::STLedgerEntry, ripple::STObject> STLedgerEntry(m, "STLedgerEntry");
-    
+    STLedgerEntry
+        .def("__repr__",
+            [](const ripple::STLedgerEntry &sle) {
+                return sle.getFullText();
+            }
+        );
+
     py::class_<ripple::Rules> Rules(m, "Rules");
     Rules
         .def("enabled", &ripple::Rules::enabled);
