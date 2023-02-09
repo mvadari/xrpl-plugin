@@ -98,6 +98,7 @@
         "*.ipp": "cpp"
     },
     "cSpell.words": [
+        "keylet",
         "NFTOKEN",
         "Optionaled",
         "PAYCHAN"

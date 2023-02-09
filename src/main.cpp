@@ -42,6 +42,27 @@ PYBIND11_MODULE(plugin_transactor, m) {
         .value("ttFEE", ripple::TxType::ttFEE)
         .value("ttUNL_MODIFY", ripple::TxType::ttUNL_MODIFY)
         .export_values();
+    
+    py::enum_<ripple::LedgerEntryType>(m, "LedgerEntryType")
+        .value("ltACCOUNT_ROOT", ripple::LedgerEntryType::ltACCOUNT_ROOT)
+        .value("ltDIR_NODE", ripple::LedgerEntryType::ltDIR_NODE)
+        .value("ltRIPPLE_STATE", ripple::LedgerEntryType::ltRIPPLE_STATE)
+        .value("ltTICKET", ripple::LedgerEntryType::ltTICKET)
+        .value("ltSIGNER_LIST", ripple::LedgerEntryType::ltSIGNER_LIST)
+        .value("ltOFFER", ripple::LedgerEntryType::ltOFFER)
+        .value("ltLEDGER_HASHES", ripple::LedgerEntryType::ltLEDGER_HASHES)
+        .value("ltAMENDMENTS", ripple::LedgerEntryType::ltAMENDMENTS)
+        .value("ltFEE_SETTINGS", ripple::LedgerEntryType::ltFEE_SETTINGS)
+        .value("ltESCROW", ripple::LedgerEntryType::ltESCROW)
+        .value("ltPAYCHAN", ripple::LedgerEntryType::ltPAYCHAN)
+        .value("ltCHECK", ripple::LedgerEntryType::ltCHECK)
+        .value("ltDEPOSIT_PREAUTH", ripple::LedgerEntryType::ltDEPOSIT_PREAUTH)
+        .value("ltNEGATIVE_UNL", ripple::LedgerEntryType::ltNEGATIVE_UNL)
+        .value("ltNFTOKEN_PAGE", ripple::LedgerEntryType::ltNFTOKEN_PAGE)
+        .value("ltNFTOKEN_OFFER", ripple::LedgerEntryType::ltNFTOKEN_OFFER)
+        .value("ltANY", ripple::LedgerEntryType::ltANY)
+        .value("ltCHILD", ripple::LedgerEntryType::ltCHILD)
+        .export_values();
 
     py::class_<ripple::SField> SField(m, "SField");
 
@@ -71,6 +92,8 @@ PYBIND11_MODULE(plugin_transactor, m) {
     py::class_<ripple::STTx, ripple::STObject> STTx(m, "STTx");
     STTx
         .def("getTxnType", &ripple::STTx::getTxnType);
+
+    py::class_<ripple::STLedgerEntry, ripple::STObject> STLedgerEntry(m, "STLedgerEntry");
     
     py::class_<ripple::Rules> Rules(m, "Rules");
     Rules
@@ -89,18 +112,35 @@ PYBIND11_MODULE(plugin_transactor, m) {
             }
         );
     
-    // py::class_<ripple::ApplyView> ApplyView(m, "ApplyView");
+    py::class_<ripple::Keylet> Keylet(m, "Keylet");
+    Keylet
+        .def_property_readonly("type",
+            [](const ripple::Keylet &keylet) {
+                return keylet.type;
+            }
+        )
+        .def_property_readonly("key",
+            [](const ripple::Keylet &keylet) {
+                return keylet.key.data();
+            }
+        );
+    
+    py::class_<ripple::ApplyView> ApplyView(m, "ApplyView");
+    ApplyView
+        .def("peek", &ripple::ApplyView::peek, py::return_value_policy::reference)
+        .def("update", &ripple::ApplyView::update);
 
     py::class_<ripple::ApplyContext> ApplyContext(m, "ApplyContext");
-    // ApplyContext
-    //     .def_property_readonly("tx",
-    //         [](const ripple::ApplyContext &ctx) {
-    //             return ctx.tx;
-    //         }
-    //     );
-        // .def("view", &ripple::ApplyContext::view);
+    ApplyContext
+        .def_property_readonly("tx",
+            [](const ripple::ApplyContext &ctx) {
+                return ctx.tx;
+            }
+        )
+        .def("view", &ripple::ApplyContext::view, py::return_value_policy::reference);
     
-    // m
-    //     .def("preflight1", &ripple::preflight1)
-    //     .def("preflight2", &ripple::preflight2);
+    m
+        .def("accountKeylet", &ripple::keylet::account);
+        // .def("preflight1", &ripple::preflight1)
+        // .def("preflight2", &ripple::preflight2);
 }
