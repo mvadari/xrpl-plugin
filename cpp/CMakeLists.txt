@@ -3,7 +3,6 @@ project(plugin_transactor)
 set(CMAKE_CXX_STANDARD 20)
 
 find_package(SOCI REQUIRED)
-find_package(pybind11 REQUIRED)
 
 
 add_subdirectory(../external/rippled subproject/rippled EXCLUDE_FROM_ALL)
