@@ -9,6 +9,7 @@
 #include <ripple/protocol/TxFlags.h>
 #include <ripple/protocol/st.h>
 
+
 namespace ripple {
 
 NotTEC
@@ -19,6 +20,8 @@ DummyTx::preflight(PreflightContext const& ctx)
 
     if (ctx.tx.getFlags() & tfUniversalMask)
         return temINVALID_FLAG;
+
+    std::cout << "In library version of DummyTx" << std::endl;
 
     return preflight2(ctx);
 }
@@ -35,4 +38,12 @@ DummyTx::doApply()
 
     return tesSUCCESS;
 }
+
+}
+
+extern "C"
+ripple::NotTEC
+preflight(ripple::PreflightContext const& ctx)
+{
+    return ripple::DummyTx::preflight(ctx);
 }
