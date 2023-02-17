@@ -17,20 +17,23 @@
 */
 //==============================================================================
 
-#ifndef RIPPLE_TX_DUMMYTX_H_INCLUDED
-#define RIPPLE_TX_DUMMYTX_H_INCLUDED
+#ifndef RIPPLE_TX_SETTRUST_H_INCLUDED
+#define RIPPLE_TX_SETTRUST_H_INCLUDED
 
 #include <ripple/app/tx/impl/Transactor.h>
+#include <ripple/basics/Log.h>
+#include <ripple/protocol/Indexes.h>
+#include <ripple/protocol/Quality.h>
+#include <ripple/protocol/TxFlags.h>
 
 namespace ripple {
 
-// Dummy transaction
-class DummyTx : public Transactor
+class SetTrust : public Transactor
 {
 public:
     static constexpr ConsequencesFactoryType ConsequencesFactory{Normal};
 
-    explicit DummyTx(ApplyContext& ctx) : Transactor(ctx)
+    explicit SetTrust(ApplyContext& ctx) : Transactor(ctx)
     {
     }
 
@@ -43,8 +46,6 @@ public:
     TER
     doApply() override;
 };
-
-//------------------------------------------------------------------------------
 
 }  // namespace ripple
 
