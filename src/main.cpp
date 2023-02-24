@@ -81,7 +81,7 @@ PYBIND11_MODULE(plugin_transactor, m) {
             }
         );
 
-    py::class_<ripple::STObject> STObject(m, "STObject");
+    py::class_<ripple::STObject, std::shared_ptr<ripple::STObject>> STObject(m, "STObject");
     STObject
         .def_property_readonly("Account",
             [](const ripple::STObject &obj) {
@@ -89,11 +89,11 @@ PYBIND11_MODULE(plugin_transactor, m) {
             }
         );
 
-    py::class_<ripple::STTx, ripple::STObject> STTx(m, "STTx");
+    py::class_<ripple::STTx, ripple::STObject, std::shared_ptr<ripple::STTx>> STTx(m, "STTx");
     STTx
         .def("getTxnType", &ripple::STTx::getTxnType);
 
-    py::class_<ripple::STLedgerEntry, ripple::STObject> STLedgerEntry(m, "STLedgerEntry");
+    py::class_<ripple::STLedgerEntry, ripple::STObject, std::shared_ptr<ripple::STLedgerEntry>> STLedgerEntry(m, "STLedgerEntry");
     STLedgerEntry
         .def("__repr__",
             [](const ripple::STLedgerEntry &sle) {
@@ -133,8 +133,17 @@ PYBIND11_MODULE(plugin_transactor, m) {
     
     py::class_<ripple::ApplyView> ApplyView(m, "ApplyView");
     ApplyView
-        .def("peek", &ripple::ApplyView::peek, py::return_value_policy::reference)
+        .def("peek", &ripple::ApplyView::peek)
         .def("update", &ripple::ApplyView::update);
+    
+    py::class_<
+        ripple::detail::ApplyViewBase,
+        ripple::ApplyView
+    > ApplyViewBase(m, "ApplyViewBase");
+    py::class_<
+        ripple::ApplyViewImpl,
+        ripple::detail::ApplyViewBase
+    > ApplyViewImpl(m, "ApplyViewImpl");
 
     py::class_<ripple::ApplyContext> ApplyContext(m, "ApplyContext");
     ApplyContext
@@ -144,6 +153,8 @@ PYBIND11_MODULE(plugin_transactor, m) {
             }
         )
         .def("view", &ripple::ApplyContext::view, py::return_value_policy::reference);
+    
+    // py::register_exception<ripple::LogicError>(m, "LogicError");
     
     m
         .def("accountKeylet", &ripple::keylet::account);
