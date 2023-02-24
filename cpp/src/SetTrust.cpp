@@ -557,3 +557,12 @@ apply(ripple::ApplyContext& ctx)
     ripple::SetTrust p(ctx);
     return p();
 }
+
+// extern "C"
+// std::initializer_list<ripple::SOElement> uniqueFields
+// {
+//     {ripple::sfLimitAmount, ripple::soeOPTIONAL},
+//     {ripple::sfQualityIn, ripple::soeOPTIONAL},
+//     {ripple::sfQualityOut, ripple::soeOPTIONAL},
+//     {ripple::sfTicketSequence, ripple::soeOPTIONAL},
+// };
