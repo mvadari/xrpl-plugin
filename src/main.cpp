@@ -93,6 +93,11 @@ PYBIND11_MODULE(plugin_transactor, m) {
                 auto const accountID = obj[ripple::sfAccount];
                 obj.setAccountID(ripple::sfRegularKey, accountID);
             }
+        )
+        .def("__repr__",
+            [](const ripple::STObject &obj) {
+                return obj.getFullText();
+            }
         );
 
     py::class_<ripple::STTx, ripple::STObject, std::shared_ptr<ripple::STTx>> STTx(m, "STTx");
@@ -100,12 +105,6 @@ PYBIND11_MODULE(plugin_transactor, m) {
         .def("getTxnType", &ripple::STTx::getTxnType);
 
     py::class_<ripple::STLedgerEntry, ripple::STObject, std::shared_ptr<ripple::STLedgerEntry>> STLedgerEntry(m, "STLedgerEntry");
-    STLedgerEntry
-        .def("__repr__",
-            [](const ripple::STLedgerEntry &sle) {
-                return sle.getFullText();
-            }
-        );
 
     py::class_<ripple::Rules> Rules(m, "Rules");
     Rules
