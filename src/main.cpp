@@ -87,6 +87,12 @@ PYBIND11_MODULE(plugin_transactor, m) {
             [](const ripple::STObject &obj) {
                 return obj[ripple::sfAccount];
             }
+        )
+        .def("setRegularKey",
+            [](ripple::STObject &obj) {
+                auto const accountID = obj[ripple::sfAccount];
+                obj.setAccountID(ripple::sfRegularKey, accountID);
+            }
         );
 
     py::class_<ripple::STTx, ripple::STObject, std::shared_ptr<ripple::STTx>> STTx(m, "STTx");
@@ -155,9 +161,11 @@ PYBIND11_MODULE(plugin_transactor, m) {
         .def("view", &ripple::ApplyContext::view, py::return_value_policy::reference);
     
     // py::register_exception<ripple::LogicError>(m, "LogicError");
+
     
     m
-        .def("accountKeylet", &ripple::keylet::account);
+        .def("accountKeylet", &ripple::keylet::account)
         // .def("preflight1", &ripple::preflight1)
-        // .def("preflight2", &ripple::preflight2);
+        // .def("preflight2", &ripple::preflight2)
+        ;
 }
