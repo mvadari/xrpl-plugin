@@ -1,12 +1,25 @@
 import plugin_transactor
-from plugin_transactor import STTx, getAccount
+from plugin_transactor import accountKeylet
+
+print("IMPORTEDDDD")
+print(dir(plugin_transactor))
+
+def preflight(ctx):
+    print("in preflight")
+    print(ctx.tx)
 
 
-def preflight(tx):
-    print("HIIIIIIIIII")
-    print(tx)
-    print(dir(tx))
-    print(dir(plugin_transactor))
-    print(tx.getTxnType())
-    print("DANGER ZONE")
-    print(getAccount(tx))
+def doApply(ctx):
+    account = ctx.tx.Account
+    view = ctx.view()
+    keylet = accountKeylet(account)
+    account_root = view.peek(keylet)
+    try:
+        account_root.setRegularKey()
+        print(account_root)
+        view.update(account_root)
+    except Exception as ex:
+        print("ERRORRRRRRRRRRR")
+        print(ex)
+        raise ex
+    print("after update")

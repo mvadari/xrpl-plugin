@@ -95,9 +95,15 @@
         "utility": "cpp",
         "stop_token": "cpp",
         "cinttypes": "cpp",
-        "*.ipp": "cpp"
+        "*.ipp": "cpp",
+        "charconv": "cpp",
+        "csetjmp": "cpp",
+        "regex": "cpp",
+        "shared_mutex": "cpp",
+        "valarray": "cpp"
     },
     "cSpell.words": [
+        "keylet",
         "NFTOKEN",
         "Optionaled",
         "PAYCHAN"
