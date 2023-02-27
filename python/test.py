@@ -5,35 +5,21 @@ print("IMPORTEDDDD")
 print(dir(plugin_transactor))
 
 def preflight(ctx):
-    print("HIIIIIIIIII")
-    tx = ctx.tx
-    print(tx)
-    print(dir(tx))
-    print(dir(plugin_transactor))
-    print(tx.getTxnType())
-    # print(getAccount(tx))
-    # print(getAccount(tx).toBase58())
-
-    print("DANGER ZONE")
-    print(ctx.rules)
-
+    print("in preflight")
+    print(ctx.tx)
 
 
 def doApply(ctx):
-    print("DOAPPLYYYYYYYYYYYYY")
-    print(dir(ctx))
-    print(ctx.tx, ctx.tx.Account)
     account = ctx.tx.Account
     view = ctx.view()
-    print(view, dir(view))
     keylet = accountKeylet(account)
-    print(keylet, dir(keylet))
-    print(keylet.type)
-    print(keylet.key)
     account_root = view.peek(keylet)
-    print(account_root)
-    print("before update")
-    print(view.update)
-    view.update(account_root)
+    try:
+        account_root.setRegularKey()
+        print(account_root)
+        view.update(account_root)
+    except Exception as ex:
+        print("ERRORRRRRRRRRRR")
+        print(ex)
+        raise ex
     print("after update")
-
