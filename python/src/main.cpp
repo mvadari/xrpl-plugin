@@ -63,6 +63,10 @@ PYBIND11_MODULE(plugin_transactor, m) {
         .value("ltANY", ripple::LedgerEntryType::ltANY)
         .value("ltCHILD", ripple::LedgerEntryType::ltCHILD)
         .export_values();
+    
+    py::enum_<ripple::TEScodes>(m, "TEScodes")
+        .value("tesSUCCESS", ripple::TEScodes::tesSUCCESS)
+        .export_values();
 
     py::class_<ripple::SField> SField(m, "SField");
 
@@ -110,6 +114,21 @@ PYBIND11_MODULE(plugin_transactor, m) {
     Rules
         .def("enabled", &ripple::Rules::enabled);
     
+    py::class_<ripple::ReadView> ReadView(m, "ReadView");
+    ReadView
+        .def_property_readonly("fees",
+            [](const ripple::ReadView &view) {
+                return view.fees();
+            }
+        )
+        .def_property_readonly("rules",
+            [](const ripple::ReadView &view) {
+                return view.rules();
+            }
+        );
+    
+    py::class_<ripple::OpenView, ripple::ReadView> OpenView(m, "OpenView");
+    
     py::class_<ripple::PreflightContext> PreflightContext(m, "PreflightContext");
     PreflightContext
         .def_property_readonly("tx",
@@ -123,6 +142,19 @@ PYBIND11_MODULE(plugin_transactor, m) {
             }
         );
     
+    py::class_<ripple::PreclaimContext> PreclaimContext(m, "PreclaimContext");
+    PreclaimContext
+        .def_property_readonly("tx",
+            [](const ripple::PreclaimContext &ctx) {
+                return ctx.tx;
+            }
+        );
+        // .def_property_readonly("view",
+        //     [](const ripple::PreclaimContext &ctx) {
+        //         return std::shared_ptr<const ripple::ReadView>(ctx.view);
+        //     }
+        // );
+    
     py::class_<ripple::Keylet> Keylet(m, "Keylet");
     Keylet
         .def_property_readonly("type",
@@ -135,6 +167,34 @@ PYBIND11_MODULE(plugin_transactor, m) {
                 return keylet.key.data();
             }
         );
+    
+    py::class_<ripple::Fees> Fees(m, "Fees");
+    Fees
+        .def_property_readonly("base",
+            [](const ripple::Fees &fees) {
+                return fees.base;
+            }
+        )
+        .def_property_readonly("reserve",
+            [](const ripple::Fees &fees) {
+                return fees.reserve;
+            }
+        )
+        .def_property_readonly("increment",
+            [](const ripple::Fees &fees) {
+                return fees.increment;
+            }
+        );
+    
+    py::class_<ripple::XRPAmount> XRPAmount(m, "XRPAmount");
+    XRPAmount
+        .def(py::init<std::int64_t &>())
+        .def_property_readonly("drops",
+            [](const ripple::XRPAmount &xrpAmount) {
+                return xrpAmount.drops();
+            }
+        );
+
     
     py::class_<ripple::ApplyView> ApplyView(m, "ApplyView");
     ApplyView
