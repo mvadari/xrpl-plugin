@@ -67,6 +67,9 @@ PYBIND11_MODULE(plugin_transactor, m) {
     py::enum_<ripple::TEScodes>(m, "TEScodes")
         .value("tesSUCCESS", ripple::TEScodes::tesSUCCESS)
         .export_values();
+    
+    py::class_<ripple::NotTEC> NotTEC(m, "NotTEC");
+    py::class_<ripple::TER> TER(m, "TER");
 
     py::class_<ripple::SField> SField(m, "SField");
 
@@ -220,6 +223,17 @@ PYBIND11_MODULE(plugin_transactor, m) {
         .def("view", &ripple::ApplyContext::view, py::return_value_policy::reference);
     
     // py::register_exception<ripple::LogicError>(m, "LogicError");
+
+    // py::class_<ripple::Transactor> Transactor(m, "Transactor");
+    // Transactor
+    //     .def("preflight", &ripple::Transactor::preflight)
+    //     .def("preclaim", &ripple::Transactor::preclaim)
+    //     .def("calculateBaseFee", &ripple::Transactor::calculateBaseFee)
+    //     .def("doApply", &ripple::Transactor::doApply);
+    //     .def("call",
+    //         [](const ripple::Transactor &transactor) {
+    //             return transactor();
+    //         })
 
     
     m
