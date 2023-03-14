@@ -15,3 +15,4 @@ target_sources(plugin_transactor PRIVATE
 target_link_libraries(plugin_transactor PUBLIC
   xrpl_core
 )
+install(TARGETS plugin_transactor)

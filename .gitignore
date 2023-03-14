@@ -172,3 +172,5 @@ conan.lock
 conanbuildinfo.txt
 conaninfo.txt
 graph_info.json
+.build
+.cupcake.toml
