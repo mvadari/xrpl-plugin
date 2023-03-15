@@ -19,6 +19,10 @@ namespace py = pybind11;
 
 PYBIND11_MODULE(plugin_transactor, m) {
 
+    /*
+    * Enums
+    */
+
     py::enum_<ripple::TxType>(m, "TxType")
         .value("ttPAYMENT", ripple::TxType::ttPAYMENT)
         .value("ttESCROW_CREATE", ripple::TxType::ttESCROW_CREATE)
@@ -102,6 +106,10 @@ PYBIND11_MODULE(plugin_transactor, m) {
         .value("lsfSellNFToken", ripple::LedgerSpecificFlags::lsfSellNFToken)
         .export_values();
     
+    /*
+    * Return code enums
+    */
+
     py::enum_<ripple::TEScodes>(m, "TEScodes", py::arithmetic())
         .value("tesSUCCESS", ripple::TEScodes::tesSUCCESS)
         .export_values();
@@ -197,20 +205,65 @@ PYBIND11_MODULE(plugin_transactor, m) {
         .value("tecINSUFFICIENT_PAYMENT", ripple::TECcodes::tecINSUFFICIENT_PAYMENT)
         .export_values();
     
+    py::enum_<ripple::TERcodes>(m, "TERcodes", py::arithmetic())
+        .value("terRETRY", ripple::TERcodes::terRETRY)
+        .value("terFUNDS_SPENT", ripple::TERcodes::terFUNDS_SPENT)
+        .value("terINSUF_FEE_B", ripple::TERcodes::terINSUF_FEE_B)
+        .value("terNO_ACCOUNT", ripple::TERcodes::terNO_ACCOUNT)
+        .value("terNO_AUTH", ripple::TERcodes::terNO_AUTH)
+        .value("terNO_LINE", ripple::TERcodes::terNO_LINE)
+        .value("terOWNERS", ripple::TERcodes::terOWNERS)
+        .value("terPRE_SEQ", ripple::TERcodes::terPRE_SEQ)
+        .value("terLAST", ripple::TERcodes::terLAST)
+        .value("terNO_RIPPLE", ripple::TERcodes::terNO_RIPPLE)
+        .value("terQUEUED", ripple::TERcodes::terQUEUED)
+        .value("terPRE_TICKET", ripple::TERcodes::terPRE_TICKET)
+        .export_values();
+
+    py::enum_<ripple::TEFcodes>(m, "TEFcodes", py::arithmetic())
+        .value("tefFAILURE", ripple::TEFcodes::tefFAILURE)
+        .value("tefALREADY", ripple::TEFcodes::tefALREADY)
+        .value("tefBAD_ADD_AUTH", ripple::TEFcodes::tefBAD_ADD_AUTH)
+        .value("tefBAD_AUTH", ripple::TEFcodes::tefBAD_AUTH)
+        .value("tefBAD_LEDGER", ripple::TEFcodes::tefBAD_LEDGER)
+        .value("tefCREATED", ripple::TEFcodes::tefCREATED)
+        .value("tefEXCEPTION", ripple::TEFcodes::tefEXCEPTION)
+        .value("tefINTERNAL", ripple::TEFcodes::tefINTERNAL)
+        .value("tefNO_AUTH_REQUIRED", ripple::TEFcodes::tefNO_AUTH_REQUIRED)
+        .value("tefPAST_SEQ", ripple::TEFcodes::tefPAST_SEQ)
+        .value("tefWRONG_PRIOR", ripple::TEFcodes::tefWRONG_PRIOR)
+        .value("tefMASTER_DISABLED", ripple::TEFcodes::tefMASTER_DISABLED)
+        .value("tefMAX_LEDGER", ripple::TEFcodes::tefMAX_LEDGER)
+        .value("tefBAD_SIGNATURE", ripple::TEFcodes::tefBAD_SIGNATURE)
+        .value("tefBAD_QUORUM", ripple::TEFcodes::tefBAD_QUORUM)
+        .value("tefNOT_MULTI_SIGNING", ripple::TEFcodes::tefNOT_MULTI_SIGNING)
+        .value("tefBAD_AUTH_MASTER", ripple::TEFcodes::tefBAD_AUTH_MASTER)
+        .value("tefINVARIANT_FAILED", ripple::TEFcodes::tefINVARIANT_FAILED)
+        .value("tefTOO_BIG", ripple::TEFcodes::tefTOO_BIG)
+        .value("tefNO_TICKET", ripple::TEFcodes::tefNO_TICKET)
+        .value("tefNFTOKEN_IS_NOT_TRANSFERABLE", ripple::TEFcodes::tefNFTOKEN_IS_NOT_TRANSFERABLE)
+        .export_values();
+    
     py::class_<ripple::NotTEC> NotTEC(m, "NotTEC");
     NotTEC
         .def(py::init<ripple::TEScodes>())
         .def(py::init<ripple::TEMcodes>())
+        .def(py::init<ripple::TERcodes>())
+        .def(py::init<ripple::TEFcodes>())
         .def(py::self == py::self)
         .def(py::self != py::self);
 
     py::implicitly_convertible<ripple::TEScodes, ripple::NotTEC>();
     py::implicitly_convertible<ripple::TEMcodes, ripple::NotTEC>();
+    py::implicitly_convertible<ripple::TERcodes, ripple::NotTEC>();
+    py::implicitly_convertible<ripple::TEFcodes, ripple::NotTEC>();
 
     py::class_<ripple::TER> TER(m, "TER");
     TER
         .def(py::init<ripple::TEScodes>())
         .def(py::init<ripple::TEMcodes>())
+        .def(py::init<ripple::TERcodes>())
+        .def(py::init<ripple::TEFcodes>())
         .def(py::init<ripple::TECcodes>())
         .def(py::init<ripple::NotTEC>())
         .def(py::self == py::self)
@@ -218,6 +271,8 @@ PYBIND11_MODULE(plugin_transactor, m) {
 
     py::implicitly_convertible<ripple::TEScodes, ripple::TER>();
     py::implicitly_convertible<ripple::TEMcodes, ripple::TER>();
+    py::implicitly_convertible<ripple::TERcodes, ripple::TER>();
+    py::implicitly_convertible<ripple::TEFcodes, ripple::TER>();
     py::implicitly_convertible<ripple::TECcodes, ripple::TER>();
     py::implicitly_convertible<ripple::NotTEC, ripple::TER>();
     
