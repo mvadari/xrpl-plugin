@@ -4,13 +4,21 @@
 
 #include <ripple/app/tx/impl/Transactor.h>
 #include <ripple/protocol/st.h>
+#include <ripple/protocol/TxFlags.h>
+#include <ripple/protocol/Feature.h>
+#include <map>
+#include <string>
 
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 
+std::map <std::string, ripple::SF_ACCOUNT> accountSFields;
+accountSFields["sfAccount"] = ripple::sfAccount;
+
 namespace py = pybind11;
 
 PYBIND11_MODULE(plugin_transactor, m) {
+
     py::enum_<ripple::TxType>(m, "TxType")
         .value("ttPAYMENT", ripple::TxType::ttPAYMENT)
         .value("ttESCROW_CREATE", ripple::TxType::ttESCROW_CREATE)
@@ -68,8 +76,69 @@ PYBIND11_MODULE(plugin_transactor, m) {
         .value("tesSUCCESS", ripple::TEScodes::tesSUCCESS)
         .export_values();
     
+    py::enum_<ripple::TEMcodes>(m, "TEMcodes")
+        .value("temMALFORMED", ripple::TEMcodes::temMALFORMED)
+        .value("temBAD_AMOUNT", ripple::TEMcodes::temBAD_AMOUNT)
+        .value("temBAD_CURRENCY", ripple::TEMcodes::temBAD_CURRENCY)
+        .value("temBAD_EXPIRATION", ripple::TEMcodes::temBAD_EXPIRATION)
+        .value("temBAD_FEE", ripple::TEMcodes::temBAD_FEE)
+        .value("temBAD_ISSUER", ripple::TEMcodes::temBAD_ISSUER)
+        .value("temBAD_LIMIT", ripple::TEMcodes::temBAD_LIMIT)
+        .value("temBAD_OFFER", ripple::TEMcodes::temBAD_OFFER)
+        .value("temBAD_PATH", ripple::TEMcodes::temBAD_PATH)
+        .value("temBAD_PATH_LOOP", ripple::TEMcodes::temBAD_PATH_LOOP)
+        .value("temBAD_REGKEY", ripple::TEMcodes::temBAD_REGKEY)
+        .value("temBAD_SEND_XRP_LIMIT", ripple::TEMcodes::temBAD_SEND_XRP_LIMIT)
+        .value("temBAD_SEND_XRP_MAX", ripple::TEMcodes::temBAD_SEND_XRP_MAX)
+        .value("temBAD_SEND_XRP_NO_DIRECT", ripple::TEMcodes::temBAD_SEND_XRP_NO_DIRECT)
+        .value("temBAD_SEND_XRP_PARTIAL", ripple::TEMcodes::temBAD_SEND_XRP_PARTIAL)
+        .value("temBAD_SEND_XRP_PATHS", ripple::TEMcodes::temBAD_SEND_XRP_PATHS)
+        .value("temBAD_SEQUENCE", ripple::TEMcodes::temBAD_SEQUENCE)
+        .value("temBAD_SIGNATURE", ripple::TEMcodes::temBAD_SIGNATURE)
+        .value("temBAD_SRC_ACCOUNT", ripple::TEMcodes::temBAD_SRC_ACCOUNT)
+        .value("temBAD_TRANSFER_RATE", ripple::TEMcodes::temBAD_TRANSFER_RATE)
+        .value("temDST_IS_SRC", ripple::TEMcodes::temDST_IS_SRC)
+        .value("temDST_NEEDED", ripple::TEMcodes::temDST_NEEDED)
+        .value("temINVALID", ripple::TEMcodes::temINVALID)
+        .value("temINVALID_FLAG", ripple::TEMcodes::temINVALID_FLAG)
+        .value("temREDUNDANT", ripple::TEMcodes::temREDUNDANT)
+        .value("temRIPPLE_EMPTY", ripple::TEMcodes::temRIPPLE_EMPTY)
+        .value("temDISABLED", ripple::TEMcodes::temDISABLED)
+        .value("temBAD_SIGNER", ripple::TEMcodes::temBAD_SIGNER)
+        .value("temBAD_QUORUM", ripple::TEMcodes::temBAD_QUORUM)
+        .value("temBAD_WEIGHT", ripple::TEMcodes::temBAD_WEIGHT)
+        .value("temBAD_TICK_SIZE", ripple::TEMcodes::temBAD_TICK_SIZE)
+        .value("temINVALID_ACCOUNT_ID", ripple::TEMcodes::temINVALID_ACCOUNT_ID)
+        .value("temCANNOT_PREAUTH_SELF", ripple::TEMcodes::temCANNOT_PREAUTH_SELF)
+        .value("temINVALID_COUNT", ripple::TEMcodes::temINVALID_COUNT)
+        .value("temUNCERTAIN", ripple::TEMcodes::temUNCERTAIN)
+        .value("temUNKNOWN", ripple::TEMcodes::temUNKNOWN)
+        .value("temSEQ_AND_TICKET", ripple::TEMcodes::temSEQ_AND_TICKET)
+        .value("temBAD_NFTOKEN_TRANSFER_FEE", ripple::TEMcodes::temBAD_NFTOKEN_TRANSFER_FEE)
+        .export_values();
+    
     py::class_<ripple::NotTEC> NotTEC(m, "NotTEC");
+    NotTEC
+        .def(py::init<ripple::TEScodes>())
+        .def(py::init<ripple::TEMcodes>())
+        .def(py::self == py::self)
+        .def(py::self != py::self);
+
+    py::implicitly_convertible<ripple::TEScodes, ripple::NotTEC>();
+    py::implicitly_convertible<ripple::TEMcodes, ripple::NotTEC>();
+
     py::class_<ripple::TER> TER(m, "TER");
+    TER
+        .def(py::init<ripple::TEScodes>())
+        .def(py::init<ripple::TEMcodes>())
+        .def(py::init<ripple::NotTEC>())
+        .def(py::self == py::self)
+        .def(py::self != py::self);
+
+    py::implicitly_convertible<ripple::TEScodes, ripple::TER>();
+    py::implicitly_convertible<ripple::TEMcodes, ripple::TER>();
+    py::implicitly_convertible<ripple::NotTEC, ripple::TER>();
+    
 
     py::class_<ripple::SField> SField(m, "SField");
 
@@ -95,10 +164,22 @@ PYBIND11_MODULE(plugin_transactor, m) {
                 return obj[ripple::sfAccount];
             }
         )
+        .def("isFieldPresent", &ripple::STObject::isFieldPresent)
+        .def("getAccountID", &ripple::STObject::getAccountID)
         .def("setRegularKey",
             [](ripple::STObject &obj) {
                 auto const accountID = obj[ripple::sfAccount];
                 obj.setAccountID(ripple::sfRegularKey, accountID);
+            }
+        )
+        .def("at",
+            [](const ripple::STObject &obj, const std::string fieldName) {
+                if (auto it = accountSFields.find(fieldName); it != accountSFields.end())
+                {
+                    auto const sField = it->second;
+                    return obj[sField];
+                }
+                ripple::Throw<std::logic_error>("No SField " + fieldName + ".");
             }
         )
         .def("__repr__",
@@ -109,7 +190,8 @@ PYBIND11_MODULE(plugin_transactor, m) {
 
     py::class_<ripple::STTx, ripple::STObject, std::shared_ptr<ripple::STTx>> STTx(m, "STTx");
     STTx
-        .def("getTxnType", &ripple::STTx::getTxnType);
+        .def("getTxnType", &ripple::STTx::getTxnType)
+        .def("getFlags", &ripple::STTx::getFlags);
 
     py::class_<ripple::STLedgerEntry, ripple::STObject, std::shared_ptr<ripple::STLedgerEntry>> STLedgerEntry(m, "STLedgerEntry");
 
@@ -223,22 +305,21 @@ PYBIND11_MODULE(plugin_transactor, m) {
         .def("view", &ripple::ApplyContext::view, py::return_value_policy::reference);
     
     // py::register_exception<ripple::LogicError>(m, "LogicError");
-
-    // py::class_<ripple::Transactor> Transactor(m, "Transactor");
-    // Transactor
-    //     .def("preflight", &ripple::Transactor::preflight)
-    //     .def("preclaim", &ripple::Transactor::preclaim)
-    //     .def("calculateBaseFee", &ripple::Transactor::calculateBaseFee)
-    //     .def("doApply", &ripple::Transactor::doApply);
-    //     .def("call",
-    //         [](const ripple::Transactor &transactor) {
-    //             return transactor();
-    //         })
-
     
     m
         .def("accountKeylet", &ripple::keylet::account)
-        // .def("preflight1", &ripple::preflight1)
-        // .def("preflight2", &ripple::preflight2)
+        .def("preflight1", &ripple::preflight1)
+        .def("preflight2", &ripple::preflight2)
+        .def("isTesSuccess", &ripple::isTesSuccess)
         ;
+    
+
+    m.attr("tfFullyCanonicalSig") = ripple::tfFullyCanonicalSig;
+    m.attr("tfUniversal") = ripple::tfUniversal;
+    m.attr("tfUniversalMask") = ripple::tfUniversalMask;
+    // m.attr("sfRegularKey") = &ripple::sfRegularKey;
+    // m.attr("sfAccount") = &ripple::sfAccount;
+    // m.attr("fixMasterKeyAsRegularKey") = ripple::fixMasterKeyAsRegularKey;
+    // m.attr("lsfPasswordSpent") = ripple::lsfPasswordSpent;
+    // m.attr("lsfDisableMaster") = ripple::lsfDisableMaster;
 }
