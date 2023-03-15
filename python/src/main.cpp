@@ -276,6 +276,9 @@ PYBIND11_MODULE(plugin_transactor, m) {
     py::implicitly_convertible<ripple::TECcodes, ripple::TER>();
     py::implicitly_convertible<ripple::NotTEC, ripple::TER>();
     
+    /*
+    * Small classes
+    */
 
     py::class_<ripple::SField> SField(m, "SField");
 
@@ -295,6 +298,27 @@ PYBIND11_MODULE(plugin_transactor, m) {
                 return "<AccountID:'" + ripple::toBase58(a) + "'>";
             }
         );
+    
+    py::class_<ripple::XRPAmount> XRPAmount(m, "XRPAmount");
+    XRPAmount
+        .def(py::init<std::int64_t &>())
+        .def_property_readonly("drops",
+            [](const ripple::XRPAmount &xrpAmount) {
+                return xrpAmount.drops();
+            }
+        );
+    
+    py::class_<ripple::uint256> uint256(m, "uint256");
+    uint256
+        .def("__repr__",
+            [](const ripple::uint256 &uint256) {
+                return ripple::to_string(uint256);
+            }
+        );
+
+    /*
+    * STObjects
+    */
 
     py::class_<ripple::STObject, std::shared_ptr<ripple::STObject>> STObject(m, "STObject");
     STObject
@@ -353,6 +377,10 @@ PYBIND11_MODULE(plugin_transactor, m) {
         .def("getFlags", &ripple::STTx::getFlags);
 
     py::class_<ripple::STLedgerEntry, ripple::STObject, std::shared_ptr<ripple::STLedgerEntry>> STLedgerEntry(m, "STLedgerEntry");
+
+    /*
+    * Contexts and classes that the contexts depend on
+    */
 
     py::class_<ripple::Rules> Rules(m, "Rules");
     Rules
@@ -430,24 +458,6 @@ PYBIND11_MODULE(plugin_transactor, m) {
             }
         );
     
-    py::class_<ripple::XRPAmount> XRPAmount(m, "XRPAmount");
-    XRPAmount
-        .def(py::init<std::int64_t &>())
-        .def_property_readonly("drops",
-            [](const ripple::XRPAmount &xrpAmount) {
-                return xrpAmount.drops();
-            }
-        );
-    
-    py::class_<ripple::uint256> uint256(m, "uint256");
-    uint256
-        .def("__repr__",
-            [](const ripple::uint256 &uint256) {
-                return ripple::to_string(uint256);
-            }
-        );
-
-    
     py::class_<ripple::ApplyView> ApplyView(m, "ApplyView");
     ApplyView
         .def("peek", &ripple::ApplyView::peek)
@@ -473,6 +483,10 @@ PYBIND11_MODULE(plugin_transactor, m) {
     
     // py::register_exception<ripple::LogicError>(m, "LogicError");
     
+    /*
+    * Misc additional stuff
+    */
+
     m
         .def("accountKeylet", &ripple::keylet::account)
         .def("signersKeylet", &ripple::keylet::signers)
