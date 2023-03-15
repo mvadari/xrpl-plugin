@@ -1,4 +1,3 @@
-import plugin_transactor
 from plugin_transactor import (
     tesSUCCESS,
     temINVALID_FLAG,
@@ -13,13 +12,8 @@ from plugin_transactor import (
     tecNO_ALTERNATIVE_KEY,
 )
 
-print("IMPORTEDDDD")
-# print(dir(plugin_transactor))
-
 
 def preflight(ctx):
-    print("in preflight")
-    print(ctx.tx)
     preflight1ret = preflight1(ctx)
     if preflight1ret != tesSUCCESS:
         return preflight1ret
@@ -36,12 +30,9 @@ def preflight(ctx):
     return preflight2(ctx)
 
 def preclaim(ctx):
-    print("in preclaim")
-    print(ctx.tx)
     return tesSUCCESS
 
 def doApply(ctx):
-    print("in doApply")
     account = ctx.tx.getAccountID_sfAccount()
     sle = ctx.view().peek(accountKeylet(account))
     # skip weird fee stuff
