@@ -12,8 +12,8 @@
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 
-// std::map <std::string, ripple::SF_ACCOUNT> accountSFields;
-// accountSFields["sfAccount"] = ripple::sfAccount;
+std::map <std::string, ripple::SF_ACCOUNT> accountSFields;
+accountSFields["sfAccount"] = ripple::sfAccount;
 
 namespace py = pybind11;
 
@@ -353,15 +353,15 @@ PYBIND11_MODULE(plugin_transactor, m) {
                 return obj.makeFieldAbsent(ripple::sfRegularKey);
             }
         )
-        // .def("at",
-        //     [](const ripple::STObject &obj, const std::string fieldName) {
-        //         if (auto it = accountSFields.find(fieldName); it != accountSFields.end())
-        //         {
-        //             auto const sField = it->second;
-        //             return obj[sField];
-        //         }
-        //         ripple::Throw<std::logic_error>("No SField " + fieldName + ".");
-        //     }
+        .def("at",
+            [](const ripple::STObject &obj, const std::string fieldName) {
+                if (auto it = accountSFields.find(fieldName); it != accountSFields.end())
+                {
+                    auto const sField = it->second;
+                    return obj[sField];
+                }
+                ripple::Throw<std::logic_error>("No SField " + fieldName + ".");
+            }
         // )
         .def(py::self == py::self)
         .def(py::self != py::self)
