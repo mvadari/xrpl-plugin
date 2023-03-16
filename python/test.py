@@ -16,8 +16,7 @@ from plugin_transactor import (
 
 
 def preflight(ctx):
-    preflight1ret = preflight1(ctx)
-    if preflight1ret != tesSUCCESS:
+    if (preflight1ret := preflight1(ctx)) != tesSUCCESS:
         return preflight1ret
 
     if ctx.tx.getFlags() & tfUniversalMask:
@@ -31,8 +30,10 @@ def preflight(ctx):
 
     return preflight2(ctx)
 
+
 def preclaim(ctx):
     return tesSUCCESS
+
 
 def doApply(ctx):
     account = ctx.tx.getAccountID(sfAccount)
