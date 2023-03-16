@@ -12,8 +12,18 @@
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 
-// std::map <std::string, ripple::SF_ACCOUNT> accountSFields;
-// accountSFields["sfAccount"] = ripple::sfAccount;
+struct WSF {
+  void *f_;
+  operator ripple::SField const &() const {
+    return *static_cast<ripple::SField *>(f_);
+  };
+};
+
+// template <class T> struct TWSF : WSF {
+//   operator ripple::TypedField<T> const &() const {
+//     return *static_cast<ripple::TypedField<T> *>(f_);
+//   };
+// };
 
 namespace py = pybind11;
 
@@ -281,8 +291,9 @@ PYBIND11_MODULE(plugin_transactor, m) {
     */
 
     py::class_<ripple::SField> SField(m, "SField");
+    py::class_<WSF> PythonWSF(m, "WSF");
+    // py::class_<TWSF<ripple::TypedField<ripple::STAccount>>> TWSF_STAccount(m, "TWSF");
 
-    py::class_<ripple::STAccount> STAccount(m, "STAccount");
 
     py::class_<ripple::AccountID> AccountID(m, "AccountID");
     AccountID
@@ -320,6 +331,11 @@ PYBIND11_MODULE(plugin_transactor, m) {
     * STObjects
     */
 
+    py::class_<ripple::STBase> STBase(m, "STBase");
+    // py::class_<ripple::STInteger, ripple::STBase> STInteger(m, "STInteger");
+    py::class_<ripple::STAccount, ripple::STBase> STAccount(m, "STAccount");
+    py::class_<ripple::STBlob, ripple::STBase> STBlob(m, "STBlob");
+
     py::class_<ripple::STObject, std::shared_ptr<ripple::STObject>> STObject(m, "STObject");
     STObject
         .def("isFlag", &ripple::STObject::isFlag)
@@ -328,31 +344,36 @@ PYBIND11_MODULE(plugin_transactor, m) {
                 return obj[ripple::sfAccount];
             }
         )
-        .def("isFieldPresent_sfRegularKey",
-            [](const ripple::STObject &obj) {
-                return obj.isFieldPresent(ripple::sfRegularKey);
+        .def("getAccountID",
+            [](const ripple::STObject &obj, const WSF &wsf) {
+                return obj.getAccountID(static_cast<ripple::SField const&>(wsf));
             }
         )
-        .def("getAccountID_sfAccount",
-            [](const ripple::STObject &obj) {
-                return obj.getAccountID(ripple::sfAccount);
+        .def("isFieldPresent",
+            [](const ripple::STObject &obj, const WSF &wsf) {
+                return obj.isFieldPresent(static_cast<ripple::SField const&>(wsf));
             }
         )
-        .def("getAccountID_sfRegularKey",
-            [](const ripple::STObject &obj) {
-                return obj.getAccountID(ripple::sfRegularKey);
+        .def("setAccountID",
+            [](
+                ripple::STObject &obj,
+                const WSF &wsf,
+                const ripple::AccountID accountID
+            ) {
+                return obj.setAccountID(static_cast<ripple::SField const&>(wsf), accountID);
             }
         )
-        .def("setAccountID_sfRegularKey",
-            [](ripple::STObject &obj, const ripple::AccountID accountID) {
-                return obj.setAccountID(ripple::sfRegularKey, accountID);
+        .def("makeFieldAbsent",
+            [](ripple::STObject &obj, const WSF &wsf) {
+                return obj.makeFieldAbsent(static_cast<ripple::SField const&>(wsf));
             }
         )
-        .def("makeFieldAbsent_sfRegularKey",
-            [](ripple::STObject &obj) {
-                return obj.makeFieldAbsent(ripple::sfRegularKey);
-            }
-        )
+        // .def("at",
+        //     [](const ripple::STObject &obj, const WSF<T> &wsf) {
+        //         return obj[static_cast<ripple::TypedField<T> const&>(wsf)];
+        //     }
+        // )
+        
         // .def("at",
         //     [](const ripple::STObject &obj, const std::string fieldName) {
         //         if (auto it = accountSFields.find(fieldName); it != accountSFields.end())
@@ -499,7 +520,11 @@ PYBIND11_MODULE(plugin_transactor, m) {
     m.attr("tfFullyCanonicalSig") = ripple::tfFullyCanonicalSig;
     m.attr("tfUniversal") = ripple::tfUniversal;
     m.attr("tfUniversalMask") = ripple::tfUniversalMask;
-    // m.attr("sfRegularKey") = &ripple::sfRegularKey;
-    // m.attr("sfAccount") = &ripple::sfAccount;
+    m.attr("sfRegularKey") = WSF{(void *)&ripple::sfRegularKey};
+    m.attr("sfAccount") = WSF{(void *)&ripple::sfAccount};
+    // m.attr("sfRegularKey") = TWSF<std::decay_t<decltype(ripple::sfRegularKey)>>{
+    //   (void *)&ripple::sfRegularKey};
+    // m.attr("sfAccount") = TWSF<std::decay_t<decltype(ripple::sfAccount)>>{
+    //   (void *)&ripple::sfAccount};
     m.attr("fixMasterKeyAsRegularKey") = ripple::fixMasterKeyAsRegularKey;
 }

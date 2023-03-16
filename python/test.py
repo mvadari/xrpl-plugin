@@ -10,6 +10,8 @@ from plugin_transactor import (
     signersKeylet,
     lsfDisableMaster,
     tecNO_ALTERNATIVE_KEY,
+    sfRegularKey,
+    sfAccount,
 )
 
 
@@ -23,8 +25,8 @@ def preflight(ctx):
         return temINVALID_FLAG
 
     if ctx.rules.enabled(fixMasterKeyAsRegularKey) and \
-        ctx.tx.isFieldPresent_sfRegularKey() and \
-            ctx.tx.getAccountID_sfRegularKey() == ctx.tx.getAccountID_sfAccount():
+        ctx.tx.isFieldPresent(sfRegularKey) and \
+            ctx.tx.getAccountID(sfRegularKey) == ctx.tx.getAccountID(sfAccount):
         return temBAD_REGKEY
 
     return preflight2(ctx)
@@ -33,15 +35,15 @@ def preclaim(ctx):
     return tesSUCCESS
 
 def doApply(ctx):
-    account = ctx.tx.getAccountID_sfAccount()
+    account = ctx.tx.getAccountID(sfAccount)
     sle = ctx.view().peek(accountKeylet(account))
     # skip weird fee stuff
-    if ctx.tx.isFieldPresent_sfRegularKey():
-        sle.setAccountID_sfRegularKey(ctx.tx.getAccountID_sfRegularKey())
+    if ctx.tx.isFieldPresent(sfRegularKey):
+        sle.setAccountID(sfRegularKey, ctx.tx.getAccountID(sfRegularKey))
     else:
         # Account has disabled master key and no multi-signer signer list.
         if sle.isFlag(lsfDisableMaster) and not ctx.view().peek(signersKeylet(account)):
             return tecNO_ALTERNATIVE_KEY
 
-        sle.makeFieldAbsent_sfRegularKey()
+        sle.makeFieldAbsent(sfRegularKey)
     return tesSUCCESS
