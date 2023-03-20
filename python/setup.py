@@ -118,7 +118,7 @@ class CMakeBuild(build_ext):
 
         print(ext.sourcedir, cmake_args)
         subprocess.run(["conan", "install", ext.sourcedir, "--output-folder", str(build_temp), "--build", "missing", "--settings", "build_type=Release"], check=True)
-        cmake_args += [f"-DCMAKE_TOOLCHAIN_FILE:FILEPATH={build_temp}/build/generators/conan_toolchain.cmake"]
+        cmake_args += [f"-DCMAKE_TOOLCHAIN_FILE:FILEPATH={build_temp}/build/generators/conan_toolchain.cmake", "-Dstatic=OFF"]
         subprocess.run(
             ["cmake", ext.sourcedir] + cmake_args, cwd=build_temp, check=True
         )

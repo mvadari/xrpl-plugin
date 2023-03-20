@@ -19,11 +19,11 @@ struct WSF {
   };
 };
 
-// template <class T> struct TWSF : WSF {
-//   operator ripple::TypedField<T> const &() const {
-//     return *static_cast<ripple::TypedField<T> *>(f_);
-//   };
-// };
+template <class T> struct TWSF : WSF {
+  operator ripple::TypedField<T> const &() const {
+    return *static_cast<ripple::TypedField<T> *>(f_);
+  };
+};
 
 namespace py = pybind11;
 
@@ -292,7 +292,7 @@ PYBIND11_MODULE(plugin_transactor, m) {
 
     py::class_<ripple::SField> SField(m, "SField");
     py::class_<WSF> PythonWSF(m, "WSF");
-    // py::class_<TWSF<ripple::TypedField<ripple::STAccount>>> TWSF_STAccount(m, "TWSF");
+    py::class_<TWSF<ripple::TypedField<ripple::STAccount>>> TWSF_STAccount(m, "TWSF");
 
 
     py::class_<ripple::AccountID> AccountID(m, "AccountID");
@@ -368,11 +368,11 @@ PYBIND11_MODULE(plugin_transactor, m) {
                 return obj.makeFieldAbsent(static_cast<ripple::SField const&>(wsf));
             }
         )
-        // .def("at",
-        //     [](const ripple::STObject &obj, const WSF<T> &wsf) {
-        //         return obj[static_cast<ripple::TypedField<T> const&>(wsf)];
-        //     }
-        // )
+        .def("at",
+            [](const ripple::STObject &obj, const TWSF<ripple::STAccount> &wsf) {
+                return obj[static_cast<ripple::TypedField<ripple::STAccount> const&>(wsf)];
+            }
+        )
         
         // .def("at",
         //     [](const ripple::STObject &obj, const std::string fieldName) {
@@ -520,11 +520,11 @@ PYBIND11_MODULE(plugin_transactor, m) {
     m.attr("tfFullyCanonicalSig") = ripple::tfFullyCanonicalSig;
     m.attr("tfUniversal") = ripple::tfUniversal;
     m.attr("tfUniversalMask") = ripple::tfUniversalMask;
-    m.attr("sfRegularKey") = WSF{(void *)&ripple::sfRegularKey};
-    m.attr("sfAccount") = WSF{(void *)&ripple::sfAccount};
-    // m.attr("sfRegularKey") = TWSF<std::decay_t<decltype(ripple::sfRegularKey)>>{
-    //   (void *)&ripple::sfRegularKey};
-    // m.attr("sfAccount") = TWSF<std::decay_t<decltype(ripple::sfAccount)>>{
-    //   (void *)&ripple::sfAccount};
+    // m.attr("sfRegularKey") = WSF{(void *)&ripple::sfRegularKey};
+    // m.attr("sfAccount") = WSF{(void *)&ripple::sfAccount};
+    m.attr("sfRegularKey") = TWSF<std::decay_t<decltype(ripple::sfRegularKey)>>{
+      (void *)&ripple::sfRegularKey};
+    m.attr("sfAccount") = TWSF<std::decay_t<decltype(ripple::sfAccount)>>{
+      (void *)&ripple::sfAccount};
     m.attr("fixMasterKeyAsRegularKey") = ripple::fixMasterKeyAsRegularKey;
 }
