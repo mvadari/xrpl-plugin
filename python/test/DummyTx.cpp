@@ -18,44 +18,32 @@ namespace ripple {
 NotTEC
 DummyTx::preflight(PreflightContext const& ctx)
 {
-    if (auto const ret = preflight1(ctx); !isTesSuccess(ret))
-        return ret;  // LCOV_EXCL_LINE
-
-    if (ctx.tx.getFlags() & tfUniversalMask)
-        return temINVALID_FLAG;
     
     py::scoped_interpreter guard{}; // start the interpreter and keep it alive
-
-    py::print("Hello, World!"); // use the Python API
-    py::object pythonPlugin = py::module_::import("dummy_tx");
-    py::print(pythonPlugin);
-    py::object preflight = pythonPlugin.attr("preflight");
-    py::print(preflight);
-    py::print(ctx);
-    preflight(ctx);
-
-    return preflight2(ctx);
+    py::object preflight = py::module_::import("dummy_tx").attr("preflight");
+    py::object preflightReturn = preflight(py::cast(ctx, py::return_value_policy::reference));
+    try {
+        return NotTEC::fromInt(preflightReturn.cast<int>());
+    } catch (const py::cast_error &) { // TODO: figure out the exact error that is thrown
+        return preflightReturn.cast<NotTEC>();
+    }
 }
 
 TER
 DummyTx::preclaim(PreclaimContext const& ctx)
 {
-    return tesSUCCESS;
+    py::scoped_interpreter guard{}; // start the interpreter and keep it alive
+    py::object preclaim = py::module_::import("dummy_tx").attr("preclaim");
+    py::object preclaimReturn = preclaim(py::cast(ctx, py::return_value_policy::reference));
+    return TER::fromInt(preclaimReturn.cast<int>());
 }
 
 TER
 DummyTx::doApply()
 {
     py::scoped_interpreter guard{}; // start the interpreter and keep it alive
-    py::print("Hello, World!"); // use the Python API
-    py::object pythonPlugin = py::module_::import("dummy_tx");
-    py::print(ctx_.tx);
-    py::print(py::cast(ctx_, py::return_value_policy::reference));
-    py::print(pythonPlugin);
-    py::object pythonDoApply = pythonPlugin.attr("doApply");
-    py::print(pythonDoApply);
-    pythonDoApply(py::cast(ctx_, py::return_value_policy::reference));
-
-    return tesSUCCESS;
+    py::object doApplyFn = py::module_::import("dummy_tx").attr("doApply");
+    py::object doApplyReturn = doApplyFn(py::cast(ctx_, py::return_value_policy::reference));
+    return TER::fromInt(doApplyReturn.cast<int>());
 }
 }

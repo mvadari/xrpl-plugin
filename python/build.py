@@ -1,3 +1,4 @@
+import os
 import sys
 import importlib
 
@@ -73,59 +74,50 @@ namespace ripple {{
 NotTEC
 {tx_name}::preflight(PreflightContext const& ctx)
 {{
-    if (auto const ret = preflight1(ctx); !isTesSuccess(ret))
-        return ret;  // LCOV_EXCL_LINE
-
-    if (ctx.tx.getFlags() & tfUniversalMask)
-        return temINVALID_FLAG;
     
     py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
-
-    py::print("Hello, World!"); // use the Python API
-    py::object pythonPlugin = py::module_::import("{module_name}");
-    py::print(pythonPlugin);
-    py::object preflight = pythonPlugin.attr("preflight");
-    py::print(preflight);
-    py::print(ctx);
-    preflight(ctx);
-
-    return preflight2(ctx);
+    py::object preflight = py::module_::import("{module_name}").attr("preflight");
+    py::object preflightReturn = preflight(py::cast(ctx, py::return_value_policy::reference));
+    try {{
+        return NotTEC::fromInt(preflightReturn.cast<int>());
+    }} catch (const py::cast_error &) {{ // TODO: figure out the exact error that is thrown
+        return preflightReturn.cast<NotTEC>();
+    }}
 }}
 
 TER
 {tx_name}::preclaim(PreclaimContext const& ctx)
 {{
-    return tesSUCCESS;
+    py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+    py::object preclaim = py::module_::import("{module_name}").attr("preclaim");
+    py::object preclaimReturn = preclaim(py::cast(ctx, py::return_value_policy::reference));
+    return TER::fromInt(preclaimReturn.cast<int>());
 }}
 
 TER
 {tx_name}::doApply()
 {{
     py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
-    py::print("Hello, World!"); // use the Python API
-    py::object pythonPlugin = py::module_::import("{module_name}");
-    py::print(ctx_.tx);
-    py::print(py::cast(ctx_, py::return_value_policy::reference));
-    py::print(pythonPlugin);
-    py::object pythonDoApply = pythonPlugin.attr("doApply");
-    py::print(pythonDoApply);
-    pythonDoApply(py::cast(ctx_, py::return_value_policy::reference));
-
-    return tesSUCCESS;
+    py::object doApplyFn = py::module_::import("{module_name}").attr("doApply");
+    py::object doApplyReturn = doApplyFn(py::cast(ctx_, py::return_value_policy::reference));
+    return TER::fromInt(doApplyReturn.cast<int>());
 }}
 }}"""
 
 
 def create_files(python_file):
-    sys.path.append(python_file)
-    last_slash = python_file.rfind("/")
-    module_name = python_file[(last_slash+1):-3]
+    abs_python_file = os.path.abspath(python_file)
+    sys.path.append(os.path.dirname(abs_python_file))
+    last_slash = abs_python_file.rfind("/")
+    module_name = abs_python_file[(last_slash+1):-3]
     module = importlib.import_module(module_name)
     tx_name = module.tx_name
-    print(tx_name)
+    # TODO: add logic to check validity of Python transactors
+    # TODO: switch to Jinja
+    # TODO: add logic to only generate the methods that exist in Python
     with open(f"{tx_name}.h", "w") as f:
         f.write(generate_header(tx_name))
-    
+
     with open(f"{tx_name}.cpp", "w") as f:
         f.write(generate_cpp(tx_name, module_name))
 
