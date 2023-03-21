@@ -1,6 +1,7 @@
 import os
 import sys
 import importlib
+# import tempfile
 
 def generate_header(tx_name):
     return f"""//------------------------------------------------------------------------------
@@ -115,11 +116,19 @@ def create_files(python_file):
     # TODO: add logic to check validity of Python transactors
     # TODO: switch to Jinja
     # TODO: add logic to only generate the methods that exist in Python
+
+    # temp_dir = tempfile.TemporaryDirectory()
+
     with open(f"{tx_name}.h", "w") as f:
         f.write(generate_header(tx_name))
 
     with open(f"{tx_name}.cpp", "w") as f:
         f.write(generate_cpp(tx_name, module_name))
+    
+    return os.path.abspath(f"{tx_name}.cpp", module_name)
+
+def build_files(cpp_file, project_name):
+    pass
 
 
 if __name__ == "__main__":
