@@ -142,13 +142,11 @@ def build_files(cpp_file, project_name):
             "conan",
             "install",
             build_source_dir,
-            "--output-folder",
-            str(build_temp),
             "--build",
             "missing",
             "--settings",
             "build_type=Debug"
-        ], check=True, stdout=subprocess.DEVNULL)
+        ], check=True, cwd=build_temp, stdout=subprocess.DEVNULL)
         conan_cmake_file = os.path.join(build_temp, "build/generators/conan_toolchain.cmake")
         cmake_args += [
             f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={os.getcwd()}{os.sep}",
