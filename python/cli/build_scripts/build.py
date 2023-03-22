@@ -1,7 +1,9 @@
 import os
 import sys
 import importlib
-# import tempfile
+import subprocess
+import tempfile
+
 
 def generate_header(tx_name):
     return f"""//------------------------------------------------------------------------------
@@ -121,7 +123,6 @@ def create_files(python_file):
     # TODO: switch to Jinja
     # TODO: add logic to only generate the methods that exist in Python
 
-    # temp_dir = tempfile.TemporaryDirectory()
 
     with open(f"{tx_name}.h", "w") as f:
         f.write(generate_header(tx_name))
@@ -131,9 +132,40 @@ def create_files(python_file):
     
     return os.path.abspath(f"{tx_name}.cpp"), module_name
 
+
 def build_files(cpp_file, project_name):
-    pass
+    with tempfile.TemporaryDirectory() as build_temp:
+        build_source_dir = os.path.dirname(__file__)
+        cmake_args = []
+        build_args = []
+        subprocess.run([
+            "conan",
+            "install",
+            build_source_dir,
+            "--output-folder",
+            str(build_temp),
+            "--build",
+            "missing",
+            "--settings",
+            "build_type=Debug"
+        ], check=True, stdout=subprocess.DEVNULL)
+        conan_cmake_file = os.path.join(build_temp, "build/generators/conan_toolchain.cmake")
+        cmake_args += [
+            f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={os.getcwd()}{os.sep}",
+            f"-DPROJECT_NAME={project_name}",
+            f"-DSOURCE_FILE={cpp_file}",
+            f"-DCMAKE_TOOLCHAIN_FILE:FILEPATH={conan_cmake_file}",
+            "-DCMAKE_BUILD_TYPE=Debug",
+            "-DBUILD_SHARED_LIBS=ON",
+        ]
+        subprocess.run(
+            ["cmake", build_source_dir] + cmake_args, cwd=build_temp, check=True, stdout=subprocess.DEVNULL
+        )
+        subprocess.run(
+            ["cmake", "--build", "."] + build_args, cwd=build_temp, check=True, stdout=subprocess.DEVNULL
+        )
 
 
 if __name__ == "__main__":
-    create_files(sys.argv[1])
+    cpp_file_fullpath, module_name = create_files(sys.argv[1])
+    build_files(cpp_file_fullpath, module_name)
