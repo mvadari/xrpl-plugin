@@ -39,7 +39,7 @@ class CMakeBuild(build_ext):
 
         # CMake lets you override the generator - we need to check this.
         # Can be set with Conda-Build, for example.
-        cmake_generator = os.environ.get("CMAKE_GENERATOR", "")
+        # cmake_generator = os.environ.get("CMAKE_GENERATOR", "")
 
         # Set Python_EXECUTABLE instead if you use PYBIND11_FINDPYTHON
         # EXAMPLE_VERSION_INFO shows you how to pass a value into the C++ code
@@ -117,7 +117,7 @@ class CMakeBuild(build_ext):
             build_temp.mkdir(parents=True)
 
         print(ext.sourcedir, cmake_args)
-        subprocess.run(["conan", "install", ext.sourcedir, "--output-folder", str(build_temp), "--build", "missing", "--settings", "build_type=Release"], check=True)
+        subprocess.run(["conan", "install", ext.sourcedir, "--build", "missing", "--settings", f"build_type={cfg}"], cwd=build_temp, check=True)
         cmake_args += [f"-DCMAKE_TOOLCHAIN_FILE:FILEPATH={build_temp}/build/generators/conan_toolchain.cmake"]
         subprocess.run(
             ["cmake", ext.sourcedir] + cmake_args, cwd=build_temp, check=True

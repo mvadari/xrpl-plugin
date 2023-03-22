@@ -14,6 +14,8 @@ from plugin_transactor import (
     sfAccount,
 )
 
+tx_name = "DummyTx"
+
 
 def preflight(ctx):
     if (preflight1ret := preflight1(ctx)) != tesSUCCESS:
@@ -30,10 +32,8 @@ def preflight(ctx):
 
     return preflight2(ctx)
 
-
 def preclaim(ctx):
     return tesSUCCESS
-
 
 def doApply(ctx):
     account = ctx.tx.getAccountID(sfAccount)
