@@ -54,7 +54,7 @@ public:
 #endif"""
 
 
-def generate_cpp(tx_name, module_name): 
+def generate_cpp(tx_name, module_name, python_folder): 
     return f"""#include <ripple/app/tx/impl/{tx_name}.h>
 #include <ripple/app/tx/impl/Transactor.h>
 #include <ripple/basics/Log.h>
@@ -77,6 +77,7 @@ NotTEC
 {{
     
     py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+    py::module_::import("sys").attr("path").attr("append")("{python_folder}");
     py::object preflight = py::module_::import("{module_name}").attr("preflight");
     py::object preflightReturn = preflight(py::cast(ctx, py::return_value_policy::reference));
     try {{
@@ -90,6 +91,7 @@ TER
 {tx_name}::preclaim(PreclaimContext const& ctx)
 {{
     py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+    py::module_::import("sys").attr("path").attr("append")("{python_folder}");
     py::object preclaim = py::module_::import("{module_name}").attr("preclaim");
     py::object preclaimReturn = preclaim(py::cast(ctx, py::return_value_policy::reference));
     return TER::fromInt(preclaimReturn.cast<int>());
@@ -99,6 +101,7 @@ TER
 {tx_name}::doApply()
 {{
     py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+    py::module_::import("sys").attr("path").attr("append")("{python_folder}");
     py::object doApplyFn = py::module_::import("{module_name}").attr("doApply");
     py::object doApplyReturn = doApplyFn(py::cast(ctx_, py::return_value_policy::reference));
     return TER::fromInt(doApplyReturn.cast<int>());
@@ -108,7 +111,8 @@ TER
 
 def create_files(python_file):
     abs_python_file = os.path.abspath(python_file)
-    sys.path.append(os.path.dirname(abs_python_file))
+    python_folder = os.path.dirname(abs_python_file)
+    sys.path.append(python_folder)
     last_slash = abs_python_file.rfind("/")
     module_name = abs_python_file[(last_slash+1):-3]
     module = importlib.import_module(module_name)
@@ -123,9 +127,9 @@ def create_files(python_file):
         f.write(generate_header(tx_name))
 
     with open(f"{tx_name}.cpp", "w") as f:
-        f.write(generate_cpp(tx_name, module_name))
+        f.write(generate_cpp(tx_name, module_name, python_folder))
     
-    return os.path.abspath(f"{tx_name}.cpp", module_name)
+    return os.path.abspath(f"{tx_name}.cpp"), module_name
 
 def build_files(cpp_file, project_name):
     pass
