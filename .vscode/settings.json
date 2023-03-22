@@ -100,12 +100,14 @@
         "csetjmp": "cpp",
         "regex": "cpp",
         "shared_mutex": "cpp",
-        "valarray": "cpp"
+        "valarray": "cpp",
+        "rope": "cpp"
     },
     "cSpell.words": [
         "keylet",
         "NFTOKEN",
         "Optionaled",
-        "PAYCHAN"
+        "PAYCHAN",
+        "Preclaim"
     ]
 }
