@@ -108,6 +108,35 @@ TER
     py::object doApplyReturn = doApplyFn(py::cast(ctx_, py::return_value_policy::reference));
     return TER::fromInt(doApplyReturn.cast<int>());
 }}
+}}
+
+extern "C"
+ripple::NotTEC
+preflight(ripple::PreflightContext const& ctx)
+{{
+    return ripple::{tx_name}::preflight(ctx);
+}}
+
+extern "C"
+ripple::TER
+preclaim(ripple::PreclaimContext const& ctx)
+{{
+    return ripple::{tx_name}::preclaim(ctx);
+}}
+
+extern "C"
+ripple::XRPAmount
+calculateBaseFee(ripple::ReadView const& view, ripple::STTx const& tx)
+{{
+    return ripple::{tx_name}::calculateBaseFee(view, tx);
+}}
+
+extern "C"
+std::pair<ripple::TER, bool>
+apply(ripple::ApplyContext& ctx)
+{{
+    ripple::{tx_name} p(ctx);
+    return p();
 }}"""
 
 
@@ -135,6 +164,7 @@ def create_files(python_file):
 
 def build_files(cpp_file, project_name):
     with tempfile.TemporaryDirectory() as build_temp:
+        build_temp = "./build"
         build_source_dir = os.path.dirname(__file__)
         cmake_args = []
         build_args = []
@@ -147,7 +177,7 @@ def build_files(cpp_file, project_name):
             "--settings",
             "build_type=Debug"
         ], check=True, cwd=build_temp, stdout=subprocess.DEVNULL)
-        conan_cmake_file = os.path.join(build_temp, "build/generators/conan_toolchain.cmake")
+        conan_cmake_file = os.path.join(build_temp, "generators/conan_toolchain.cmake")
         cmake_args += [
             f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={os.getcwd()}{os.sep}",
             f"-DPROJECT_NAME={project_name}",
