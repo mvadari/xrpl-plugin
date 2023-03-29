@@ -28,7 +28,7 @@
 namespace ripple {
 
 NotTEC
-SetTrust::preflight(PreflightContext const& ctx)
+preflight(PreflightContext const& ctx)
 {
     if (auto const ret = preflight1(ctx); !isTesSuccess(ret))
         return ret;
@@ -81,7 +81,7 @@ SetTrust::preflight(PreflightContext const& ctx)
 }
 
 TER
-SetTrust::preclaim(PreclaimContext const& ctx)
+preclaim(PreclaimContext const& ctx)
 {
     auto const id = ctx.tx[sfAccount];
 
@@ -146,21 +146,22 @@ SetTrust::preclaim(PreclaimContext const& ctx)
 }
 
 TER
-SetTrust::doApply()
+doApply(ApplyContext& ctx, XRPAmount mPriorBalance, XRPAmount mSourceBalance)
 {
     TER terResult = tesSUCCESS;
+    auto const account = ctx.tx.getAccountID(sfAccount);
 
-    STAmount const saLimitAmount(ctx_.tx.getFieldAmount(sfLimitAmount));
-    bool const bQualityIn(ctx_.tx.isFieldPresent(sfQualityIn));
-    bool const bQualityOut(ctx_.tx.isFieldPresent(sfQualityOut));
+    STAmount const saLimitAmount(ctx.tx.getFieldAmount(sfLimitAmount));
+    bool const bQualityIn(ctx.tx.isFieldPresent(sfQualityIn));
+    bool const bQualityOut(ctx.tx.isFieldPresent(sfQualityOut));
 
     Currency const currency(saLimitAmount.getCurrency());
     AccountID uDstAccountID(saLimitAmount.getIssuer());
 
     // true, iff current is high account.
-    bool const bHigh = account_ > uDstAccountID;
+    bool const bHigh = account > uDstAccountID;
 
-    auto const sle = view().peek(keylet::account(account_));
+    auto const sle = ctx.view().peek(keylet::account(account));
     if (!sle)
         return tefINTERNAL;
 
@@ -186,16 +187,16 @@ SetTrust::doApply()
 
     XRPAmount const reserveCreate(
         (uOwnerCount < 2) ? XRPAmount(beast::zero)
-                          : view().fees().accountReserve(uOwnerCount + 1));
+                          : ctx.view().fees().accountReserve(uOwnerCount + 1));
 
-    std::uint32_t uQualityIn(bQualityIn ? ctx_.tx.getFieldU32(sfQualityIn) : 0);
+    std::uint32_t uQualityIn(bQualityIn ? ctx.tx.getFieldU32(sfQualityIn) : 0);
     std::uint32_t uQualityOut(
-        bQualityOut ? ctx_.tx.getFieldU32(sfQualityOut) : 0);
+        bQualityOut ? ctx.tx.getFieldU32(sfQualityOut) : 0);
 
     if (bQualityOut && QUALITY_ONE == uQualityOut)
         uQualityOut = 0;
 
-    std::uint32_t const uTxFlags = ctx_.tx.getFlags();
+    std::uint32_t const uTxFlags = ctx.tx.getFlags();
 
     bool const bSetAuth = (uTxFlags & tfSetfAuth);
     bool const bSetNoRipple = (uTxFlags & tfSetNoRipple);
@@ -203,37 +204,37 @@ SetTrust::doApply()
     bool const bSetFreeze = (uTxFlags & tfSetFreeze);
     bool const bClearFreeze = (uTxFlags & tfClearFreeze);
 
-    auto viewJ = ctx_.app.journal("View");
+    auto viewJ = ctx.app.journal("View");
 
     // Trust lines to self are impossible but because of the old bug there are
     // two on 19-02-2022. This code was here to allow those trust lines to be
     // deleted. The fixTrustLinesToSelf fix amendment will remove them when it
     // enables so this code will no longer be needed.
-    if (!view().rules().enabled(fixTrustLinesToSelf) &&
-        account_ == uDstAccountID)
+    if (!ctx.view().rules().enabled(fixTrustLinesToSelf) &&
+        account == uDstAccountID)
     {
         return trustDelete(
-            view(),
-            view().peek(keylet::line(account_, uDstAccountID, currency)),
-            account_,
+            ctx.view(),
+            ctx.view().peek(keylet::line(account, uDstAccountID, currency)),
+            account,
             uDstAccountID,
             viewJ);
     }
 
-    SLE::pointer sleDst = view().peek(keylet::account(uDstAccountID));
+    SLE::pointer sleDst = ctx.view().peek(keylet::account(uDstAccountID));
 
     if (!sleDst)
     {
-        JLOG(j_.trace())
+        JLOG(ctx.journal.trace())
             << "Delay transaction: Destination account does not exist.";
         return tecNO_DST;
     }
 
     STAmount saLimitAllow = saLimitAmount;
-    saLimitAllow.setIssuer(account_);
+    saLimitAllow.setIssuer(account);
 
     SLE::pointer sleRippleState =
-        view().peek(keylet::line(account_, uDstAccountID, currency));
+        ctx.view().peek(keylet::line(account, uDstAccountID, currency));
 
     if (sleRippleState)
     {
@@ -245,8 +246,8 @@ SetTrust::doApply()
         std::uint32_t uLowQualityOut;
         std::uint32_t uHighQualityIn;
         std::uint32_t uHighQualityOut;
-        auto const& uLowAccountID = !bHigh ? account_ : uDstAccountID;
-        auto const& uHighAccountID = bHigh ? account_ : uDstAccountID;
+        auto const& uLowAccountID = !bHigh ? account : uDstAccountID;
+        auto const& uHighAccountID = bHigh ? account : uDstAccountID;
         SLE::ref sleLowAccount = !bHigh ? sle : sleDst;
         SLE::ref sleHighAccount = bHigh ? sle : sleDst;
 
@@ -359,7 +360,7 @@ SetTrust::doApply()
             if ((bHigh ? saHighBalance : saLowBalance) >= beast::zero)
                 uFlagsOut |= (bHigh ? lsfHighNoRipple : lsfLowNoRipple);
 
-            else if (view().rules().enabled(fix1578))
+            else if (ctx.view().rules().enabled(fix1578))
                 // Cannot set noRipple on a negative balance.
                 return tecNO_PERMISSION;
         }
@@ -414,7 +415,7 @@ SetTrust::doApply()
         if (bLowReserveSet && !bLowReserved)
         {
             // Set reserve for low account.
-            adjustOwnerCount(view(), sleLowAccount, 1, viewJ);
+            adjustOwnerCount(ctx.view(), sleLowAccount, 1, viewJ);
             uFlagsOut |= lsfLowReserve;
 
             if (!bHigh)
@@ -424,14 +425,14 @@ SetTrust::doApply()
         if (bLowReserveClear && bLowReserved)
         {
             // Clear reserve for low account.
-            adjustOwnerCount(view(), sleLowAccount, -1, viewJ);
+            adjustOwnerCount(ctx.view(), sleLowAccount, -1, viewJ);
             uFlagsOut &= ~lsfLowReserve;
         }
 
         if (bHighReserveSet && !bHighReserved)
         {
             // Set reserve for high account.
-            adjustOwnerCount(view(), sleHighAccount, 1, viewJ);
+            adjustOwnerCount(ctx.view(), sleHighAccount, 1, viewJ);
             uFlagsOut |= lsfHighReserve;
 
             if (bHigh)
@@ -441,7 +442,7 @@ SetTrust::doApply()
         if (bHighReserveClear && bHighReserved)
         {
             // Clear reserve for high account.
-            adjustOwnerCount(view(), sleHighAccount, -1, viewJ);
+            adjustOwnerCount(ctx.view(), sleHighAccount, -1, viewJ);
             uFlagsOut &= ~lsfHighReserve;
         }
 
@@ -453,12 +454,12 @@ SetTrust::doApply()
             // Delete.
 
             terResult = trustDelete(
-                view(), sleRippleState, uLowAccountID, uHighAccountID, viewJ);
+                ctx.view(), sleRippleState, uLowAccountID, uHighAccountID, viewJ);
         }
         // Reserve is not scaled by load.
         else if (bReserveIncrease && mPriorBalance < reserveCreate)
         {
-            JLOG(j_.trace())
+            JLOG(ctx.journal.trace())
                 << "Delay transaction: Insufficent reserve to add trust line.";
 
             // Another transaction could provide XRP to the account and then
@@ -467,9 +468,9 @@ SetTrust::doApply()
         }
         else
         {
-            view().update(sleRippleState);
+            ctx.view().update(sleRippleState);
 
-            JLOG(j_.trace()) << "Modify ripple line";
+            JLOG(ctx.journal.trace()) << "Modify ripple line";
         }
     }
     // Line does not exist.
@@ -481,13 +482,13 @@ SetTrust::doApply()
                                            // default quality out.
         (!bSetAuth))
     {
-        JLOG(j_.trace())
+        JLOG(ctx.journal.trace())
             << "Redundant: Setting non-existent ripple line to defaults.";
         return tecNO_LINE_REDUNDANT;
     }
     else if (mPriorBalance < reserveCreate)  // Reserve is not scaled by load.
     {
-        JLOG(j_.trace()) << "Delay transaction: Line does not exist. "
+        JLOG(ctx.journal.trace()) << "Delay transaction: Line does not exist. "
                             "Insufficent reserve to create line.";
 
         // Another transaction could create the account and then this
@@ -499,16 +500,16 @@ SetTrust::doApply()
         // Zero balance in currency.
         STAmount saBalance({currency, noAccount()});
 
-        auto const k = keylet::line(account_, uDstAccountID, currency);
+        auto const k = keylet::line(account, uDstAccountID, currency);
 
-        JLOG(j_.trace()) << "doTrustSet: Creating ripple line: "
+        JLOG(ctx.journal.trace()) << "doTrustSet: Creating ripple line: "
                          << to_string(k.key);
 
         // Create a new ripple line.
         terResult = trustCreate(
-            view(),
+            ctx.view(),
             bHigh,
-            account_,
+            account,
             uDstAccountID,
             k.key,
             sle,
@@ -533,29 +534,31 @@ extern "C"
 ripple::NotTEC
 preflight(ripple::PreflightContext const& ctx)
 {
-    return ripple::SetTrust::preflight(ctx);
+    return ripple::preflight(ctx);
 }
 
 extern "C"
 ripple::TER
 preclaim(ripple::PreclaimContext const& ctx)
 {
-    return ripple::SetTrust::preclaim(ctx);
+    return ripple::preclaim(ctx);
 }
 
 extern "C"
 ripple::XRPAmount
 calculateBaseFee(ripple::ReadView const& view, ripple::STTx const& tx)
 {
-    return ripple::SetTrust::calculateBaseFee(view, tx);
+    return ripple::Transactor::calculateBaseFee(view, tx);
 }
 
 extern "C"
-std::pair<ripple::TER, bool>
-apply(ripple::ApplyContext& ctx)
+ripple::TER
+doApply(
+    ripple::ApplyContext& ctx,
+    ripple::XRPAmount mPriorBalance,
+    ripple::XRPAmount mSourceBalance)
 {
-    ripple::SetTrust p(ctx);
-    return p();
+    return ripple::doApply(ctx, mPriorBalance, mSourceBalance);
 }
 
 // extern "C"
