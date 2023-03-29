@@ -35,7 +35,7 @@ def preflight(ctx):
 def preclaim(ctx):
     return tesSUCCESS
 
-def doApply(ctx):
+def doApply(ctx, _mPriorBalance, _mSourceBalance):
     account = ctx.tx.getAccountID(sfAccount)
     sle = ctx.view().peek(accountKeylet(account))
     # skip weird fee stuff

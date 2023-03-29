@@ -75,7 +75,7 @@ using namespace pybind11::literals; // to bring in the `_a` literal
 namespace ripple {{
 
 NotTEC
-{tx_name}::preflight(PreflightContext const& ctx)
+preflight(PreflightContext const& ctx)
 {{
     
     py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
@@ -83,14 +83,14 @@ NotTEC
     py::object preflight = py::module_::import("{module_name}").attr("preflight");
     py::object preflightReturn = preflight(py::cast(ctx, py::return_value_policy::reference));
     try {{
-        return NotTEC::fromInt(preflightReturn.cast<int>());
-    }} catch (const py::cast_error &) {{ // TODO: figure out the exact error that is thrown
         return preflightReturn.cast<NotTEC>();
+    }} catch (const py::cast_error &) {{ // TODO: figure out the exact error that is thrown
+        return NotTEC::fromInt(preflightReturn.cast<int>());
     }}
 }}
 
 TER
-{tx_name}::preclaim(PreclaimContext const& ctx)
+preclaim(PreclaimContext const& ctx)
 {{
     py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
     py::module_::import("sys").attr("path").attr("append")("{python_folder}");
@@ -100,12 +100,15 @@ TER
 }}
 
 TER
-{tx_name}::doApply()
+doApply(ApplyContext& ctx, XRPAmount mPriorBalance, XRPAmount mSourceBalance)
 {{
     py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
     py::module_::import("sys").attr("path").attr("append")("{python_folder}");
     py::object doApplyFn = py::module_::import("{module_name}").attr("doApply");
-    py::object doApplyReturn = doApplyFn(py::cast(ctx_, py::return_value_policy::reference));
+    py::object doApplyReturn = doApplyFn(
+        py::cast(ctx, py::return_value_policy::reference),
+        mPriorBalance,
+        mSourceBalance);
     return TER::fromInt(doApplyReturn.cast<int>());
 }}
 }}
@@ -114,29 +117,28 @@ extern "C"
 ripple::NotTEC
 preflight(ripple::PreflightContext const& ctx)
 {{
-    return ripple::{tx_name}::preflight(ctx);
+    return ripple::preflight(ctx);
 }}
 
 extern "C"
 ripple::TER
 preclaim(ripple::PreclaimContext const& ctx)
 {{
-    return ripple::{tx_name}::preclaim(ctx);
+    return ripple::preclaim(ctx);
 }}
 
 extern "C"
 ripple::XRPAmount
 calculateBaseFee(ripple::ReadView const& view, ripple::STTx const& tx)
 {{
-    return ripple::{tx_name}::calculateBaseFee(view, tx);
+    return ripple::Transactor::calculateBaseFee(view, tx);
 }}
 
 extern "C"
-std::pair<ripple::TER, bool>
-apply(ripple::ApplyContext& ctx)
+ripple::TER
+doApply(ripple::ApplyContext& ctx, ripple::XRPAmount mPriorBalance, ripple::XRPAmount mSourceBalance)
 {{
-    ripple::{tx_name} p(ctx);
-    return p();
+    return ripple::doApply(ctx, mPriorBalance, mSourceBalance);
 }}"""
 
 
