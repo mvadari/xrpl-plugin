@@ -28,24 +28,14 @@
 
 namespace ripple {
 
-class SetTrust : public Transactor
-{
-public:
-    static constexpr ConsequencesFactoryType ConsequencesFactory{Normal};
+NotTEC
+preflight(PreflightContext const& ctx);
 
-    explicit SetTrust(ApplyContext& ctx) : Transactor(ctx)
-    {
-    }
+TER
+preclaim(PreclaimContext const& ctx);
 
-    static NotTEC
-    preflight(PreflightContext const& ctx);
-
-    static TER
-    preclaim(PreclaimContext const& ctx);
-
-    TER
-    doApply() override;
-};
+TER
+doApply(ApplyContext& ctx, XRPAmount mPriorBalance, XRPAmount mSourceBalance);
 
 }  // namespace ripple
 

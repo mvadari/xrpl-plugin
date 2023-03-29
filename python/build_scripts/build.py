@@ -75,7 +75,7 @@ using namespace pybind11::literals; // to bring in the `_a` literal
 namespace ripple {{
 
 NotTEC
-{tx_name}::preflight(PreflightContext const& ctx)
+preflight(PreflightContext const& ctx)
 {{
     
     py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
@@ -83,14 +83,14 @@ NotTEC
     py::object preflight = py::module_::import("{module_name}").attr("preflight");
     py::object preflightReturn = preflight(py::cast(ctx, py::return_value_policy::reference));
     try {{
-        return NotTEC::fromInt(preflightReturn.cast<int>());
-    }} catch (const py::cast_error &) {{ // TODO: figure out the exact error that is thrown
         return preflightReturn.cast<NotTEC>();
+    }} catch (const py::cast_error &) {{ // TODO: figure out the exact error that is thrown
+        return NotTEC::fromInt(preflightReturn.cast<int>());
     }}
 }}
 
 TER
-{tx_name}::preclaim(PreclaimContext const& ctx)
+preclaim(PreclaimContext const& ctx)
 {{
     py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
     py::module_::import("sys").attr("path").attr("append")("{python_folder}");
@@ -100,14 +100,45 @@ TER
 }}
 
 TER
-{tx_name}::doApply()
+doApply(ApplyContext& ctx, XRPAmount mPriorBalance, XRPAmount mSourceBalance)
 {{
     py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
     py::module_::import("sys").attr("path").attr("append")("{python_folder}");
     py::object doApplyFn = py::module_::import("{module_name}").attr("doApply");
-    py::object doApplyReturn = doApplyFn(py::cast(ctx_, py::return_value_policy::reference));
+    py::object doApplyReturn = doApplyFn(
+        py::cast(ctx, py::return_value_policy::reference),
+        mPriorBalance,
+        mSourceBalance);
     return TER::fromInt(doApplyReturn.cast<int>());
 }}
+}}
+
+extern "C"
+ripple::NotTEC
+preflight(ripple::PreflightContext const& ctx)
+{{
+    return ripple::preflight(ctx);
+}}
+
+extern "C"
+ripple::TER
+preclaim(ripple::PreclaimContext const& ctx)
+{{
+    return ripple::preclaim(ctx);
+}}
+
+extern "C"
+ripple::XRPAmount
+calculateBaseFee(ripple::ReadView const& view, ripple::STTx const& tx)
+{{
+    return ripple::Transactor::calculateBaseFee(view, tx);
+}}
+
+extern "C"
+ripple::TER
+doApply(ripple::ApplyContext& ctx, ripple::XRPAmount mPriorBalance, ripple::XRPAmount mSourceBalance)
+{{
+    return ripple::doApply(ctx, mPriorBalance, mSourceBalance);
 }}"""
 
 
@@ -135,6 +166,7 @@ def create_files(python_file):
 
 def build_files(cpp_file, project_name):
     with tempfile.TemporaryDirectory() as build_temp:
+        build_temp = "./build"
         build_source_dir = os.path.dirname(__file__)
         cmake_args = []
         build_args = []
@@ -147,7 +179,7 @@ def build_files(cpp_file, project_name):
             "--settings",
             "build_type=Debug"
         ], check=True, cwd=build_temp, stdout=subprocess.DEVNULL)
-        conan_cmake_file = os.path.join(build_temp, "build/generators/conan_toolchain.cmake")
+        conan_cmake_file = os.path.join(build_temp, "generators/conan_toolchain.cmake")
         cmake_args += [
             f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={os.getcwd()}{os.sep}",
             f"-DPROJECT_NAME={project_name}",
