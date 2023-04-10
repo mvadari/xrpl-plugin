@@ -561,11 +561,40 @@ doApply(
     return ripple::doApply(ctx, mPriorBalance, mSourceBalance);
 }
 
-// extern "C"
-// std::initializer_list<ripple::SOElement> uniqueFields
-// {
-//     {ripple::sfLimitAmount, ripple::soeOPTIONAL},
-//     {ripple::sfQualityIn, ripple::soeOPTIONAL},
-//     {ripple::sfQualityOut, ripple::soeOPTIONAL},
-//     {ripple::sfTicketSequence, ripple::soeOPTIONAL},
-// };
+extern "C"
+char const*
+getTxName()
+{
+    return "TrustSet";
+}
+
+struct FakeSOElement {
+    int fieldCode;
+    ripple::SOEStyle style;
+};
+
+extern "C"
+std::vector<FakeSOElement>
+getTxFormat()
+{
+    return std::vector<FakeSOElement>{
+        {ripple::sfLimitAmount.getCode(), ripple::soeOPTIONAL},
+        {ripple::sfQualityIn.getCode(), ripple::soeOPTIONAL},
+        {ripple::sfQualityOut.getCode(), ripple::soeOPTIONAL},
+        {ripple::sfTicketSequence.getCode(), ripple::soeOPTIONAL},
+    };
+}
+
+extern "C"
+std::uint16_t
+getTxType()
+{
+    return 20;
+}
+
+extern "C"
+std::string
+getTTName()
+{
+    return "ttTRUST_SET";
+}

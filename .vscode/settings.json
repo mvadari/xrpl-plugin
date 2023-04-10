@@ -101,7 +101,8 @@
         "regex": "cpp",
         "shared_mutex": "cpp",
         "valarray": "cpp",
-        "rope": "cpp"
+        "rope": "cpp",
+        "slist": "cpp"
     },
     "cSpell.words": [
         "keylet",
