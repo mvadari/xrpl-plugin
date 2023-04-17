@@ -526,6 +526,9 @@ doApply(ApplyContext& ctx, XRPAmount mPriorBalance, XRPAmount mSourceBalance)
     return terResult;
 }
 
+
+SF_AMOUNT const sfLimitAmount2(access, STI_AMOUNT, 11, "LimitAmount2");
+
 }  // namespace ripple
 
 
