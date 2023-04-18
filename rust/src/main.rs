@@ -1,4 +1,5 @@
 use cxx::let_cxx_string;
+
 #[cxx::bridge]
 mod rippled {
     // These are Rust functions that can be called by C++
@@ -14,7 +15,7 @@ mod rippled {
         // include!("rust/include/blobstore.h");
         include!("rust/include/blobstore.h");
 
-        pub(crate) fn encoded_size(n: usize) -> usize;
+        // pub(crate) fn encoded_size(n: usize) -> usize;
 
         /*include!("rust/include/blobstore.h");
 
@@ -53,12 +54,12 @@ fn main() {
     let mut buf = MultiBuf { chunks, pos: 0 };
     let blobid = client.put(&mut buf);
     println!("blobid = {}", blobid);*/
-    let size = unsafe {
-        rippled::encoded_size(4)
-    };
-    println!("Size: {}", size);
+    // let size = unsafe {
+    //     rippled::encoded_size(4)
+    // };
+    // println!("Size: {}", size);
 
     let_cxx_string!(b64 = "dGhlIGNha2UgaXMgYSBsaWU");
-    let decoded = unsafe { rippled::base64_decode_ptr(&b64) };
+    let decoded = rippled::base64_decode_ptr(&b64);
     println!("decoded: {}", decoded)
 }

@@ -10,7 +10,7 @@ fn main() {
     let xrpl_core_file = Path::new(&manifest_dir)
         .join("../external/rippled/.build/libxrpl_core.a");
 
-    std::fs::remove_file(target_dir.join("libxrpl_core.a"));
+    std::fs::remove_file(target_dir.join("libxrpl_core.a")).unwrap();
     let res = std::fs::copy(xrpl_core_file.clone(), target_dir.join("libxrpl_core.a").clone());
     if res.is_err() {
         println!(
