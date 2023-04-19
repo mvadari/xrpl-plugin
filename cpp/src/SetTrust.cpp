@@ -27,6 +27,19 @@
 
 namespace ripple {
 
+static SField::private_access_tag_t access;
+static std::string const fieldName = "LimitAmount2";
+static char const* fieldNameC = fieldName.c_str(); 
+
+SF_AMOUNT const&
+sfLimitAmount2() {
+    int const fieldValue = 393227;
+    if (SField const& field = SField::getField(fieldValue); field != sfInvalid)
+        return static_cast<SF_AMOUNT const&>(field);
+    SF_AMOUNT const* newSField = new SF_AMOUNT(access, STI_AMOUNT, 11, fieldNameC);
+    return *newSField;
+}
+
 NotTEC
 preflight(PreflightContext const& ctx)
 {
@@ -44,7 +57,7 @@ preflight(PreflightContext const& ctx)
         return temINVALID_FLAG;
     }
 
-    STAmount const saLimitAmount(tx.getFieldAmount(sfLimitAmount));
+    STAmount const saLimitAmount(tx.getFieldAmount(sfLimitAmount2()));
 
     if (!isLegalNet(saLimitAmount))
         return temBAD_AMOUNT;
@@ -99,7 +112,7 @@ preclaim(PreclaimContext const& ctx)
         return tefNO_AUTH_REQUIRED;
     }
 
-    auto const saLimitAmount = ctx.tx[sfLimitAmount];
+    auto const saLimitAmount = ctx.tx[sfLimitAmount2()];
 
     auto const currency = saLimitAmount.getCurrency();
     auto const uDstAccountID = saLimitAmount.getIssuer();
@@ -151,7 +164,7 @@ doApply(ApplyContext& ctx, XRPAmount mPriorBalance, XRPAmount mSourceBalance)
     TER terResult = tesSUCCESS;
     auto const account = ctx.tx.getAccountID(sfAccount);
 
-    STAmount const saLimitAmount(ctx.tx.getFieldAmount(sfLimitAmount));
+    STAmount const saLimitAmount(ctx.tx.getFieldAmount(sfLimitAmount2()));
     bool const bQualityIn(ctx.tx.isFieldPresent(sfQualityIn));
     bool const bQualityOut(ctx.tx.isFieldPresent(sfQualityOut));
 
@@ -526,9 +539,6 @@ doApply(ApplyContext& ctx, XRPAmount mPriorBalance, XRPAmount mSourceBalance)
     return terResult;
 }
 
-
-SF_AMOUNT const sfLimitAmount2(access, STI_AMOUNT, 11, "LimitAmount2");
-
 }  // namespace ripple
 
 
@@ -581,10 +591,26 @@ std::vector<FakeSOElement>
 getTxFormat()
 {
     return std::vector<FakeSOElement>{
-        {ripple::sfLimitAmount.getCode(), ripple::soeOPTIONAL},
+        {ripple::sfLimitAmount2().getCode(), ripple::soeOPTIONAL},
         {ripple::sfQualityIn.getCode(), ripple::soeOPTIONAL},
         {ripple::sfQualityOut.getCode(), ripple::soeOPTIONAL},
         {ripple::sfTicketSequence.getCode(), ripple::soeOPTIONAL},
+    };
+}
+
+struct SFieldInfo {
+    int typeId;
+    int fieldValue;
+    const char * txtName;
+};
+
+extern "C"
+std::vector<SFieldInfo>
+getSFields()
+{
+    auto const& sfLimitAmount2 = ripple::sfLimitAmount2();
+    return std::vector<SFieldInfo>{
+        {sfLimitAmount2.fieldType, sfLimitAmount2.fieldValue, sfLimitAmount2.fieldName.c_str()},
     };
 }
 
