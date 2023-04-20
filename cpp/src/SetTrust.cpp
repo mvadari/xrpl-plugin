@@ -28,16 +28,45 @@
 namespace ripple {
 
 static SField::private_access_tag_t access;
-static std::string const fieldName = "LimitAmount2";
-static char const* fieldNameC = fieldName.c_str(); 
+
+// helper stuff that needs to be moved to rippled
+
+template <typename T>
+SerializedTypeID getSTId() { }
+
+template <>
+SerializedTypeID getSTId<SF_AMOUNT>() { return STI_AMOUNT; }
+
+template <> 
+SerializedTypeID getSTId<SF_ACCOUNT>() { return STI_ACCOUNT; }
+
+template <class T>
+T const&
+newSField(const int fieldValue, std::string const fieldName)
+{
+    if (SField const& field = SField::getField(fieldName); field != sfInvalid)
+        return static_cast<T const&>(field);
+    T const* newSField = new T(access, getSTId<T>(), fieldValue, fieldName.c_str());
+    return *newSField;
+}
+
+template <class T>
+T const&
+newSField(const int fieldValue, char const* fieldName)
+{
+    if (SField const& field = SField::getField(fieldName); field != sfInvalid)
+        return static_cast<T const&>(field);
+    T const* newSField = new T(access, getSTId<T>(), fieldValue, fieldName);
+    return *newSField;
+}
+
+// end of helper stuff
+
 
 SF_AMOUNT const&
-sfLimitAmount2() {
-    int const fieldValue = 393227;
-    if (SField const& field = SField::getField(fieldValue); field != sfInvalid)
-        return static_cast<SF_AMOUNT const&>(field);
-    SF_AMOUNT const* newSField = new SF_AMOUNT(access, STI_AMOUNT, 11, fieldNameC);
-    return *newSField;
+sfLimitAmount2()
+{
+    return newSField<SF_AMOUNT>(11, "LimitAmount2");
 }
 
 NotTEC
