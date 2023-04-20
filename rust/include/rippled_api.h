@@ -14,12 +14,18 @@
 #include <ripple/protocol/TxFlags.h>
 #include <ripple/protocol/Feature.h>
 
-std::unique_ptr<std::string>
-base64_decode_ptr(std::string const& data);
+std::unique_ptr <std::string>
+base64_decode_ptr(std::string const &data);
 
-std::unique_ptr<ripple::NotTEC>
+std::unique_ptr <ripple::NotTEC>
 from_tefcodes(ripple::TEFcodes code);
 
-std::unique_ptr<ripple::STTx> tx_ptr(ripple::PreflightContext const& ctx);
+std::unique_ptr <ripple::STTx> tx_ptr(ripple::PreflightContext const &ctx);
+
+// Return the XRP Issuer as an AccountID
+ripple::AccountID const &xrp_account();
+
+
+//void toAccountIdVec(rust::Vec<u32> v);
 
 #endif //PLUGIN_TRANSACTOR_BLOBSTORE_H

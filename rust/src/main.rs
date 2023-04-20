@@ -3,9 +3,18 @@ use crate::rippled::{PreflightContext, STTx, TxType};
 
 #[cxx::bridge]
 mod rippled {
-
-    // These are Rust functions that can be called by C++
+    // These are Rust functions that can be called by C++.
     extern "Rust" {
+        ////////////////////////////////
+        // Zero or more opaque types which both languages can pass around but only Rust can see
+        // the fields.
+        ////////////////////////////////
+
+        // type MultiBuf;
+
+        ////////////////////////////////
+        // Functions implemented in Rust.
+        ////////////////////////////////
 
         /*type NotTEC;
         fn preflight() -> NotTEC*/
@@ -23,7 +32,8 @@ mod rippled {
         tefCREATED,
         tefEXCEPTION,
         tefINTERNAL,
-        tefNO_AUTH_REQUIRED,  // Can't set auth if auth is not required.
+        tefNO_AUTH_REQUIRED,
+        // Can't set auth if auth is not required.
         tefPAST_SEQ,
         tefWRONG_PRIOR,
         tefMASTER_DISABLED,
@@ -145,29 +155,78 @@ mod rippled {
         ttUNL_MODIFY = 102,
     }
 
-    // These are C++ functions that can be called by Rust
+    #[derive(Debug)]
+    pub struct PreflightContext<'a> {
+        pub tx: &'a STTx,
+    }
+
+    #[derive(Debug)]
+    pub struct STTx {
+        // TODO: Add other fields
+        pub tx_type_: TxType,
+    }
+
+    // pub struct AccountId {
+    //     id: u16,
+    // }
+
+
+    // Safety: the extern "C++" block is responsible for deciding whether to expose each signature
+    // inside as safe-to-call or unsafe-to-call. If an extern block contains at least one
+    // safe-to-call signature, it must be written as an unsafe extern block, which serves as
+    // an item level unsafe block to indicate that an unchecked safety claim is being made about
+    // the contents of the block.
+
+    // These are C++ functions that can be called by Rust.
+    // Within the extern "C++" part, we list types and functions for which C++ is the source of
+    // truth, as well as the header(s) that declare those APIs.
     #[namespace = "ripple"]
     unsafe extern "C++" {
+        ////////////////////////////////
+        // One or more headers with the matching C++ declarations for the
+        // enclosing extern "C++" block. Our code generators don't read it
+        // but it gets #include'd and used in static assertions to ensure
+        // our picture of the FFI boundary is accurate.
+        ////////////////////////////////
         include!("rust/include/rippled_api.h");
 
+        ////////////////////////////////
+        // Zero or more opaque types which both languages can pass around
+        // but only C++ can see the fields.
+        // type BlobstoreClient;
+        ////////////////////////////////
         type TxType;
         type TEFcodes;
 
-        pub fn getTxnType(
-            self: &STTx
-        ) -> TxType;
+        #[namespace = "ripple"]
+        type AccountID;
 
-    }
+        ////////////////////////////////
+        // Functions implemented in C++.
+        ////////////////////////////////
 
-    // #[namespace = "ripple"]
-    pub struct PreflightContext<'a> {
-        pub tx: &'a STTx
-    }
+        // In AccountId.h --> AccountID const & xrpAccount();
+        fn xrpAccount<'a>() -> &'a AccountID;
 
-    #[namespace = "ripple"]
-    pub struct STTx {
-        // TODO: Add other fields
-        pub tx_type_: TxType
+        fn data(self: &AccountID) -> *const u8;
+
+        // Bits ==> 160 (20 bytes)
+        // WIDTH ==> 5
+        // data_ is an array of 5 uint32's in bigendian order.
+        // In C++, we want to copy the 5 bytes into a Rust Vec and return by value.
+        // Then, in Rust, we can pass this pointer to that function and get an AccountID.
+
+
+        // : error: cannot initialize a variable of type
+        // '::std::unique_ptr< ::ripple::AccountID> (*)()' (aka 'unique_ptr<base_uint<160, detail::AccountIDTag>> (*)()')
+        // 'const ripple::AccountID &()'                   (aka 'const base_uint<160, detail::AccountIDTag> &()'):
+        // different return type (
+        // '::std::unique_ptr< ::ripple::AccountID>' (aka 'unique_ptr<base_uint<160, detail::AccountIDTag>>')
+        // 'const ripple::AccountID &'               (aka 'const base_uint<160, detail::AccountIDTag> &'))
+
+        // pub fn getTxnType(
+        //     self: &STTx
+        // ) -> TxType;
     }
 
     unsafe extern "C++" {
@@ -179,7 +238,7 @@ mod rippled {
         pub fn from_tefcodes(code: TEFcodes) -> UniquePtr<NotTEC>;
         // TODO: I added this function to TER.h in rippled just to test things out. We should
         //  get rid of this and the function in TER.h later
-        pub fn get_value(self: &NotTEC) -> i32;
+        //pub fn get_value(self: &NotTEC) -> i32;
 
         pub(crate) fn base64_decode_ptr(s: &CxxString) -> UniquePtr<CxxString>;
 
@@ -192,7 +251,6 @@ mod rippled {
 
         // #[rust_name = "get_tx_type"]
         // #[namespace = "ripple"]
-
     }
 }
 
@@ -215,17 +273,28 @@ fn main() {
 
     let tef = rippled::TEFcodes::tefALREADY;
     let not_tec = rippled::from_tefcodes(tef);
-    println!("NotTEC: {:?}", not_tec.deref().get_value());
-    assert_eq!(not_tec.deref().get_value(), -198);
+    // println!("NotTEC: {:?}", not_tec.deref());
+    // assert_eq!(not_tec.deref().get_value(), -198);
 
-    /*let tx = STTx {
+    let tx = STTx {
         tx_type_: TxType::ttACCOUNT_SET
     };
+    println!("tx={:?}", tx);
 
     let preflight = PreflightContext {
         tx: &tx
     };
+    println!("preflight={:?}", preflight);
 
-    let tx_type = preflight.tx.getTxnType();
-    println!("tx_type: {:?}", tx_type);*/
+
+    let xrp_account_cxx: &rippled::AccountID = rippled::xrpAccount();
+    unsafe {
+        let first_byte = xrp_account_cxx.data();
+        println!("first_byte: {:?}", *first_byte);
+    }
+    // let xrp_account_id: xrpl_rust_sdk_core::core::types::account_id::AccountID
+    //     = rust::to_account_id(xrp_account_cxx);
+
+    /*   let tx_type = preflight.tx.getTxnType();
+       println!("tx_type: {:?}", tx_type);*/
 }
