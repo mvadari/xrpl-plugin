@@ -1,5 +1,7 @@
+pub mod dummy_tx_rs;
+
 use cxx::let_cxx_string;
-use crate::rippled::{PreflightContext, STTx, TxType};
+use crate::rippled::{TxType};
 
 #[cxx::bridge]
 mod rippled {
@@ -155,21 +157,6 @@ mod rippled {
         ttUNL_MODIFY = 102,
     }
 
-    #[derive(Debug)]
-    pub struct PreflightContext<'a> {
-        pub tx: &'a STTx,
-    }
-
-    #[derive(Debug)]
-    pub struct STTx {
-        // TODO: Add other fields
-        pub tx_type_: TxType,
-    }
-
-    // pub struct AccountId {
-    //     id: u16,
-    // }
-
 
     // Safety: the extern "C++" block is responsible for deciding whether to expose each signature
     // inside as safe-to-call or unsafe-to-call. If an extern block contains at least one
@@ -209,24 +196,8 @@ mod rippled {
         fn xrpAccount<'a>() -> &'a AccountID;
 
         fn data(self: &AccountID) -> *const u8;
-
-        // Bits ==> 160 (20 bytes)
-        // WIDTH ==> 5
-        // data_ is an array of 5 uint32's in bigendian order.
-        // In C++, we want to copy the 5 bytes into a Rust Vec and return by value.
-        // Then, in Rust, we can pass this pointer to that function and get an AccountID.
-
-
-        // : error: cannot initialize a variable of type
-        // '::std::unique_ptr< ::ripple::AccountID> (*)()' (aka 'unique_ptr<base_uint<160, detail::AccountIDTag>> (*)()')
-        // 'const ripple::AccountID &()'                   (aka 'const base_uint<160, detail::AccountIDTag> &()'):
-        // different return type (
-        // '::std::unique_ptr< ::ripple::AccountID>' (aka 'unique_ptr<base_uint<160, detail::AccountIDTag>>')
-        // 'const ripple::AccountID &'               (aka 'const base_uint<160, detail::AccountIDTag> &'))
-
-        // pub fn getTxnType(
-        //     self: &STTx
-        // ) -> TxType;
+        fn begin(self: &AccountID) -> *const u8;
+        fn end(self: &AccountID) -> *const u8;
     }
 
     unsafe extern "C++" {
@@ -242,30 +213,33 @@ mod rippled {
 
         pub(crate) fn base64_decode_ptr(s: &CxxString) -> UniquePtr<CxxString>;
 
-        /*#[namespace = "ripple"]
-        type STTx;
-
         #[namespace = "ripple"]
         type PreflightContext;
-        pub fn tx_ptr(ctx: &PreflightContext) -> UniquePtr<STTx>;*/
+        #[namespace = "ripple"]
+        type STTx;
+        #[namespace = "ripple"]
+        type Rules;
+        #[namespace = "ripple"]
+        type uint256;
 
-        // #[rust_name = "get_tx_type"]
-        // #[namespace = "ripple"]
+        fn fixMasterKeyAsRegularKey() -> &'static uint256;
+
+        fn get_tx(ctx: &PreflightContext) -> &STTx;
+        fn get_rules(ctx: &PreflightContext) -> &Rules;
+
+        #[namespace = "ripple"]
+        fn getTxnType(self: &STTx) -> TxType;
+
+        #[namespace = "ripple"]
+        fn enabled(self: &Rules, s_field: &uint256) -> bool;
+
+        fn get_dummy_sttx<'a>() -> &'a STTx;
+        fn get_dummy_ctx<'a>() -> &'a PreflightContext;
     }
 }
 
 fn main() {
     use std::ops::Deref;
-    /*let client = ffi::new_blobstore_client();
-
-    let chunks = vec![b"fearless".to_vec(), b"concurrency".to_vec()];
-    let mut buf = MultiBuf { chunks, pos: 0 };
-    let blobid = client.put(&mut buf);
-    println!("blobid = {}", blobid);*/
-    // let size = unsafe {
-    //     rippled::encoded_size(4)
-    // };
-    // println!("Size: {}", size);
 
     let_cxx_string!(b64 = "dGhlIGNha2UgaXMgYSBsaWU");
     let decoded = rippled::base64_decode_ptr(&b64);
@@ -276,25 +250,33 @@ fn main() {
     // println!("NotTEC: {:?}", not_tec.deref());
     // assert_eq!(not_tec.deref().get_value(), -198);
 
-    let tx = STTx {
-        tx_type_: TxType::ttACCOUNT_SET
-    };
-    println!("tx={:?}", tx);
-
-    let preflight = PreflightContext {
-        tx: &tx
-    };
-    println!("preflight={:?}", preflight);
-
 
     let xrp_account_cxx: &rippled::AccountID = rippled::xrpAccount();
-    unsafe {
-        let first_byte = xrp_account_cxx.data();
-        println!("first_byte: {:?}", *first_byte);
-    }
-    // let xrp_account_id: xrpl_rust_sdk_core::core::types::account_id::AccountID
-    //     = rust::to_account_id(xrp_account_cxx);
 
-    /*   let tx_type = preflight.tx.getTxnType();
-       println!("tx_type: {:?}", tx_type);*/
+    let account_id = to_account_id(xrp_account_cxx);
+    println!("account_id: {:?}", account_id);
+    assert_eq!(account_id, ACCOUNT_ZERO);
+
+    let tx: &rippled::STTx = rippled::get_dummy_sttx();
+    let tx_type: TxType = tx.getTxnType();
+    println!("tx_type: {:?}", tx_type);
+    assert_eq!(tx_type, rippled::TxType::ttPAYMENT);
+
+    let ctx = rippled::get_dummy_ctx();
+    let res = dummy_tx_rs::preFlight(ctx);
+
+}
+
+use xrpl_rust_sdk_core::core::types::{AccountId, ACCOUNT_ZERO};
+
+pub fn to_account_id(cxx_account_id: &rippled::AccountID) -> AccountId {
+    unsafe {
+        let begin: *const u8 = cxx_account_id.begin();
+        let end: *const u8 = cxx_account_id.end();
+        let offset = end.offset_from(begin);
+        assert!(!offset.is_negative());
+        let account_id_slice = std::slice::from_raw_parts(begin, offset as usize);
+
+        return AccountId::try_from(account_id_slice).unwrap();
+    }
 }

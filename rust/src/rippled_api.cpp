@@ -27,6 +27,30 @@ ripple::AccountID const &xrp_account() {
     return ripple::xrpAccount();
 }
 
+ripple::STTx const &get_tx(ripple::PreflightContext const &ctx) {
+    return ctx.tx;
+}
+
+ripple::Rules const &get_rules(ripple::PreflightContext const &ctx) {
+    return ctx.rules;
+}
+
+ripple::uint256 const &fixMasterKeyAsRegularKey() {
+    return ripple::fixMasterKeyAsRegularKey;
+}
+
+ripple::PreflightContext const &get_dummy_ctx() {
+    // TODO: Return a PreflightContext where .rules has fixMasterKeyAsRegularKey enabled
+}
+
+ripple::STTx const &get_dummy_sttx() {
+    ripple::STTx tx = ripple::STTx(ripple::TxType::ttPAYMENT, [](ripple::STObject& obj) {
+        obj.setFieldU16(ripple::sfTransactionType, ripple::TxType::ttPAYMENT);
+    });
+
+    return tx;
+}
+
 // Test function to simulate turning an AccountID into a Rust AccountId.
 
 // Send in a C++ Vec of u32s, get back a std::vector

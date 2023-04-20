@@ -25,6 +25,16 @@ std::unique_ptr <ripple::STTx> tx_ptr(ripple::PreflightContext const &ctx);
 // Return the XRP Issuer as an AccountID
 ripple::AccountID const &xrp_account();
 
+ripple::STTx const &get_tx(ripple::PreflightContext const &ctx);
+ripple::Rules const &get_rules(ripple::PreflightContext const &ctx);
+
+ripple::STTx const &get_dummy_sttx();
+
+ripple::uint256 const &fixMasterKeyAsRegularKey();
+
+ripple::PreflightContext const &get_dummy_ctx();
+
+//ripple::uint256 const &foo(ripple::uint256 const* bar);
 
 //void toAccountIdVec(rust::Vec<u32> v);
 
