@@ -25,30 +25,48 @@
 #include <ripple/protocol/Quality.h>
 #include <ripple/protocol/st.h>
 
+
+typedef void (*createNewSFieldPtr)(ripple::SField::private_access_tag_t access, int tid, int fv, const char* fn);
+
 namespace ripple {
+
+const int STI_AMOUNT2 = 24;
+
+class STAmount2 final : public STAmount
+{
+int
+getSType() const
+{
+    return STI_AMOUNT2;
+}
+};
+
+using SF_AMOUNT2 = TypedField<STAmount2>;
+
+template <class T>
+void
+createNewSType(SField::private_access_tag_t access, int tid, int fv, const char* fn)
+{
+    new T(access, tid, fv, fn);
+}
 
 static SField::private_access_tag_t access;
 
 // helper stuff that needs to be moved to rippled
 
 template <typename T>
-SerializedTypeID getSTId() { }
+int getSTId() { }
 
 template <>
-SerializedTypeID getSTId<SF_AMOUNT>() { return STI_AMOUNT; }
+int getSTId<SF_AMOUNT>() { return STI_AMOUNT; }
 
 template <> 
-SerializedTypeID getSTId<SF_ACCOUNT>() { return STI_ACCOUNT; }
+int getSTId<SF_ACCOUNT>() { return STI_ACCOUNT; }
 
-template <class T>
-T const&
-newSField(const int fieldValue, std::string const fieldName)
-{
-    if (SField const& field = SField::getField(fieldName); field != sfInvalid)
-        return static_cast<T const&>(field);
-    T const* newSField = new T(access, getSTId<T>(), fieldValue, fieldName.c_str());
-    return *newSField;
-}
+template <> 
+int getSTId<SF_AMOUNT2>() { return STI_AMOUNT2; }
+
+
 
 template <class T>
 T const&
@@ -60,13 +78,20 @@ newSField(const int fieldValue, char const* fieldName)
     return *newSField;
 }
 
+template <class T>
+T const&
+newSField(const int fieldValue, std::string const fieldName)
+{
+    return newSField<T>(fieldValue, fieldName.c_str());
+}
+
 // end of helper stuff
 
 
-SF_AMOUNT const&
+SF_AMOUNT2 const&
 sfLimitAmount2()
 {
-    return newSField<SF_AMOUNT>(11, "LimitAmount2");
+    return newSField<SF_AMOUNT2>(11, "LimitAmount2");
 }
 
 NotTEC
@@ -632,6 +657,16 @@ struct SFieldInfo {
     int fieldValue;
     const char * txtName;
 };
+
+extern "C"
+std::vector<std::pair<int, createNewSFieldPtr>>
+getSTypes()
+{
+    registerSType(ripple::STI_AMOUNT2, ripple::createNewSType<ripple::SF_AMOUNT2>);
+    return std::vector<std::pair<int, createNewSFieldPtr>>{
+        {ripple::STI_AMOUNT2, ripple::createNewSType<ripple::SF_AMOUNT2>}
+    };
+}
 
 extern "C"
 std::vector<SFieldInfo>
