@@ -53,10 +53,12 @@ ripple::STTx const &get_dummy_sttx() {
 
 namespace ripple {
 
-    NotTEC
-    preflight(PreflightContext const &ctx) {
-        return *pre_flight(ctx).release();
-    }
+    /*extern "C" {
+        NotTEC
+        preflight(PreflightContext const &ctx) {
+            return *pre_flight(ctx);
+        }
+    }*/
 
 }
 
