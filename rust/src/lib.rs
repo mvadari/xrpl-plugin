@@ -2,16 +2,14 @@ use cxx::UniquePtr;
 
 pub mod dummy_tx_rs;
 
-/*pub fn pre_flight_ptr(ctx: &rippled::PreflightContext) -> UniquePtr<rippled::NotTEC> {
-    UniquePtr::new(dummy_tx_rs::preFlight(ctx))
-}*/
+pub use dummy_tx_rs::pre_flight;
 
 #[cxx::bridge]
 pub mod rippled {
 
     // These are Rust functions that can be called by C++.
     extern "Rust" {
-        // fn pre_flight_ptr(ctx: &PreflightContext) -> UniquePtr<NotTEC>;
+        fn pre_flight(ctx: &PreflightContext) -> UniquePtr<NotTEC>;
     }
 
     #[namespace = "ripple"]

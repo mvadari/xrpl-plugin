@@ -51,13 +51,14 @@ ripple::STTx const &get_dummy_sttx() {
     return tx;
 }
 
-/*namespace ripple {
+namespace ripple {
+
     NotTEC
-    DummyTx::preflight(PreflightContext const& ctx)
-    {
-        rust::preflight(ctx)
+    preflight(PreflightContext const &ctx) {
+        return *pre_flight(ctx).release();
     }
-}*/
+
+}
 
 // Test function to simulate turning an AccountID into a Rust AccountId.
 
