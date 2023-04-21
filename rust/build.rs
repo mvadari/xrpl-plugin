@@ -27,9 +27,9 @@ fn main() {
 
     println!("cargo:rustc-link-search=native={}/target/rippled/", manifest_dir);
     println!("cargo:rustc-link-lib=xrpl_core");
-    println!("cargo:rerun-if-changed=src/main.rs");
-    println!("cargo:rerun-if-changed=src/blobstore.cpp");
-    println!("cargo:rerun-if-changed=include/blobstore.h");
+    println!("cargo:rerun-if-changed=src/lib.rs");
+    println!("cargo:rerun-if-changed=src/rippled_api.cpp");
+    println!("cargo:rerun-if-changed=include/rippled_api.h");
 
     println!("cargo:rustc-link-search=native={}", "/Users/nkramer/.conan/data/boost/1.77.0/_/_/package/1080f5eeec2c2f1a57638424f85f00e32203faa4/lib/");
     println!("cargo:rustc-link-lib=boost_thread");
@@ -37,7 +37,7 @@ fn main() {
     println!("cargo:rustc-link-search=native={}", "/Users/nkramer/.conan/data/openssl/1.1.1m/_/_/package/240c2182163325b213ca6886a7614c8ed2bf1738/lib/");
     println!("cargo:rustc-link-lib=crypto");
 
-    cxx_build::bridge("src/main.rs")
+    cxx_build::bridge("src/lib.rs")
         .file("src/rippled_api.cpp")
         .flag_if_supported("-std=c++20")
         .flag("-DBOOST_ASIO_HAS_STD_INVOKE_RESULT")

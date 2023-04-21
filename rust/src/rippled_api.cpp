@@ -4,7 +4,7 @@
 
 #include "rust/include/rippled_api.h"
 #include "ripple/basics/base64.h"
-#include "rust/src/main.rs.h"
+#include "rust/src/lib.rs.h"
 #include <functional>
 #include <string>
 
@@ -50,6 +50,14 @@ ripple::STTx const &get_dummy_sttx() {
 
     return tx;
 }
+
+/*namespace ripple {
+    NotTEC
+    DummyTx::preflight(PreflightContext const& ctx)
+    {
+        rust::preflight(ctx)
+    }
+}*/
 
 // Test function to simulate turning an AccountID into a Rust AccountId.
 

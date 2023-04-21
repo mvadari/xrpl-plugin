@@ -1,25 +1,17 @@
+use cxx::UniquePtr;
+
 pub mod dummy_tx_rs;
 
-use cxx::let_cxx_string;
-use crate::rippled::{TxType};
+/*pub fn pre_flight_ptr(ctx: &rippled::PreflightContext) -> UniquePtr<rippled::NotTEC> {
+    UniquePtr::new(dummy_tx_rs::preFlight(ctx))
+}*/
 
 #[cxx::bridge]
-mod rippled {
+pub mod rippled {
+
     // These are Rust functions that can be called by C++.
     extern "Rust" {
-        ////////////////////////////////
-        // Zero or more opaque types which both languages can pass around but only Rust can see
-        // the fields.
-        ////////////////////////////////
-
-        // type MultiBuf;
-
-        ////////////////////////////////
-        // Functions implemented in Rust.
-        ////////////////////////////////
-
-        /*type NotTEC;
-        fn preflight() -> NotTEC*/
+        // fn pre_flight_ptr(ctx: &PreflightContext) -> UniquePtr<NotTEC>;
     }
 
     #[namespace = "ripple"]
@@ -193,28 +185,28 @@ mod rippled {
         ////////////////////////////////
 
         // In AccountId.h --> AccountID const & xrpAccount();
-        fn xrpAccount<'a>() -> &'a AccountID;
+        pub fn xrpAccount<'a>() -> &'a AccountID;
 
-        fn data(self: &AccountID) -> *const u8;
-        fn begin(self: &AccountID) -> *const u8;
-        fn end(self: &AccountID) -> *const u8;
+        pub fn data(self: &AccountID) -> *const u8;
+        pub fn begin(self: &AccountID) -> *const u8;
+        pub fn end(self: &AccountID) -> *const u8;
     }
 
     unsafe extern "C++" {
         include!("rust/include/rippled_api.h");
 
         #[namespace = "ripple"]
-        type NotTEC;
+        pub(crate) type NotTEC;
         // TODO: Add other codes enums and constructors in rippled_api.h and .cpp
         pub fn from_tefcodes(code: TEFcodes) -> UniquePtr<NotTEC>;
         // TODO: I added this function to TER.h in rippled just to test things out. We should
         //  get rid of this and the function in TER.h later
         //pub fn get_value(self: &NotTEC) -> i32;
 
-        pub(crate) fn base64_decode_ptr(s: &CxxString) -> UniquePtr<CxxString>;
+        pub fn base64_decode_ptr(s: &CxxString) -> UniquePtr<CxxString>;
 
         #[namespace = "ripple"]
-        type PreflightContext;
+        pub(crate) type PreflightContext;
         #[namespace = "ripple"]
         type STTx;
         #[namespace = "ripple"]
@@ -222,61 +214,18 @@ mod rippled {
         #[namespace = "ripple"]
         type uint256;
 
-        fn fixMasterKeyAsRegularKey() -> &'static uint256;
+        pub fn fixMasterKeyAsRegularKey() -> &'static uint256;
 
-        fn get_tx(ctx: &PreflightContext) -> &STTx;
-        fn get_rules(ctx: &PreflightContext) -> &Rules;
-
-        #[namespace = "ripple"]
-        fn getTxnType(self: &STTx) -> TxType;
+        pub fn get_tx(ctx: &PreflightContext) -> &STTx;
+        pub fn get_rules(ctx: &PreflightContext) -> &Rules;
 
         #[namespace = "ripple"]
-        fn enabled(self: &Rules, s_field: &uint256) -> bool;
+        pub fn getTxnType(self: &STTx) -> TxType;
 
-        fn get_dummy_sttx<'a>() -> &'a STTx;
-        fn get_dummy_ctx<'a>() -> &'a PreflightContext;
-    }
-}
+        #[namespace = "ripple"]
+        pub fn enabled(self: &Rules, s_field: &uint256) -> bool;
 
-fn main() {
-    use std::ops::Deref;
-
-    let_cxx_string!(b64 = "dGhlIGNha2UgaXMgYSBsaWU");
-    let decoded = rippled::base64_decode_ptr(&b64);
-    println!("decoded: {}", decoded);
-
-    let tef = rippled::TEFcodes::tefALREADY;
-    let not_tec = rippled::from_tefcodes(tef);
-    // println!("NotTEC: {:?}", not_tec.deref());
-    // assert_eq!(not_tec.deref().get_value(), -198);
-
-
-    let xrp_account_cxx: &rippled::AccountID = rippled::xrpAccount();
-
-    let account_id = to_account_id(xrp_account_cxx);
-    println!("account_id: {:?}", account_id);
-    assert_eq!(account_id, ACCOUNT_ZERO);
-
-    let tx: &rippled::STTx = rippled::get_dummy_sttx();
-    let tx_type: TxType = tx.getTxnType();
-    println!("tx_type: {:?}", tx_type);
-    assert_eq!(tx_type, rippled::TxType::ttPAYMENT);
-
-    let ctx = rippled::get_dummy_ctx();
-    let res = dummy_tx_rs::preFlight(ctx);
-
-}
-
-use xrpl_rust_sdk_core::core::types::{AccountId, ACCOUNT_ZERO};
-
-pub fn to_account_id(cxx_account_id: &rippled::AccountID) -> AccountId {
-    unsafe {
-        let begin: *const u8 = cxx_account_id.begin();
-        let end: *const u8 = cxx_account_id.end();
-        let offset = end.offset_from(begin);
-        assert!(!offset.is_negative());
-        let account_id_slice = std::slice::from_raw_parts(begin, offset as usize);
-
-        return AccountId::try_from(account_id_slice).unwrap();
+        pub fn get_dummy_sttx<'a>() -> &'a STTx;
+        pub fn get_dummy_ctx<'a>() -> &'a PreflightContext;
     }
 }

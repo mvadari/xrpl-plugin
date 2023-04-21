@@ -1,3 +1,4 @@
+use cxx::UniquePtr;
 
 type PreflightContext = super::rippled::PreflightContext;
 type NotTEC = super::rippled::NotTEC;
