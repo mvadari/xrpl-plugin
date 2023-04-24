@@ -34,7 +34,6 @@ ripple::uint256 const &fixMasterKeyAsRegularKey();
 
 ripple::PreflightContext const &get_dummy_ctx();
 
-
 namespace ripple {
 
     class RustDummyTx : public Transactor
@@ -49,11 +48,11 @@ namespace ripple {
         static NotTEC
         preflight(PreflightContext const& ctx);
 
-        /*static TER
+        static TER
         preclaim(PreclaimContext const& ctx);
 
         TER
-        doApply() override;*/
+        doApply() override;
     };
 
 //------------------------------------------------------------------------------
