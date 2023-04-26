@@ -24,9 +24,31 @@
 #include <ripple/protocol/Indexes.h>
 #include <ripple/protocol/Quality.h>
 #include <ripple/protocol/st.h>
+#include <ripple/protocol/ErrorCodes.h>
 
 
-typedef void (*createNewSFieldPtr)(ripple::SField::private_access_tag_t access, int tid, int fv, const char* fn);
+typedef ripple::SField const& (*createNewSFieldPtr)(
+    ripple::SField::private_access_tag_t access,
+    int tid,
+    int fv,
+    const char* fn);
+typedef ripple::STBase* (*constructSTypePtr)(ripple::SerialIter& sit, ripple::SField const& name);
+typedef ripple::STBase* (*constructSTypePtr2)(ripple::SField const& name);
+typedef std::optional<ripple::detail::STVar> (*parseLeafTypePtr)(
+    ripple::SField const&,
+    std::string const&,
+    std::string const&,
+    ripple::SField const*,
+    Json::Value const&,
+    Json::Value&);
+
+struct STypeExport {
+    int typeId;
+    createNewSFieldPtr createPtr;
+    parseLeafTypePtr parsePtr;
+    constructSTypePtr constructPtr;
+    constructSTypePtr2 constructPtr2;
+};
 
 namespace ripple {
 
@@ -44,10 +66,55 @@ getSType() const
 using SF_AMOUNT2 = TypedField<STAmount2>;
 
 template <class T>
-void
+T*
+constructNewSType(SerialIter& sit, SField const& name)
+{
+    T* stype = new T(sit, name);
+    return stype;
+}
+
+template <class T>
+T*
+constructNewSType2(SField const& name)
+{
+    return new T(name);
+}
+
+template <class T>
+SField const&
 createNewSType(SField::private_access_tag_t access, int tid, int fv, const char* fn)
 {
-    new T(access, tid, fv, fn);
+    if (SField const& field = SField::getField(field_code(tid, fv)); field != sfInvalid)
+        return field;
+    // TODO: refactor
+    // probably not a memory leak because the constructor adds the object to a map
+    return *(new T(access, tid, fv, fn));
+}
+
+std::optional<detail::STVar>
+parseLeafType(
+    SField const& field,
+    std::string const& json_name,
+    std::string const& fieldName,
+    SField const* name,
+    Json::Value const& value,
+    Json::Value& error)
+{
+    // copied from ripple::STParsedJSONDetail::parseLeafType<STAmount>
+    std::optional<detail::STVar> ret;
+    try
+    {
+        ret =
+            detail::make_stvar<STAmount>(amountFromJson(field, value));
+        return ret;
+    }
+    catch (std::exception const&)
+    {
+        RPC::make_error(
+            rpcINVALID_PARAMS,
+            "Field '" + json_name + "." + fieldName + "' has invalid data.");
+        return ret;
+    }
 }
 
 static SField::private_access_tag_t access;
@@ -659,12 +726,19 @@ struct SFieldInfo {
 };
 
 extern "C"
-std::vector<std::pair<int, createNewSFieldPtr>>
+std::vector<STypeExport>
 getSTypes()
 {
     registerSType(ripple::STI_AMOUNT2, ripple::createNewSType<ripple::SF_AMOUNT2>);
-    return std::vector<std::pair<int, createNewSFieldPtr>>{
-        {ripple::STI_AMOUNT2, ripple::createNewSType<ripple::SF_AMOUNT2>}
+    STypeExport StiAmount2{
+        ripple::STI_AMOUNT2,
+        ripple::createNewSType<ripple::SF_AMOUNT2>,
+        ripple::parseLeafType,
+        ripple::constructNewSType<ripple::STAmount2>,
+        ripple::constructNewSType2<ripple::STAmount2>
+    };
+    return std::vector<STypeExport>{
+        StiAmount2,
     };
 }
 

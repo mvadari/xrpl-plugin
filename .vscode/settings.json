@@ -103,7 +103,8 @@
         "valarray": "cpp",
         "rope": "cpp",
         "slist": "cpp",
-        "__verbose_abort": "cpp"
+        "__verbose_abort": "cpp",
+        "*.inc": "cpp"
     },
     "cSpell.words": [
         "keylet",
