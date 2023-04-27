@@ -25,6 +25,7 @@
 #include <ripple/protocol/Quality.h>
 #include <ripple/protocol/st.h>
 #include <ripple/protocol/ErrorCodes.h>
+#include <ripple/beast/core/LexicalCast.h>
 
 
 typedef ripple::SField const& (*createNewSFieldPtr)(
@@ -52,21 +53,27 @@ struct STypeExport {
 
 namespace ripple {
 
-const int STI_AMOUNT2 = 24;
+const int STI_UINT32_2 = 24;
 
-class STAmount2 final : public STAmount
+class STUInt32_2 : public STUInt32
 {
+using STUInt32::STUInt32;
+
+STUInt32_2(STUInt32 num) : STUInt32(num.value())
+{
+}
+
 int
 getSType() const
 {
-    return STI_AMOUNT2;
+    return STI_UINT32_2;
 }
 };
 
-using SF_AMOUNT2 = TypedField<STAmount2>;
+using SF_UINT32_2 = TypedField<STUInt32_2>;
 
 template <class T>
-T*
+STBase*
 constructNewSType(SerialIter& sit, SField const& name)
 {
     T* stype = new T(sit, name);
@@ -74,7 +81,7 @@ constructNewSType(SerialIter& sit, SField const& name)
 }
 
 template <class T>
-T*
+STBase*
 constructNewSType2(SField const& name)
 {
     return new T(name);
@@ -100,19 +107,37 @@ parseLeafType(
     Json::Value const& value,
     Json::Value& error)
 {
-    // copied from ripple::STParsedJSONDetail::parseLeafType<STAmount>
+    // copied from parseLeafType<STUInt32>
     std::optional<detail::STVar> ret;
     try
     {
-        ret =
-            detail::make_stvar<STAmount>(amountFromJson(field, value));
+        if (value.isString())
+        {
+            ret = detail::make_stvar<STUInt32_2>(
+                field,
+                beast::lexicalCastThrow<std::uint32_t>(
+                    value.asString()));
+        }
+        else if (value.isInt())
+        {
+            ret = detail::make_stvar<STUInt32_2>(
+                field, to_unsigned<std::uint32_t>(value.asInt()));
+        }
+        else if (value.isUInt())
+        {
+            ret = detail::make_stvar<STUInt32_2>(
+                field, safe_cast<std::uint32_t>(value.asUInt()));
+        }
+        else
+        {
+            error = bad_type(json_name, fieldName);
+            return ret;
+        }
         return ret;
     }
     catch (std::exception const&)
     {
-        RPC::make_error(
-            rpcINVALID_PARAMS,
-            "Field '" + json_name + "." + fieldName + "' has invalid data.");
+        error = invalid_data(json_name, fieldName);
         return ret;
     }
 }
@@ -122,7 +147,7 @@ static SField::private_access_tag_t access;
 // helper stuff that needs to be moved to rippled
 
 template <typename T>
-int getSTId() { }
+int getSTId() { return 0; }
 
 template <>
 int getSTId<SF_AMOUNT>() { return STI_AMOUNT; }
@@ -131,7 +156,10 @@ template <>
 int getSTId<SF_ACCOUNT>() { return STI_ACCOUNT; }
 
 template <> 
-int getSTId<SF_AMOUNT2>() { return STI_AMOUNT2; }
+int getSTId<SF_UINT32>() { return STI_UINT32; }
+
+// template <> 
+// int getSTId<SF_UINT32_2>() { return STI_UINT32_2; }
 
 
 
@@ -154,11 +182,10 @@ newSField(const int fieldValue, std::string const fieldName)
 
 // end of helper stuff
 
-
-SF_AMOUNT2 const&
-sfLimitAmount2()
+SF_UINT32 const&
+sfQualityIn2()
 {
-    return newSField<SF_AMOUNT2>(11, "LimitAmount2");
+    return newSField<SF_UINT32>(1, "QualityIn2");
 }
 
 NotTEC
@@ -178,7 +205,7 @@ preflight(PreflightContext const& ctx)
         return temINVALID_FLAG;
     }
 
-    STAmount const saLimitAmount(tx.getFieldAmount(sfLimitAmount2()));
+    STAmount const saLimitAmount(tx.getFieldAmount(sfLimitAmount));
 
     if (!isLegalNet(saLimitAmount))
         return temBAD_AMOUNT;
@@ -233,7 +260,7 @@ preclaim(PreclaimContext const& ctx)
         return tefNO_AUTH_REQUIRED;
     }
 
-    auto const saLimitAmount = ctx.tx[sfLimitAmount2()];
+    auto const saLimitAmount = ctx.tx[sfLimitAmount];
 
     auto const currency = saLimitAmount.getCurrency();
     auto const uDstAccountID = saLimitAmount.getIssuer();
@@ -285,8 +312,8 @@ doApply(ApplyContext& ctx, XRPAmount mPriorBalance, XRPAmount mSourceBalance)
     TER terResult = tesSUCCESS;
     auto const account = ctx.tx.getAccountID(sfAccount);
 
-    STAmount const saLimitAmount(ctx.tx.getFieldAmount(sfLimitAmount2()));
-    bool const bQualityIn(ctx.tx.isFieldPresent(sfQualityIn));
+    STAmount const saLimitAmount(ctx.tx.getFieldAmount(sfLimitAmount));
+    bool const bQualityIn(ctx.tx.isFieldPresent(sfQualityIn2()));
     bool const bQualityOut(ctx.tx.isFieldPresent(sfQualityOut));
 
     Currency const currency(saLimitAmount.getCurrency());
@@ -323,7 +350,7 @@ doApply(ApplyContext& ctx, XRPAmount mPriorBalance, XRPAmount mSourceBalance)
         (uOwnerCount < 2) ? XRPAmount(beast::zero)
                           : ctx.view().fees().accountReserve(uOwnerCount + 1));
 
-    std::uint32_t uQualityIn(bQualityIn ? ctx.tx.getFieldU32(sfQualityIn) : 0);
+    std::uint32_t uQualityIn(bQualityIn ? ctx.tx.getFieldU32(sfQualityIn2()) : 0);
     std::uint32_t uQualityOut(
         bQualityOut ? ctx.tx.getFieldU32(sfQualityOut) : 0);
 
@@ -712,8 +739,8 @@ std::vector<FakeSOElement>
 getTxFormat()
 {
     return std::vector<FakeSOElement>{
-        {ripple::sfLimitAmount2().getCode(), ripple::soeOPTIONAL},
-        {ripple::sfQualityIn.getCode(), ripple::soeOPTIONAL},
+        {ripple::sfLimitAmount.getCode(), ripple::soeOPTIONAL},
+        {ripple::sfQualityIn2().getCode(), ripple::soeOPTIONAL},
         {ripple::sfQualityOut.getCode(), ripple::soeOPTIONAL},
         {ripple::sfTicketSequence.getCode(), ripple::soeOPTIONAL},
     };
@@ -729,16 +756,15 @@ extern "C"
 std::vector<STypeExport>
 getSTypes()
 {
-    registerSType(ripple::STI_AMOUNT2, ripple::createNewSType<ripple::SF_AMOUNT2>);
-    STypeExport StiAmount2{
-        ripple::STI_AMOUNT2,
-        ripple::createNewSType<ripple::SF_AMOUNT2>,
-        ripple::parseLeafType,
-        ripple::constructNewSType<ripple::STAmount2>,
-        ripple::constructNewSType2<ripple::STAmount2>
-    };
+    // registerSType(ripple::STI_UINT32_2, ripple::createNewSType<ripple::SF_UINT32_2>);
     return std::vector<STypeExport>{
-        StiAmount2,
+    //     {
+    //         ripple::STI_UINT32_2,
+    //         ripple::createNewSType<ripple::SF_UINT32_2>,
+    //         ripple::parseLeafType,
+    //         ripple::constructNewSType<ripple::STUInt32_2>,
+    //         ripple::constructNewSType2<ripple::STUInt32_2>
+    //     },
     };
 }
 
@@ -746,9 +772,9 @@ extern "C"
 std::vector<SFieldInfo>
 getSFields()
 {
-    auto const& sfLimitAmount2 = ripple::sfLimitAmount2();
+    auto const& sfQualityIn2 = ripple::sfQualityIn2();
     return std::vector<SFieldInfo>{
-        {sfLimitAmount2.fieldType, sfLimitAmount2.fieldValue, sfLimitAmount2.fieldName.c_str()},
+        {sfQualityIn2.fieldType, sfQualityIn2.fieldValue, sfQualityIn2.fieldName.c_str()},
     };
 }
 
