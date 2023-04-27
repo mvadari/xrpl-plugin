@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 fn main() {
     let manifest_dir = env!("CARGO_MANIFEST_DIR");
@@ -7,26 +7,14 @@ fn main() {
         .join("rippled");
     std::fs::create_dir_all(&target_dir).unwrap();
 
-    let xrpl_core_file = Path::new(&manifest_dir)
-        .join("../external/rippled/.build/libxrpl_core.a");
-
-    if target_dir.join("libxrpl_core.a").exists() {
-        std::fs::remove_file(target_dir.join("libxrpl_core.a")).unwrap();
-    }
-    let res = std::fs::copy(xrpl_core_file.clone(), target_dir.join("libxrpl_core.a").clone());
-    if res.is_err() {
-        println!(
-            "cargo:warning=Error copying file: {} {} {:?}",
-            xrpl_core_file.display(),
-            target_dir.display(),
-            res
-        );
-    }
-
-    res.unwrap();
+    remove_and_copy_file(None, "libxrpl_core.a", &target_dir);
+    remove_and_copy_file(Some("src/secp256k1"), "libsecp256k1.a", &target_dir);
+    remove_and_copy_file(Some("src/ed25519-donna"), "libed25519.a", &target_dir);
 
     println!("cargo:rustc-link-search=native={}/target/rippled/", manifest_dir);
     println!("cargo:rustc-link-lib=xrpl_core");
+    println!("cargo:rustc-link-lib=secp256k1");
+    println!("cargo:rustc-link-lib=ed25519");
     println!("cargo:rerun-if-changed=src/lib.rs");
     println!("cargo:rerun-if-changed=src/rippled_api.cpp");
     println!("cargo:rerun-if-changed=include/rippled_api.h");
@@ -52,4 +40,30 @@ fn main() {
             Path::new("/Users/nkramer/.conan/data/date/3.0.1/_/_/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/include/").to_path_buf()
         ])
         .compile("rust");
+}
+
+fn remove_and_copy_file(extra_build_path: Option<&str>, lib_name: &str, target_dir: &PathBuf) {
+    let mut lib_file = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("../external/rippled/.build/");
+    if let Some(extra_path) = extra_build_path {
+        lib_file = lib_file.join(extra_path);
+    }
+
+    lib_file = lib_file.join(lib_name);
+
+    if target_dir.join(lib_name).exists() {
+        std::fs::remove_file(target_dir.join(lib_name)).unwrap();
+    }
+
+    let res = std::fs::copy(lib_file.clone(), target_dir.join(lib_name).clone());
+    if res.is_err() {
+        println!(
+            "cargo:warning=Error copying file: {} {} {:?}",
+            lib_file.display(),
+            target_dir.display(),
+            res
+        );
+    }
+
+    res.unwrap();
 }

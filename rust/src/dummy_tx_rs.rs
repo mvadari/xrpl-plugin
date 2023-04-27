@@ -1,19 +1,70 @@
-use cxx::UniquePtr;
+use std::ops::Deref;
+use std::pin::Pin;
+use cxx::{SharedPtr, UniquePtr};
+use crate::{AccountID, ApplyFlags, LedgerSpecificFlags, rippled, TECcodes, TEFcodes, TEMcodes, TER, TEScodes};
 use super::rippled::*;
 // type PreflightContext = super::rippled::PreflightContext;
 // type NotTEC = super::rippled::NotTEC;
 
-pub fn pre_flight(ctx: &PreflightContext) -> i32 {
-    let enabled = get_rules(ctx).enabled(fixMasterKeyAsRegularKey());
-    println!("enabled = {}", enabled);
-    // from_tefcodes(TEFcodes::tefALREADY)
-    return 0;
+pub fn pre_flight(ctx: &PreflightContext) -> NotTEC {
+    let preflight1ret = preflight1(ctx);
+    if preflight1ret != TEScodes::tesSUCCESS {
+        return preflight1ret;
+    }
+
+    // There are no SetRegularKey tx flags, so if there are any flags set, return an error code
+    let sttx_as_stobject = upcast(ctx.getTx());
+    if (sttx_as_stobject.getFlags() & tfUniversalMask()) != 0 {
+        println!("Malformed transaction: Invalid flags set.");
+        return TEMcodes::temINVALID_FLAG.into();
+    }
+
+    let regular_key: AccountID = sttx_as_stobject.getAccountID(sfRegularKey());
+    println!("RegularKey: {:?}", toBase58(&regular_key));
+    println!("Account: {:?}", toBase58(&sttx_as_stobject.getAccountID(sfAccount())));
+    if ctx.getRules().enabled(fixMasterKeyAsRegularKey()) &&
+        sttx_as_stobject.isFieldPresent(sfRegularKey()) &&
+        sttx_as_stobject.getAccountID(sfRegularKey()) == sttx_as_stobject.getAccountID(sfAccount()) {
+        return TEMcodes::temBAD_REGKEY.into();
+    }
+
+    preflight2(ctx)
 }
 
-pub fn pre_claim(ctx: &PreclaimContext) -> i32 {
-    return 0;
+pub fn pre_claim(ctx: &PreclaimContext) -> TER {
+    return TEScodes::tesSUCCESS.into();
 }
 
-pub fn do_apply(ctx: &ApplyContext, m_prior_balance: XRPAmount, m_source_balance: XRPAmount) -> i32 {
-    return 0;
+pub fn do_apply(mut ctx: Pin<&mut ApplyContext>, m_prior_balance: XRPAmount, m_source_balance: XRPAmount) -> TER {
+    let tx_as_stobject = upcast(ctx.getTx());
+    let account = tx_as_stobject.getAccountID(sfAccount());
+    let keylet = rippled::account(&account);
+
+    let sle: SharedPtr<SLE> = ctx.as_mut().view().peek(&keylet);
+    if sle.is_null() {
+        return TEFcodes::tefINTERNAL.into();
+    }
+
+    let app: Pin<&mut Application> = ctx.as_mut().getApp();
+    let base_fee: XRPAmount = ctx.as_mut().getBaseFee();
+    let view: Pin<&mut ApplyView> = ctx.as_mut().view();
+    let fees: &Fees = view.fees();
+    let flags: ApplyFlags = view.flags();
+
+    // This will never be true unless we duplicate the logic in SetRegularKey::calculateBaseFee
+    if minimumFee(app, base_fee, fees, flags) == XRPAmount::zero() {
+        setFlag(&sle, LedgerSpecificFlags::lsfPasswordSpent.into());
+    }
+
+    if upcast(ctx.getTx()).isFieldPresent(sfRegularKey()) {
+        setAccountID(&sle, sfRegularKey(), &upcast(ctx.getTx()).getAccountID(sfRegularKey()));
+    } else {
+        if sle.deref().isFlag(LedgerSpecificFlags::lsfDisableMaster.into()) & !ctx.as_mut().view().peek(&signers(&account)).is_null() {
+            return TECcodes::tecNO_ALTERNATIVE_KEY.into();
+        }
+
+        makeFieldAbsent(&sle,sfRegularKey());
+    }
+
+    return TEScodes::tesSUCCESS.into();
 }
