@@ -63,6 +63,18 @@ STUInt32_2(STUInt32 num) : STUInt32(num.value())
 {
 }
 
+STBase*
+copy(std::size_t n, void* buf) const
+{
+    return emplace(n, buf, *this);
+}
+
+STBase*
+move(std::size_t n, void* buf)
+{
+    return emplace(n, buf, std::move(*this));
+}
+
 int
 getSType() const
 {
