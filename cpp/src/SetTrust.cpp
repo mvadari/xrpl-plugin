@@ -57,7 +57,10 @@ const int STI_UINT32_2 = 24;
 
 class STUInt32_2 : public STUInt32
 {
-using STUInt32::STUInt32;
+STUInt32_2::STInteger(SerialIter& sit, SField const& name)
+    : STInteger(name, sit.get32())
+{
+}
 
 STUInt32_2(STUInt32 num) : STUInt32(num.value())
 {
@@ -99,7 +102,7 @@ createNewSType(SField::private_access_tag_t access, int tid, int fv, const char*
 }
 
 std::optional<detail::STVar>
-parseLeafType(
+parseLeafTypeNew(
     SField const& field,
     std::string const& json_name,
     std::string const& fieldName,
@@ -158,8 +161,8 @@ int getSTId<SF_ACCOUNT>() { return STI_ACCOUNT; }
 template <> 
 int getSTId<SF_UINT32>() { return STI_UINT32; }
 
-// template <> 
-// int getSTId<SF_UINT32_2>() { return STI_UINT32_2; }
+template <> 
+int getSTId<SF_UINT32_2>() { return STI_UINT32_2; }
 
 
 
@@ -182,10 +185,10 @@ newSField(const int fieldValue, std::string const fieldName)
 
 // end of helper stuff
 
-SF_UINT32 const&
+SF_UINT32_2 const&
 sfQualityIn2()
 {
-    return newSField<SF_UINT32>(1, "QualityIn2");
+    return newSField<SF_UINT32_2>(47, "QualityIn2");
 }
 
 NotTEC
@@ -756,15 +759,15 @@ extern "C"
 std::vector<STypeExport>
 getSTypes()
 {
-    // registerSType(ripple::STI_UINT32_2, ripple::createNewSType<ripple::SF_UINT32_2>);
+    registerSType(ripple::STI_UINT32_2, ripple::createNewSType<ripple::SF_UINT32_2>);
     return std::vector<STypeExport>{
-    //     {
-    //         ripple::STI_UINT32_2,
-    //         ripple::createNewSType<ripple::SF_UINT32_2>,
-    //         ripple::parseLeafType,
-    //         ripple::constructNewSType<ripple::STUInt32_2>,
-    //         ripple::constructNewSType2<ripple::STUInt32_2>
-    //     },
+        {
+            ripple::STI_UINT32_2,
+            ripple::createNewSType<ripple::SF_UINT32_2>,
+            ripple::parseLeafTypeNew,
+            ripple::constructNewSType<ripple::STUInt32_2>,
+            ripple::constructNewSType2<ripple::STUInt32_2>
+        },
     };
 }
 
