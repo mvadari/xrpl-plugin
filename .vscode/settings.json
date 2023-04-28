@@ -102,7 +102,12 @@
         "shared_mutex": "cpp",
         "valarray": "cpp",
         "rope": "cpp",
-        "slist": "cpp"
+        "slist": "cpp",
+        "__verbose_abort": "cpp",
+        "*.inc": "cpp",
+        "__memory": "cpp",
+        "scoped_allocator": "cpp",
+        "filesystem": "cpp"
     },
     "cSpell.words": [
         "keylet",
