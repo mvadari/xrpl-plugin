@@ -57,10 +57,7 @@ const int STI_UINT32_2 = 24;
 
 class STUInt32_2 : public STUInt32
 {
-STUInt32_2::STInteger(SerialIter& sit, SField const& name)
-    : STInteger(name, sit.get32())
-{
-}
+using STUInt32::STUInt32;
 
 STUInt32_2(STUInt32 num) : STUInt32(num.value())
 {
