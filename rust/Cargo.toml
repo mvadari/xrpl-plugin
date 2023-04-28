@@ -1,17 +1,5 @@
-[package]
-name = "rust"
-version = "0.1.0"
-edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-[lib]
-name = "rust"
-path = "src/lib.rs"
-crate-type = ["dylib", "staticlib"]
-
-[dependencies]
-cxx = "1.0.94"
-"xrpl-rust-sdk-core" = { path = "../../xrpl-rust-sdk/xrpl-rust-sdk-core" }
-
-[build-dependencies]
-cxx-build = "1.0.94"
+[workspace]
+resolver = "2"
+members = [
+    "crates/rippled-bridge"
+]

@@ -35,7 +35,7 @@ fn main() {
         //  we add a conan step in this build.rs that installs boost and date somewhere
         //  and then we can include those output paths here?
         .includes([
-            Path::new(manifest_dir).join("../external/rippled/src/"),
+            Path::new(manifest_dir).join("../../../external/rippled/src/"),
             Path::new("/Users/nkramer/.conan/data/boost/1.77.0/_/_/source/src/").to_path_buf(),
             Path::new("/Users/nkramer/.conan/data/date/3.0.1/_/_/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/include/").to_path_buf()
         ])
@@ -44,7 +44,7 @@ fn main() {
 
 fn remove_and_copy_file(extra_build_path: Option<&str>, lib_name: &str, target_dir: &PathBuf) {
     let mut lib_file = Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("../external/rippled/.build/");
+        .join("../../../external/rippled/.build/");
     if let Some(extra_path) = extra_build_path {
         lib_file = lib_file.join(extra_path);
     }
