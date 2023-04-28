@@ -738,7 +738,7 @@ extern "C"
 char const*
 getTxName()
 {
-    return "TrustSet";
+    return "TrustSet2";
 }
 
 struct FakeSOElement {
