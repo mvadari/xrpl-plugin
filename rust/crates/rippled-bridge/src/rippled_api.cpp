@@ -2,9 +2,9 @@
 // Created by Noah Kramer on 4/17/23.
 //
 
-#include "rust/include/rippled_api.h"
+#include "rippled-bridge/include/rippled_api.h"
 #include "ripple/basics/base64.h"
-#include "rust/src/lib.rs.h"
+#include "rippled-bridge/src/lib.rs.h"
 #include <functional>
 #include <string>
 

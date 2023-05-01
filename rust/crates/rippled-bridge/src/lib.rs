@@ -2,6 +2,7 @@ use std::ops::Deref;
 use std::pin::Pin;
 use cxx::{ExternType, SharedPtr, type_id, UniquePtr};
 use cxx::kind::Trivial;
+use xrpl_rust_sdk_core::core::types::{AccountId, XrpAmount};
 
 pub mod dummy_tx_rs;
 pub mod ter;
@@ -14,7 +15,7 @@ pub use ter::{TER, NotTEC, TEFcodes, TEMcodes, TELcodes, TECcodes, TEScodes, TER
 pub use flags::{LedgerSpecificFlags, ApplyFlags};
 
 // Also try this
-#[no_mangle]
+/*#[no_mangle]
 pub fn preflight(ctx: &rippled::PreflightContext) -> NotTEC {
     pre_flight(ctx)
 }
@@ -32,7 +33,7 @@ pub fn calculateBaseFee(view: &rippled::ReadView, tx: &rippled::STTx) -> XRPAmou
 #[no_mangle]
 pub fn doApply(mut ctx: Pin<&mut rippled::ApplyContext>, mPriorBalance: rippled::XRPAmount, mSourceBalance: rippled::XRPAmount) -> TER {
     do_apply(ctx, mPriorBalance, mSourceBalance)
-}
+}*/
 
 #[repr(u16)]
 #[derive(Debug, Clone, Copy)]
@@ -156,10 +157,10 @@ pub mod rippled {
     extern "Rust" {
         // This function is unused, but exists only to ensure that line 11's interface is bridge
         // compatible.
-        pub fn preflight(ctx: &PreflightContext) -> NotTEC;
+        /*pub fn preflight(ctx: &PreflightContext) -> NotTEC;
         pub fn preclaim(ctx: &PreclaimContext) -> TER;
         pub fn calculateBaseFee(view: &ReadView, tx: &STTx) -> XRPAmount;
-        pub fn doApply(mut ctx: Pin<&mut ApplyContext>, mPriorBalance: XRPAmount, mSourceBalance: XRPAmount) -> TER;
+        pub fn doApply(mut ctx: Pin<&mut ApplyContext>, mPriorBalance: XRPAmount, mSourceBalance: XRPAmount) -> TER;*/
     }
 
     // Safety: the extern "C++" block is responsible for deciding whether to expose each signature
@@ -179,7 +180,7 @@ pub mod rippled {
         // but it gets #include'd and used in static assertions to ensure
         // our picture of the FFI boundary is accurate.
         ////////////////////////////////
-        include!("rust/include/rippled_api.h");
+        include!("rippled-bridge/include/rippled_api.h");
 
         ////////////////////////////////
         // Zero or more opaque types which both languages can pass around
@@ -202,12 +203,12 @@ pub mod rippled {
         pub type XRPAmount = super::XRPAmount;
         pub type ReadView;
         pub type ApplyView;
-        pub(crate) type STTx;
-        type Rules;
-        type uint256;
+        pub type STTx;
+        pub type Rules;
+        pub type uint256;
         type Transactor;
-        type SField;
-        type STObject;
+        pub type SField;
+        pub type STObject;
         type Keylet = super::Keylet;
         type LedgerEntryType = super::LedgerEntryType;
         pub(crate) type SLE;
@@ -237,7 +238,7 @@ pub mod rippled {
     }
 
     unsafe extern "C++" {
-        include!("rust/include/rippled_api.h");
+        include!("rippled-bridge/include/rippled_api.h");
 
         pub fn base64_decode_ptr(s: &CxxString) -> UniquePtr<CxxString>;
 
@@ -315,6 +316,12 @@ pub struct AccountID {
     data_: [u8; 20]
 }
 
+impl From<AccountID> for AccountId {
+    fn from(value: AccountID) -> Self {
+        AccountId::from(value.data_)
+    }
+}
+
 unsafe impl cxx::ExternType for AccountID {
     type Id = type_id!("ripple::AccountID");
     type Kind = Trivial;
@@ -329,6 +336,20 @@ pub struct XRPAmount {
 impl XRPAmount {
     pub fn zero() -> Self {
         XRPAmount { drops_: 0 }
+    }
+}
+
+impl From<XrpAmount> for XRPAmount {
+    fn from(value: XrpAmount) -> Self {
+        XRPAmount {
+            drops_: value.get_drops() as i64
+        }
+    }
+}
+
+impl From<XRPAmount> for XrpAmount {
+    fn from(value: XRPAmount) -> Self {
+        XrpAmount::of_drops(value.drops_ as u64).unwrap()
     }
 }
 

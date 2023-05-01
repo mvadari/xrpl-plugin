@@ -1,7 +1,7 @@
 use std::ops::Deref;
 use std::pin::Pin;
 use cxx::{SharedPtr, UniquePtr};
-use crate::{AccountID, ApplyFlags, LedgerSpecificFlags, rippled, TECcodes, TEFcodes, TEMcodes, TER, TEScodes};
+use crate::{AccountID, ApplyFlags, LedgerSpecificFlags, NotTEC, rippled, TECcodes, TEFcodes, TEMcodes, TER, TEScodes};
 use super::rippled::*;
 // type PreflightContext = super::rippled::PreflightContext;
 // type NotTEC = super::rippled::NotTEC;
@@ -35,6 +35,10 @@ pub fn pre_claim(ctx: &PreclaimContext) -> TER {
     return TEScodes::tesSUCCESS.into();
 }
 
+// TODO: Write wrappers for everything used in this function in plugin-transactor/lib.rs,
+//   then add `do_apply` to `transactor.rs` Transactor trait and implement on DummyTx using the
+//   wrappers instead of raw ffi code.
+//   Once that's done, we should get rid of this file.
 pub fn do_apply(mut ctx: Pin<&mut ApplyContext>, m_prior_balance: XRPAmount, m_source_balance: XRPAmount) -> TER {
     let tx_as_stobject = upcast(ctx.getTx());
     let account = tx_as_stobject.getAccountID(sfAccount());

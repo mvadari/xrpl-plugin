@@ -39,7 +39,7 @@ fn main() {
             Path::new("/Users/nkramer/.conan/data/boost/1.77.0/_/_/source/src/").to_path_buf(),
             Path::new("/Users/nkramer/.conan/data/date/3.0.1/_/_/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/include/").to_path_buf()
         ])
-        .compile("rust");
+        .compile("rippled_bridge");
 }
 
 fn remove_and_copy_file(extra_build_path: Option<&str>, lib_name: &str, target_dir: &PathBuf) {
