@@ -31,18 +31,6 @@ ripple::uint256 const &fixMasterKeyAsRegularKey() {
     return ripple::fixMasterKeyAsRegularKey;
 }
 
-ripple::PreflightContext const &get_dummy_ctx() {
-    // TODO: Return a PreflightContext where .rules has fixMasterKeyAsRegularKey enabled
-}
-
-ripple::STTx const &get_dummy_sttx() {
-    ripple::STTx tx = ripple::STTx(ripple::TxType::ttPAYMENT, [](ripple::STObject& obj) {
-        obj.setFieldU16(ripple::sfTransactionType, ripple::TxType::ttPAYMENT);
-    });
-
-    return tx;
-}
-
 ripple::XRPAmount defaultCalculateBaseFee(ripple::ReadView const& view, ripple::STTx const& tx) {
     return ripple::Transactor::calculateBaseFee(view, tx);
 }

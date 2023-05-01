@@ -76,31 +76,6 @@ constexpr ripple::SField const& sfAccount() {
 
 std::unique_ptr<std::string> toBase58(const ripple::AccountID& accountId);
 
-namespace ripple {
-
-    class RustDummyTx : public Transactor
-    {
-    public:
-        static constexpr ConsequencesFactoryType ConsequencesFactory{Normal};
-
-        explicit RustDummyTx(ApplyContext& ctx) : Transactor(ctx)
-        {
-        }
-
-        static NotTEC
-        preflight(PreflightContext const& ctx);
-
-        static TER
-        preclaim(PreclaimContext const& ctx);
-
-        TER
-        doApply() override;
-    };
-
-//------------------------------------------------------------------------------
-
-}
-
 //ripple::uint256 const &foo(ripple::uint256 const* bar);
 
 //void toAccountIdVec(rust::Vec<u32> v);

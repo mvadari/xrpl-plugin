@@ -1,4 +1,4 @@
 [submodule "external/rippled"]
 	path = external/rippled
 	url = https://github.com/nkramer44/rippled.git
-    branch = experimental
+    branch = nk/rust-plugin
