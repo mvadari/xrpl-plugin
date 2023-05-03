@@ -65,40 +65,12 @@ ripple::SField const& field
     sle->makeFieldAbsent(field);
 }
 
-/*std::int32_t preflight1(ripple::PreflightContext const& ctx) {
-    return ripple::preflight1(ctx).getUnderlyingCode();
-}
-
-std::int32_t preflight2(ripple::PreflightContext const& ctx) {
-    return ripple::preflight2(ctx).getUnderlyingCode();
-}*/
-
 std::unique_ptr<std::string> toBase58(const ripple::AccountID& accountId) {
     std::cout << "Size: " << sizeof(ripple::NotTEC) << " Alignement: " << alignof(ripple::NotTEC) << std::endl;
     return std::make_unique<std::string>(ripple::toBase58(accountId));
 }
 
-namespace ripple {
-
-    /*extern "C" {
-        NotTEC
-        preflight(PreflightContext const &ctx) {
-            return *pre_flight(ctx);
-        }
-    }*/
-
+void push_soelement(int field_code, ripple::SOEStyle style, std::vector<ripple::FakeSOElement>& vec) {
+    vec.push_back({field_code, style});
 }
 
-// Test function to simulate turning an AccountID into a Rust AccountId.
-
-// Send in a C++ Vec of u32s, get back a std::vector
-//void toAccountIdVec(rust::Vec<u32> v) {
-////    for (auto shared : v) {
-////        std::cout << shared.v << std::endl;
-////    }
-//
-//    // Copy the elements to a C++ std::vector using STL algorithm.
-//    std::vector<Shared> stdv;
-//    std::copy(v.begin(), v.end(), std::back_inserter(stdv));
-//    assert(v.size() == stdv.size());
-//}

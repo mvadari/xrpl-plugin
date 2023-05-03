@@ -74,10 +74,23 @@ constexpr ripple::SField const& sfAccount() {
     return ripple::sfAccount;
 }
 
+constexpr ripple::SField const& sfTicketSequence() {
+    return ripple::sfTicketSequence;
+}
+
 std::unique_ptr<std::string> toBase58(const ripple::AccountID& accountId);
 
-//ripple::uint256 const &foo(ripple::uint256 const* bar);
+struct STypeExport;
 
-//void toAccountIdVec(rust::Vec<u32> v);
+/*void
+foo(std::unique_ptr<std::vector<ripple::FakeSOElement>> vec);*/
 
+//rust::Vec<ripple::FakeSOElement> getTxFormat();
+
+// (1) Mayukha's code calls this (this has to be callable in the dylib)
+//void getTxFormat2(std::vector<ripple::FakeSOElement> vec);
+// (2) getTxFormat2 will call a Rust function over the bridge and get a rust::Vec and copy the values into the std::vector that
+//    gets passed in
+
+void push_soelement(int field_code, ripple::SOEStyle style, std::vector<ripple::FakeSOElement>& vec);
 #endif //PLUGIN_TRANSACTOR_BLOBSTORE_H
