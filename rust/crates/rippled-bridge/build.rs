@@ -22,10 +22,11 @@ fn main() {
     println!("cargo:rerun-if-changed=include/rippled_api.h");
 
     let command = InstallCommandBuilder::new()
-        .build_policy(BuildPolicy::Never)
+        .build_policy(BuildPolicy::Missing)
         .recipe_path(Path::new("conanfile.txt"))
         .build();
 
+    println!("cargo:warning=CONAN: {:?}", env::var("PATH"));
     let build_info = command.generate().expect("Error executing conan command.");
     build_info.cargo_emit();
 
