@@ -1,4 +1,6 @@
+use std::env;
 use std::path::{Path, PathBuf};
+use conan::{BuildPolicy, InstallCommandBuilder};
 
 fn main() {
     let manifest_dir = env!("CARGO_MANIFEST_DIR");
@@ -19,25 +21,22 @@ fn main() {
     println!("cargo:rerun-if-changed=src/rippled_api.cpp");
     println!("cargo:rerun-if-changed=include/rippled_api.h");
 
-    println!("cargo:rustc-link-search=native={}", "/Users/nkramer/.conan/data/boost/1.77.0/_/_/package/fe7d69d60522d2cdcbaae6c1cf3e710f6e95e703/lib/");
-    println!("cargo:rustc-link-lib=boost_thread");
+    let command = InstallCommandBuilder::new()
+        .build_policy(BuildPolicy::Missing)
+        .recipe_path(Path::new("conanfile.txt"))
+        .build();
 
-    println!("cargo:rustc-link-search=native={}", "/Users/nkramer/.conan/data/openssl/1.1.1m/_/_/package/6bfe84f85e7c10bcc5faaea768689942159f07e4/lib/");
-    println!("cargo:rustc-link-lib=crypto");
+    let build_info = command.generate().expect("Error executing conan command.");
+    build_info.cargo_emit();
 
     cxx_build::bridge("src/lib.rs")
         .file("src/rippled_api.cpp")
         .flag_if_supported("-std=c++20")
         .flag("-DBOOST_ASIO_HAS_STD_INVOKE_RESULT")
-        // TODO: The boost and date include paths are hardcoded for my machine. Is there
-        //  a better way to include dependency header files? Maybe we try to get cxx to build
-        //  with cmake and include a CMakeLists.txt that depends on boost and date? Maybe
-        //  we add a conan step in this build.rs that installs boost and date somewhere
-        //  and then we can include those output paths here?
         .includes([
             Path::new(manifest_dir).join("../../../external/rippled/src/"),
-            Path::new("/Users/nkramer/.conan/data/boost/1.77.0/_/_/source/src/").to_path_buf(),
-            Path::new("/Users/nkramer/.conan/data/date/3.0.1/_/_/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/include/").to_path_buf()
+            Path::new(build_info.get_dependency("boost").unwrap().get_include_dir().unwrap()).to_path_buf(),
+            Path::new(build_info.get_dependency("date").unwrap().get_include_dir().unwrap()).to_path_buf()
         ])
         .compile("rippled_bridge");
 }
