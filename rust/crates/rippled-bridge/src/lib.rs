@@ -42,16 +42,16 @@ pub fn doApply(mut ctx: Pin<&mut rippled::ApplyContext>, mPriorBalance: rippled:
 
 #[cxx::bridge]
 pub mod rippled {
-
     // TODO: Make these match whats in SetTrust.cpp
     pub struct STypeExport {
         pub foo: i32
     }
 
     pub struct SFieldInfo {
-        pub foo: i32
+        pub type_id: i32,
+        pub field_value: i32,
+        pub txt_name: *const c_char
     }
-
 
     extern "Rust" {
         // This function is unused, but exists only to ensure that line 11's interface is bridge
@@ -195,6 +195,8 @@ pub mod rippled {
         pub fn minimumFee(app: Pin<&mut Application>, baseFee: XRPAmount, fees: &Fees, flags: ApplyFlags) -> XRPAmount;
 
         pub fn push_soelement(field_code: i32, style: SOEStyle, vec: Pin<&mut CxxVector<FakeSOElement>>);
+
+        // pub fn newSField<T>(fieldValue: i32, fieldName: *const c_char) -> &'static T;
     }
 }
 

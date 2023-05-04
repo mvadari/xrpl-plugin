@@ -99,17 +99,8 @@ pub fn getSFields(mut s_fields: Pin<&mut CxxVector<SFieldInfo>>) {
     });*/
 }
 
-/*#[no_mangle]
-pub fn getTTName() -> *const u8 {
-    let_cxx_string!(tt_name = "ttDUMMY_TX2");
-    tt_name.as_ptr()
-}
-
-#[no_mangle]
-pub fn getTxName() -> *const u8 {
-    let_cxx_string!(tx_name = "DummyTx2😀");
-    tx_name.as_ptr()
-}*/
+// Need to:
+//   Define a type_id, ie STI_
 
 static NAME_ONCE: OnceCell<CString> = OnceCell::new();
 static TT_ONCE: OnceCell<CString> = OnceCell::new();

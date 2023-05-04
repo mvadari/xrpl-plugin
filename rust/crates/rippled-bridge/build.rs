@@ -19,10 +19,10 @@ fn main() {
     println!("cargo:rerun-if-changed=src/rippled_api.cpp");
     println!("cargo:rerun-if-changed=include/rippled_api.h");
 
-    println!("cargo:rustc-link-search=native={}", "/Users/nkramer/.conan/data/boost/1.77.0/_/_/package/1080f5eeec2c2f1a57638424f85f00e32203faa4/lib/");
+    println!("cargo:rustc-link-search=native={}", "/Users/nkramer/.conan/data/boost/1.77.0/_/_/package/fe7d69d60522d2cdcbaae6c1cf3e710f6e95e703/lib/");
     println!("cargo:rustc-link-lib=boost_thread");
 
-    println!("cargo:rustc-link-search=native={}", "/Users/nkramer/.conan/data/openssl/1.1.1m/_/_/package/240c2182163325b213ca6886a7614c8ed2bf1738/lib/");
+    println!("cargo:rustc-link-search=native={}", "/Users/nkramer/.conan/data/openssl/1.1.1m/_/_/package/6bfe84f85e7c10bcc5faaea768689942159f07e4/lib/");
     println!("cargo:rustc-link-lib=crypto");
 
     cxx_build::bridge("src/lib.rs")
