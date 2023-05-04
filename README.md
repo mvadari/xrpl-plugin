@@ -28,19 +28,24 @@ pip install ./python
 
 # Rust
 
-## Build Rust
+## Build Rust Project
 
-```bash
-cd rust
-cargo build
+
+
+
+
+
+### Execute Rust Transaction in rippled
+
+1. Update `Application.cpp` near line `1185` to point to the appropriate `dylib` location. For example:
+
+```c++
+ addPluginTransactor("/Users/dfuelling/Development/github/mvadari/plugin-transactor/rust/target/debug/libdummy_tx.dylib");
 ```
 
-## Execute Rust Transaction in rippled
-
 1. Build `rippled` per the instructions in [BUILD.md](./external/rippled/BUILD.md).
-2. Build `rust` project per the above instructions.
-3. Create a `rippled.cfg` file with the contents of [this rippled.cfg]()https://raw.githubusercontent.com/XRPLF/xrpl4j/main/xrpl4j-integration-tests/src/test/resources/rippled/rippled.cfg
-4. Select a directory for the rippled database (e.g., `../db` and `../db/nudb`).
+1. Create a `rippled.cfg` file with the contents of [this rippled.cfg]()https://raw.githubusercontent.com/XRPLF/xrpl4j/main/xrpl4j-integration-tests/src/test/resources/rippled/rippled.cfg
+1. Select a directory for the rippled database (e.g., `../db` and `../db/nudb`).
 
 In `rippled.cfg`, change the change `[node_db]` stanza's path value to the path to your `db/nudb` directory,
 like this:
@@ -57,14 +62,29 @@ And change the `[database_path]` stanza's path value to the path to your `db` di
   ../db
 ```
 
-5. Start rippled using this command:
+1. Make Symlink to point to the xrpl-rs project where the link is `xrpl-rust-sdk` and the link target is the relative 
+path of your `xrpl-rust-sdk`. For example:
+
+```bash
+cd ..
+ln -s ../xpring-eng/xrpl-rust-sdk xrpl-rust-sdk
+```
+
+1. Build the Rust components 
+
+```bash
+cd rust
+cargo build
+```
+
+1. Start rippled using this command:
 
 ```bash
 cd ./external/rippled/.build
 ./rippled --conf ../rippled.cfg -a --start
 ```
 
-6. Submit a `DummyTx2` transaction using this command:
+1. Submit a `DummyTx2` transaction using this command:
 
 ```bash
 ./rippled --conf ../rippled.cfg submit snoPBrXtMeMyMHUVTgbuqAfg1SUTb '{"TransactionType": "DummyTx2", "Account": "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh", "RegularKey": "rKyudGBFnT6N5fJdaHnRqLpWM1CD8oFrBZ"}'
