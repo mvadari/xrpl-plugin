@@ -22,7 +22,7 @@ fn main() {
     println!("cargo:rerun-if-changed=include/rippled_api.h");
 
     let command = InstallCommandBuilder::new()
-        .build_policy(BuildPolicy::Missing)
+        .build_policy(BuildPolicy::Never)
         .recipe_path(Path::new("conanfile.txt"))
         .build();
 
