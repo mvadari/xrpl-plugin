@@ -74,3 +74,22 @@ void push_soelement(int field_code, ripple::SOEStyle style, std::vector<ripple::
     vec.push_back({field_code, style});
 }
 
+void push_stype_export(int tid, ParseLeafTypeFnPtr parseLeafTypeFn, STypeFromSITFnPtr sTypeFromSitFnPtr, STypeFromSFieldFnPtr sTypeFromSFieldFnPtr, std::vector<STypeExport>& vec) {
+    vec.push_back({tid, parseLeafTypeFn, sTypeFromSitFnPtr, sTypeFromSFieldFnPtr});
+}
+
+void push_sfield_info(int tid, int fv, const char * txt_name, std::vector<ripple::SFieldInfo>& vec) {
+    vec.push_back({tid, fv, txt_name});
+}
+
+ripple::SField const& constructSField(int tid, int fv, const char* fn) {
+    if (ripple::SField const& field = ripple::SField::getField(ripple::field_code(tid, fv)); field != ripple::sfInvalid)
+        return field;
+    return *(new ripple::SField(tid, fv, fn));
+}
+
+/*ripple::SField const & makeTypedField(int tid, int fv, const char* fn) {
+    if (ripple::SField const& field = ripple::SField::getField(ripple::field_code(tid, fv)); field != ripple::sfInvalid)
+        return field;
+    return *(new ripple::TypedField<ripple::STPluginType>(tid, fv, fn));
+}*/

@@ -1,9 +1,9 @@
-use std::ffi::c_void;
+use std::ffi::{c_char, c_void};
 use std::fmt::Formatter;
 use std::mem::MaybeUninit;
 use std::ops::Deref;
 use std::pin::Pin;
-use cxx::{CxxVector, ExternType, SharedPtr, type_id, UniquePtr};
+use cxx::{CxxString, CxxVector, ExternType, SharedPtr, type_id, UniquePtr};
 use cxx::kind::Trivial;
 use cxx::vector::VectorElement;
 use xrpl_rust_sdk_core::core::types::{AccountId, XrpAmount};
@@ -17,6 +17,7 @@ pub use dummy_tx_rs::pre_claim;
 pub use dummy_tx_rs::do_apply;
 pub use ter::{TER, NotTEC, TEFcodes, TEMcodes, TELcodes, TECcodes, TEScodes, TERcodes};
 pub use flags::{LedgerSpecificFlags, ApplyFlags};
+use crate::rippled::{OptionalSTVar, SerialIter, SField, STBase, Value};
 
 // Also try this
 /*#[no_mangle]
@@ -42,16 +43,18 @@ pub fn doApply(mut ctx: Pin<&mut rippled::ApplyContext>, mPriorBalance: rippled:
 
 #[cxx::bridge]
 pub mod rippled {
-    // TODO: Make these match whats in SetTrust.cpp
-    pub struct STypeExport {
-        pub foo: i32
-    }
 
-    pub struct SFieldInfo {
+    // TODO: Make these match whats in SetTrust.cpp
+    /*pub struct STypeExport {
+        pub type_id: i32,
+        // pub create_ptr: fn(tid: i32, fv: i32, f_name: *const c_char)
+    }*/
+
+    /*pub struct SFieldInfo {
         pub type_id: i32,
         pub field_value: i32,
         pub txt_name: *const c_char
-    }
+    }*/
 
     extern "Rust" {
         // This function is unused, but exists only to ensure that line 11's interface is bridge
@@ -115,6 +118,11 @@ pub mod rippled {
         type ApplyFlags = super::ApplyFlags;
         pub type FakeSOElement /*= super::FakeSOElement*/;
         type SOEStyle = super::SOEStyle;
+        pub type SFieldInfo;
+        pub type SerialIter;
+        pub type STBase;
+        #[namespace = "Json"]
+        pub type Value;
 
         ////////////////////////////////
         // Functions implemented in C++.
@@ -139,6 +147,14 @@ pub mod rippled {
 
     unsafe extern "C++" {
         include!("rippled-bridge/include/rippled_api.h");
+
+        pub type STypeExport;
+        pub type ParseLeafTypeFnPtr = super::ParseLeafTypeFnPtr;
+        pub type STypeFromSITFnPtr = super::STypeFromSITFnPtr;
+        pub type STypeFromSFieldFnPtr = super::STypeFromSFieldFnPtr;
+        pub type OptionalSTVar;
+
+        pub fn make_empty_stvar_opt() -> UniquePtr<OptionalSTVar>;
 
         pub fn base64_decode_ptr(s: &CxxString) -> UniquePtr<CxxString>;
 
@@ -195,9 +211,60 @@ pub mod rippled {
         pub fn minimumFee(app: Pin<&mut Application>, baseFee: XRPAmount, fees: &Fees, flags: ApplyFlags) -> XRPAmount;
 
         pub fn push_soelement(field_code: i32, style: SOEStyle, vec: Pin<&mut CxxVector<FakeSOElement>>);
+        pub unsafe fn push_stype_export(
+            tid: i32,
+            parse_leaf_type_fn: ParseLeafTypeFnPtr,
+            from_sit_constructor_ptr: STypeFromSITFnPtr,
+            from_sfield_constructor_ptr: STypeFromSFieldFnPtr,
+            vec: Pin<&mut CxxVector<STypeExport>>
+        );
+        pub unsafe fn push_sfield_info(tid: i32, fv: i32, txt_name: *const c_char, vec: Pin<&mut CxxVector<SFieldInfo>>);
 
-        // pub fn newSField<T>(fieldValue: i32, fieldName: *const c_char) -> &'static T;
+        pub fn isString(self: &Value) -> bool;
     }
+}
+
+// https://github.com/dtolnay/cxx/issues/895#issuecomment-913095541
+#[repr(transparent)]
+pub struct ParseLeafTypeFnPtr(
+    pub extern "C" fn(
+        field: &SField,
+        json_name: &CxxString,
+        field_name: &CxxString,
+        name: &SField,
+        value: &Value,
+        error: Pin<&mut Value>
+    ) -> UniquePtr<OptionalSTVar>
+);
+
+unsafe impl ExternType for ParseLeafTypeFnPtr {
+    type Id = type_id!("ParseLeafTypeFnPtr");
+    type Kind = Trivial;
+}
+
+#[repr(transparent)]
+pub struct STypeFromSITFnPtr(
+    pub extern "C" fn(
+        sit: Pin<&mut SerialIter>,
+        name: &SField
+    ) -> *mut STBase
+);
+
+unsafe impl ExternType for STypeFromSITFnPtr {
+    type Id = type_id!("STypeFromSITFnPtr");
+    type Kind = Trivial;
+}
+
+#[repr(transparent)]
+pub struct STypeFromSFieldFnPtr(
+    pub extern "C" fn(
+        name: &SField
+    ) -> *mut STBase
+);
+
+unsafe impl ExternType for STypeFromSFieldFnPtr {
+    type Id = type_id!("STypeFromSFieldFnPtr");
+    type Kind = Trivial;
 }
 
 /*pub struct SLE {
@@ -208,6 +275,12 @@ impl SLE {
     pub fn setFlag(&self, f: u32) -> bool {
         rippled::setFlag(&self.sle, f)
     }
+}*/
+
+/*#[repr(C)]
+pub struct STypeExport {
+    pub type_id: i32,
+    pub create_ptr: fn(tid: i32, fv: i32, f_name: *const c_char) -> &'static TypedSTPluginType,
 }*/
 
 #[repr(C)]

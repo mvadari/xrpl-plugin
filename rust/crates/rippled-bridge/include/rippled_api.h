@@ -80,8 +80,6 @@ constexpr ripple::SField const& sfTicketSequence() {
 
 std::unique_ptr<std::string> toBase58(const ripple::AccountID& accountId);
 
-struct STypeExport;
-
 /*void
 foo(std::unique_ptr<std::vector<ripple::FakeSOElement>> vec);*/
 
@@ -92,5 +90,46 @@ foo(std::unique_ptr<std::vector<ripple::FakeSOElement>> vec);*/
 // (2) getTxFormat2 will call a Rust function over the bridge and get a rust::Vec and copy the values into the std::vector that
 //    gets passed in
 
+using OptionalSTVar = std::optional<ripple::detail::STVar>;
+
+typedef std::unique_ptr<OptionalSTVar> (*parseLeafTypePtr)(
+        ripple::SField const&,
+        std::string const&,
+        std::string const&,
+        ripple::SField const*,
+        Json::Value const&,
+        Json::Value&);
+
+struct STypeExport {
+    int typeId;
+//    createNewSFieldPtr createPtr;
+    parseLeafTypePtr parsePtr;
+    ripple::constructSTypePtr constructPtr;
+    ripple::constructSTypePtr2 constructPtr2;
+};
+
+using ParseLeafTypeFnPtr = std::unique_ptr<OptionalSTVar> (*)(
+ripple::SField const&,
+std::string const&,
+std::string const&,
+ripple::SField const*,
+Json::Value const&,
+Json::Value&);
+
+using STypeFromSITFnPtr = ripple::STBase* (*)(ripple::SerialIter&, ripple::SField const&);
+using STypeFromSFieldFnPtr = ripple::STBase* (*)(ripple::SField const&);
+
 void push_soelement(int field_code, ripple::SOEStyle style, std::vector<ripple::FakeSOElement>& vec);
+void push_stype_export(int tid, ParseLeafTypeFnPtr parseLeafTypeFn, STypeFromSITFnPtr sTypeFromSitFnPtr, STypeFromSFieldFnPtr sTypeFromSFieldFnPtr, std::vector<STypeExport>& vec);
+void push_sfield_info(int tid, int fv, const char * txt_name, std::vector<ripple::SFieldInfo>& vec);
+
+ripple::SField const& constructSField(int tid, int fv, const char* fn);
+
+std::unique_ptr<OptionalSTVar> make_empty_stvar_opt() {
+    OptionalSTVar ret;
+    return std::make_unique<OptionalSTVar>(ret);
+}
+
+/*using TypedSTPluginType = ripple::TypedField<ripple::STPluginType>;
+ripple::SField const & makeTypedField(int tid, int fv, const char* fn);*/
 #endif //PLUGIN_TRANSACTOR_BLOBSTORE_H
