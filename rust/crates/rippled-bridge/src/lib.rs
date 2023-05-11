@@ -123,6 +123,7 @@ pub mod rippled {
         pub type STBase;
         #[namespace = "Json"]
         pub type Value;
+        pub type Buffer;
 
         ////////////////////////////////
         // Functions implemented in C++.
@@ -153,8 +154,6 @@ pub mod rippled {
         pub type STypeFromSITFnPtr = super::STypeFromSITFnPtr;
         pub type STypeFromSFieldFnPtr = super::STypeFromSFieldFnPtr;
         pub type OptionalSTVar;
-
-        pub fn make_empty_stvar_opt() -> UniquePtr<OptionalSTVar>;
 
         pub fn base64_decode_ptr(s: &CxxString) -> UniquePtr<CxxString>;
 
@@ -221,8 +220,18 @@ pub mod rippled {
         pub unsafe fn push_sfield_info(tid: i32, fv: i32, txt_name: *const c_char, vec: Pin<&mut CxxVector<SFieldInfo>>);
 
         pub fn isString(self: &Value) -> bool;
+        pub fn asString(json_value: &Value) -> UniquePtr<CxxString>;
+        pub fn make_empty_stvar_opt() -> UniquePtr<OptionalSTVar>;
+        pub fn make_stvar(field: &SField, data: &[u8]) -> UniquePtr<OptionalSTVar>;
+        pub fn bad_type(error: Pin<&mut Value>, json_name: &CxxString, field_name: &CxxString);
+        pub fn invalid_data(error: Pin<&mut Value>, json_name: &CxxString, field_name: &CxxString);
+        pub fn getVLBuffer(sit: Pin<&mut SerialIter>) -> UniquePtr<Buffer>;
+        pub fn make_stype(field: &SField, buffer: UniquePtr<Buffer>) -> UniquePtr<STBase>;
+        pub fn make_empty_stype(field: &SField) -> UniquePtr<STBase>;
     }
 }
+
+
 
 // https://github.com/dtolnay/cxx/issues/895#issuecomment-913095541
 #[repr(transparent)]
@@ -234,7 +243,7 @@ pub struct ParseLeafTypeFnPtr(
         name: &SField,
         value: &Value,
         error: Pin<&mut Value>
-    ) -> UniquePtr<OptionalSTVar>
+    ) -> *mut OptionalSTVar
 );
 
 unsafe impl ExternType for ParseLeafTypeFnPtr {

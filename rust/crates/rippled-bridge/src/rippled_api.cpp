@@ -88,6 +88,37 @@ ripple::SField const& constructSField(int tid, int fv, const char* fn) {
     return *(new ripple::SField(tid, fv, fn));
 }
 
+std::unique_ptr<OptionalSTVar> make_stvar(ripple::SField const& field, rust::Slice<const uint8_t> slice) {
+//    ripple::Buffer buffer = ripple::Buffer(slice.data(), slice.size());
+    std::unique_ptr<OptionalSTVar> ret = std::make_unique<OptionalSTVar>(ripple::detail::make_stvar<ripple::STPluginType>(field, ripple::Buffer(slice.data(), slice.size())));
+    return ret;
+}
+
+void bad_type(Json::Value& error, std::string const& json_name, std::string const& field_name) {
+    error = ripple::bad_type(json_name, field_name);
+}
+
+void invalid_data(Json::Value& error, std::string const& json_name, std::string const& field_name) {
+    error = ripple::invalid_data(json_name, field_name);
+}
+
+std::unique_ptr<std::string> asString(Json::Value const& value) {
+    return std::make_unique<std::string>(value.asString());
+}
+
+std::unique_ptr<ripple::Buffer> getVLBuffer(ripple::SerialIter& sit) {
+    const ripple::Buffer &buffer = sit.getVLBuffer();
+    return std::make_unique<ripple::Buffer>(buffer);
+}
+
+std::unique_ptr<ripple::STBase> make_stype(ripple::SField const& field, std::unique_ptr<ripple::Buffer> buffer) {
+    return std::make_unique<ripple::STBase>(ripple::STPluginType(field, ripple::Buffer(buffer.get()->data(), buffer.get()->size())));
+}
+
+std::unique_ptr<ripple::STBase> make_empty_stype(ripple::SField const& field) {
+    return std::make_unique<ripple::STBase>(ripple::STPluginType(field));
+}
+
 /*ripple::SField const & makeTypedField(int tid, int fv, const char* fn) {
     if (ripple::SField const& field = ripple::SField::getField(ripple::field_code(tid, fv)); field != ripple::sfInvalid)
         return field;

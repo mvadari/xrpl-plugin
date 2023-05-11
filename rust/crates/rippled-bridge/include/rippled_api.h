@@ -13,6 +13,7 @@
 #include <ripple/protocol/st.h>
 #include <ripple/protocol/TxFlags.h>
 #include <ripple/protocol/Feature.h>
+#include "rust/cxx.h"
 
 std::unique_ptr <std::string>
 base64_decode_ptr(std::string const &data);
@@ -92,7 +93,7 @@ foo(std::unique_ptr<std::vector<ripple::FakeSOElement>> vec);*/
 
 using OptionalSTVar = std::optional<ripple::detail::STVar>;
 
-typedef std::unique_ptr<OptionalSTVar> (*parseLeafTypePtr)(
+typedef const OptionalSTVar* (*parseLeafTypePtr)(
         ripple::SField const&,
         std::string const&,
         std::string const&,
@@ -108,7 +109,7 @@ struct STypeExport {
     ripple::constructSTypePtr2 constructPtr2;
 };
 
-using ParseLeafTypeFnPtr = std::unique_ptr<OptionalSTVar> (*)(
+using ParseLeafTypeFnPtr = const OptionalSTVar* (*)(
 ripple::SField const&,
 std::string const&,
 std::string const&,
@@ -130,6 +131,15 @@ std::unique_ptr<OptionalSTVar> make_empty_stvar_opt() {
     return std::make_unique<OptionalSTVar>(ret);
 }
 
+std::unique_ptr<OptionalSTVar> make_stvar(ripple::SField const& field, rust::Slice<const uint8_t> slice);
+
+void bad_type(Json::Value& error, std::string const& json_name, std::string const& field_name);
+void invalid_data(Json::Value& error, std::string const& json_name, std::string const& field_name);
+std::unique_ptr<std::string> asString(Json::Value const& value);
+
+std::unique_ptr<ripple::Buffer> getVLBuffer(ripple::SerialIter& sit);
+std::unique_ptr<ripple::STBase> make_stype(ripple::SField const& field, std::unique_ptr<ripple::Buffer> buffer);
+std::unique_ptr<ripple::STBase> make_empty_stype(ripple::SField const& field);
 /*using TypedSTPluginType = ripple::TypedField<ripple::STPluginType>;
 ripple::SField const & makeTypedField(int tid, int fv, const char* fn);*/
 #endif //PLUGIN_TRANSACTOR_BLOBSTORE_H

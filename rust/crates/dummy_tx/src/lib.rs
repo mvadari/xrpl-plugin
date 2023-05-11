@@ -1,13 +1,15 @@
 use std::ffi::CString;
 use std::pin::Pin;
+use std::str::Utf8Error;
 use std::vec;
 use cxx::{CxxString, CxxVector, let_cxx_string, UniquePtr};
 use once_cell::sync::OnceCell;
 use xrpl_rust_sdk_core::core::crypto::ToFromBase58;
+use xrpl_rust_sdk_core::core::types::AccountId;
 use plugin_transactor::{Feature, PreclaimContext, preflight1, preflight2, PreflightContext, SField, STTx, TF_UNIVERSAL_MASK, Transactor};
 use plugin_transactor::transactor::SOElement;
 use rippled_bridge::{NotTEC, ParseLeafTypeFnPtr, rippled, SOEStyle, STypeFromSFieldFnPtr, STypeFromSITFnPtr, TEMcodes, TER, TEScodes, XRPAmount};
-use rippled_bridge::rippled::{FakeSOElement, OptionalSTVar, push_soelement, SerialIter, SFieldInfo, sfRegularKey, sfTicketSequence, STBase, STypeExport, Value};
+use rippled_bridge::rippled::{account, asString, FakeSOElement, getVLBuffer, make_empty_stype, make_stvar, make_stype, OptionalSTVar, push_soelement, SerialIter, SFieldInfo, sfRegularKey, sfTicketSequence, STBase, STypeExport, Value};
 
 struct DummyTx2;
 
@@ -83,35 +85,60 @@ pub fn getTxType() -> u16 {
 }
 
 #[no_mangle]
-extern "C" fn parseLeafTypeNew(
+extern "C" fn parseLeafTypeSTAccount2(
     field: &rippled::SField,
     json_name: &CxxString,
     field_name: &CxxString,
     name: &rippled::SField,
     value: &Value,
     error: Pin<&mut Value>,
-) -> UniquePtr<OptionalSTVar> {
+) -> *mut OptionalSTVar {
     if !value.isString() {
-        // bad_type(error, json_name, field_name);
-
+        rippled::bad_type(error, json_name, field_name);
+        return rippled::make_empty_stvar_opt().into_raw();
     }
 
-    todo!()
+    let value_as_cxx_string = asString(value);
+    let str_result: Result<&str, Utf8Error> = value_as_cxx_string.to_str();
+    return if str_result.is_ok() {
+        let str_value = str_result.unwrap();
+        let b58_result = AccountId::try_from(str_value);
+        if b58_result.is_ok() {
+            let ret: UniquePtr<OptionalSTVar> = rippled::make_stvar(field, b58_result.unwrap().as_ref());
+            ret.into_raw()
+        } else {
+            let mut account_slice = [0; 20];
+            let hex_result = hex::decode_to_slice(str_value, &mut account_slice[..]);
+            if hex_result.is_ok() {
+                let account_id = AccountId::from(account_slice);
+                rippled::make_stvar(field, account_id.as_ref()).into_raw()
+            } else {
+                rippled::invalid_data(error, json_name, field_name);
+                rippled::make_empty_stvar_opt().into_raw()
+            }
+        }
+    } else {
+        rippled::invalid_data(error, json_name, field_name);
+        rippled::make_empty_stvar_opt().into_raw()
+    }
 }
+
+// 8ac000
 
 #[no_mangle]
 extern "C" fn constructNewSType(
     sit: Pin<&mut SerialIter>,
     name: &rippled::SField
 ) -> *mut STBase {
-    todo!()
+    let buffer = getVLBuffer(sit);
+    return make_stype(name, buffer).into_raw()
 }
 
 #[no_mangle]
 extern "C" fn constructNewSType2(
     name: &rippled::SField
 ) -> *mut STBase {
-    todo!()
+    return make_empty_stype(name).into_raw();
 }
 
 #[no_mangle]
@@ -119,7 +146,7 @@ pub fn getSTypes(mut s_types: Pin<&mut CxxVector<STypeExport>>) {
     unsafe {
         rippled::push_stype_export(
             24,
-            ParseLeafTypeFnPtr(parseLeafTypeNew),
+            ParseLeafTypeFnPtr(parseLeafTypeSTAccount2),
             STypeFromSITFnPtr(constructNewSType),
             STypeFromSFieldFnPtr(constructNewSType2),
             s_types,
