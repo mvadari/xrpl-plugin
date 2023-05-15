@@ -6,6 +6,7 @@
 #include <ripple/protocol/st.h>
 #include <ripple/protocol/TxFlags.h>
 #include <ripple/protocol/Feature.h>
+#include <ripple/ledger/View.h>
 #include <map>
 #include <string>
 
@@ -33,37 +34,37 @@ PYBIND11_MODULE(plugin_transactor, m) {
     * Enums
     */
 
-    py::enum_<ripple::TxType>(m, "TxType")
-        .value("ttPAYMENT", ripple::TxType::ttPAYMENT)
-        .value("ttESCROW_CREATE", ripple::TxType::ttESCROW_CREATE)
-        .value("ttESCROW_FINISH", ripple::TxType::ttESCROW_FINISH)
-        .value("ttACCOUNT_SET", ripple::TxType::ttACCOUNT_SET)
-        .value("ttESCROW_CANCEL", ripple::TxType::ttESCROW_CANCEL)
-        .value("ttREGULAR_KEY_SET", ripple::TxType::ttREGULAR_KEY_SET)
-        .value("ttOFFER_CREATE", ripple::TxType::ttOFFER_CREATE)
-        .value("ttOFFER_CANCEL", ripple::TxType::ttOFFER_CANCEL)
-        .value("ttTICKET_CREATE", ripple::TxType::ttTICKET_CREATE)
-        .value("ttSIGNER_LIST_SET", ripple::TxType::ttSIGNER_LIST_SET)
-        .value("ttPAYCHAN_CREATE", ripple::TxType::ttPAYCHAN_CREATE)
-        .value("ttPAYCHAN_FUND", ripple::TxType::ttPAYCHAN_FUND)
-        .value("ttPAYCHAN_CLAIM", ripple::TxType::ttPAYCHAN_CLAIM)
-        .value("ttCHECK_CREATE", ripple::TxType::ttCHECK_CREATE)
-        .value("ttCHECK_CASH", ripple::TxType::ttCHECK_CASH)
-        .value("ttCHECK_CANCEL", ripple::TxType::ttCHECK_CANCEL)
-        .value("ttDEPOSIT_PREAUTH", ripple::TxType::ttDEPOSIT_PREAUTH)
-        .value("ttTRUST_SET", ripple::TxType::ttTRUST_SET)
-        .value("ttACCOUNT_DELETE", ripple::TxType::ttACCOUNT_DELETE)
-        .value("ttHOOK_SET", ripple::TxType::ttHOOK_SET)
-        .value("ttNFTOKEN_MINT", ripple::TxType::ttNFTOKEN_MINT)
-        .value("ttNFTOKEN_BURN", ripple::TxType::ttNFTOKEN_BURN)
-        .value("ttNFTOKEN_CREATE_OFFER", ripple::TxType::ttNFTOKEN_CREATE_OFFER)
-        .value("ttNFTOKEN_CANCEL_OFFER", ripple::TxType::ttNFTOKEN_CANCEL_OFFER)
-        .value("ttNFTOKEN_ACCEPT_OFFER", ripple::TxType::ttNFTOKEN_ACCEPT_OFFER)
-        .value("ttDUMMY_TX", ripple::TxType::ttDUMMY_TX)
-        .value("ttAMENDMENT", ripple::TxType::ttAMENDMENT)
-        .value("ttFEE", ripple::TxType::ttFEE)
-        .value("ttUNL_MODIFY", ripple::TxType::ttUNL_MODIFY)
-        .export_values();
+    // py::enum_<ripple::TxType>(m, "TxType")
+    //     .value("ttPAYMENT", ripple::TxType::ttPAYMENT)
+    //     .value("ttESCROW_CREATE", ripple::TxType::ttESCROW_CREATE)
+    //     .value("ttESCROW_FINISH", ripple::TxType::ttESCROW_FINISH)
+    //     .value("ttACCOUNT_SET", ripple::TxType::ttACCOUNT_SET)
+    //     .value("ttESCROW_CANCEL", ripple::TxType::ttESCROW_CANCEL)
+    //     .value("ttREGULAR_KEY_SET", ripple::TxType::ttREGULAR_KEY_SET)
+    //     .value("ttOFFER_CREATE", ripple::TxType::ttOFFER_CREATE)
+    //     .value("ttOFFER_CANCEL", ripple::TxType::ttOFFER_CANCEL)
+    //     .value("ttTICKET_CREATE", ripple::TxType::ttTICKET_CREATE)
+    //     .value("ttSIGNER_LIST_SET", ripple::TxType::ttSIGNER_LIST_SET)
+    //     .value("ttPAYCHAN_CREATE", ripple::TxType::ttPAYCHAN_CREATE)
+    //     .value("ttPAYCHAN_FUND", ripple::TxType::ttPAYCHAN_FUND)
+    //     .value("ttPAYCHAN_CLAIM", ripple::TxType::ttPAYCHAN_CLAIM)
+    //     .value("ttCHECK_CREATE", ripple::TxType::ttCHECK_CREATE)
+    //     .value("ttCHECK_CASH", ripple::TxType::ttCHECK_CASH)
+    //     .value("ttCHECK_CANCEL", ripple::TxType::ttCHECK_CANCEL)
+    //     .value("ttDEPOSIT_PREAUTH", ripple::TxType::ttDEPOSIT_PREAUTH)
+    //     .value("ttTRUST_SET", ripple::TxType::ttTRUST_SET)
+    //     .value("ttACCOUNT_DELETE", ripple::TxType::ttACCOUNT_DELETE)
+    //     .value("ttHOOK_SET", ripple::TxType::ttHOOK_SET)
+    //     .value("ttNFTOKEN_MINT", ripple::TxType::ttNFTOKEN_MINT)
+    //     .value("ttNFTOKEN_BURN", ripple::TxType::ttNFTOKEN_BURN)
+    //     .value("ttNFTOKEN_CREATE_OFFER", ripple::TxType::ttNFTOKEN_CREATE_OFFER)
+    //     .value("ttNFTOKEN_CANCEL_OFFER", ripple::TxType::ttNFTOKEN_CANCEL_OFFER)
+    //     .value("ttNFTOKEN_ACCEPT_OFFER", ripple::TxType::ttNFTOKEN_ACCEPT_OFFER)
+    //     .value("ttDUMMY_TX", ripple::TxType::ttDUMMY_TX)
+    //     .value("ttAMENDMENT", ripple::TxType::ttAMENDMENT)
+    //     .value("ttFEE", ripple::TxType::ttFEE)
+    //     .value("ttUNL_MODIFY", ripple::TxType::ttUNL_MODIFY)
+    //     .export_values();
     
     py::enum_<ripple::LedgerEntryType>(m, "LedgerEntryType")
         .value("ltACCOUNT_ROOT", ripple::LedgerEntryType::ltACCOUNT_ROOT)
@@ -96,7 +97,7 @@ PYBIND11_MODULE(plugin_transactor, m) {
         .value("lsfGlobalFreeze", ripple::LedgerSpecificFlags::lsfGlobalFreeze)
         .value("lsfDefaultRipple", ripple::LedgerSpecificFlags::lsfDefaultRipple)
         .value("lsfDepositAuth", ripple::LedgerSpecificFlags::lsfDepositAuth)
-        .value("lsfDisallowIncomingNFTOffer", ripple::LedgerSpecificFlags::lsfDisallowIncomingNFTOffer)
+        .value("lsfDisallowIncomingNFTokenOffer", ripple::LedgerSpecificFlags::lsfDisallowIncomingNFTokenOffer)
         .value("lsfDisallowIncomingCheck", ripple::LedgerSpecificFlags::lsfDisallowIncomingCheck)
         .value("lsfDisallowIncomingPayChan", ripple::LedgerSpecificFlags::lsfDisallowIncomingPayChan)
         .value("lsfDisallowIncomingTrustline", ripple::LedgerSpecificFlags::lsfDisallowIncomingTrustline)
@@ -317,7 +318,22 @@ PYBIND11_MODULE(plugin_transactor, m) {
             [](const ripple::XRPAmount &xrpAmount) {
                 return xrpAmount.drops();
             }
-        );
+        )
+        .def(py::self += py::self)
+        .def(py::self + py::self)
+        .def(py::self -= py::self)
+        .def(py::self - py::self)
+        .def(py::self *= int())
+        .def(py::self * int())
+        .def(py::self == py::self)
+        .def(py::self != py::self)
+        .def(py::self < py::self)
+        .def(py::self > py::self)
+        .def(py::self <= py::self)
+        .def(py::self >= py::self)
+        .def(py::self == int())
+        .def(py::self != int())
+        .def(-py::self);
     
     py::class_<ripple::uint256> uint256(m, "uint256");
     uint256
@@ -326,16 +342,57 @@ PYBIND11_MODULE(plugin_transactor, m) {
                 return ripple::to_string(uint256);
             }
         );
+    
+    py::class_<beast::Zero> BeastZero(m, "BeastZero");
+    py::class_<beast::Journal> Journal(m, "Journal");
+
+    py::class_<ripple::SeqProxy> SeqProxy(m, "SeqProxy");
+    SeqProxy
+        .def("value", &ripple::SeqProxy::value)
+    ;
 
     /*
     * STObjects
     */
 
     py::class_<ripple::STBase> STBase(m, "STBase");
+    STBase
+        .def("__repr__",
+            [](const ripple::STBase &obj) {
+                return obj.getFullText();
+            }
+        );
     // py::class_<ripple::STInteger, ripple::STBase> STInteger(m, "STInteger");
     py::class_<ripple::STAccount, ripple::STBase> STAccount(m, "STAccount");
     py::class_<ripple::STBlob, ripple::STBase> STBlob(m, "STBlob");
-
+    py::class_<ripple::STAmount, ripple::STBase> STAmount(m, "STAmount");
+    STAmount
+        .def(py::init<ripple::STAmount &>())
+        .def("is_xrp", 
+            [](const ripple::STAmount &amt) {
+                return ripple::isXRP(amt);
+            }
+        )
+        .def("xrp", &ripple::STAmount::xrp)
+        .def(py::self += py::self)
+        .def(py::self -= py::self)
+        .def(py::self + py::self)
+        .def(py::self == py::self)
+        .def(py::self != py::self)
+        .def(py::self < py::self)
+        .def(py::self > py::self)
+        .def(py::self <= py::self)
+        .def(py::self >= py::self)
+        // .def(py::self == beast::Zero())
+        // .def(py::self != beast::Zero())
+        // .def(py::self < beast::Zero())
+        // .def(py::self > beast::Zero())
+        // .def(py::self <= beast::Zero())
+        // .def(py::self >= beast::Zero())
+        .def(-py::self)
+        .def(py::self - py::self)
+    ;
+    // py::implicitly_convertible<beast::Zero, ripple::STAmount>();
     py::class_<ripple::STObject, std::shared_ptr<ripple::STObject>> STObject(m, "STObject");
     STObject
         .def("isFlag", &ripple::STObject::isFlag)
@@ -349,6 +406,16 @@ PYBIND11_MODULE(plugin_transactor, m) {
                 return obj.getAccountID(static_cast<ripple::SField const&>(wsf));
             }
         )
+        .def("getAmount",
+            [](const ripple::STObject &obj, const WSF &wsf) {
+                return obj.getFieldAmount(static_cast<ripple::SField const&>(wsf));
+            }
+        )
+        .def("getU32",
+            [](const ripple::STObject &obj, const WSF &wsf) {
+                return obj.getFieldU32(static_cast<ripple::SField const&>(wsf));
+            }
+        )
         .def("isFieldPresent",
             [](const ripple::STObject &obj, const WSF &wsf) {
                 return obj.isFieldPresent(static_cast<ripple::SField const&>(wsf));
@@ -360,7 +427,43 @@ PYBIND11_MODULE(plugin_transactor, m) {
                 const WSF &wsf,
                 const ripple::AccountID accountID
             ) {
-                return obj.setAccountID(static_cast<ripple::SField const&>(wsf), accountID);
+                obj.setAccountID(static_cast<ripple::SField const&>(wsf), accountID);
+            }
+        )
+        .def("setAmount",
+            [](
+                ripple::STObject &obj,
+                const WSF &wsf,
+                const ripple::STAmount amount
+            ) {
+                obj.setFieldAmount(static_cast<ripple::SField const&>(wsf), amount);
+            }
+        )
+        .def("setU32",
+            [](
+                ripple::STObject &obj,
+                const WSF &wsf,
+                const std::uint32_t num
+            ) {
+                obj.setFieldU32(static_cast<ripple::SField const&>(wsf), num);
+            }
+        )
+        .def("setU64",
+            [](
+                ripple::STObject &obj,
+                const WSF &wsf,
+                const std::uint64_t num
+            ) {
+                obj.setFieldU64(static_cast<ripple::SField const&>(wsf), num);
+            }
+        )
+        .def("setVL",
+            [](
+                ripple::STObject &obj,
+                const WSF &wsf,
+                const ripple::Blob blob
+            ) {
+                obj.setFieldVL(static_cast<ripple::SField const&>(wsf), blob);
             }
         )
         .def("makeFieldAbsent",
@@ -385,19 +488,22 @@ PYBIND11_MODULE(plugin_transactor, m) {
         //     }
         // )
         .def(py::self == py::self)
-        .def(py::self != py::self)
-        .def("__repr__",
-            [](const ripple::STObject &obj) {
-                return obj.getFullText();
-            }
-        );
+        .def(py::self != py::self);
 
     py::class_<ripple::STTx, ripple::STObject, std::shared_ptr<ripple::STTx>> STTx(m, "STTx");
     STTx
         .def("getTxnType", &ripple::STTx::getTxnType)
-        .def("getFlags", &ripple::STTx::getFlags);
+        .def("getFlags", &ripple::STTx::getFlags)
+        .def("getSeqProxy", &ripple::STTx::getSeqProxy)
+    ;
 
     py::class_<ripple::STLedgerEntry, ripple::STObject, std::shared_ptr<ripple::STLedgerEntry>> STLedgerEntry(m, "STLedgerEntry");
+    STLedgerEntry
+        .def("__repr__",
+            [](const ripple::STLedgerEntry &obj) {
+                return obj.getFullText();
+            }
+        );
 
     /*
     * Contexts and classes that the contexts depend on
@@ -477,12 +583,52 @@ PYBIND11_MODULE(plugin_transactor, m) {
             [](const ripple::Fees &fees) {
                 return fees.increment;
             }
+        )
+        .def("accountReserve", &ripple::Fees::accountReserve);
+    
+    py::class_<ripple::NetClock::time_point> TimePoint(m, "TimePoint");
+    TimePoint
+        .def("time_since_epoch",
+            [](const ripple::NetClock::time_point &tp) {
+                return tp.time_since_epoch().count();
+            }
+        )
+        .def("__repr__",
+            [](const ripple::NetClock::time_point &tp) {
+                return ripple::to_string(tp);
+            }
         );
+    ;
+    
+    py::class_<ripple::LedgerInfo> LedgerInfo(m, "LedgerInfo");
+    LedgerInfo
+        .def_property_readonly("parent_close_time",
+            [](const ripple::LedgerInfo &info) {
+                return info.parentCloseTime;
+            }
+        )
+    ;
     
     py::class_<ripple::ApplyView> ApplyView(m, "ApplyView");
     ApplyView
         .def("peek", &ripple::ApplyView::peek)
-        .def("update", &ripple::ApplyView::update);
+        .def("update", &ripple::ApplyView::update)
+        .def("info", &ripple::ApplyView::info)
+        .def("rules", &ripple::ApplyView::rules)
+        .def("fees", &ripple::ApplyView::fees)
+        .def("insert", &ripple::ApplyView::insert)
+        .def("dirInsert",
+            [](ripple::ApplyView &view, ripple::AccountID account, ripple::Keylet keylet) {
+                return view.dirInsert(ripple::keylet::ownerDir(account), keylet, ripple::describeOwnerDir(account));;
+            }
+        )
+        // .def("dirInsert", py::overload_cast<
+        //     ripple::Keylet, ripple::Keylet, std::function<void(std::shared_ptr<ripple::SLE> const&)>
+        // >(&ripple::ApplyView::dirInsert))
+        // .def("dirInsert", py::overload_cast<
+        //     ripple::Keylet, ripple::uint256, std::function<void(std::shared_ptr<ripple::SLE> const&)>
+        // >(&ripple::ApplyView::dirInsert))
+    ;
     
     py::class_<
         ripple::detail::ApplyViewBase,
@@ -500,6 +646,11 @@ PYBIND11_MODULE(plugin_transactor, m) {
                 return ctx.tx;
             }
         )
+        .def_property_readonly("journal",
+            [](const ripple::ApplyContext &ctx) {
+                return ctx.journal;
+            }
+        )
         .def("view", &ripple::ApplyContext::view, py::return_value_policy::reference);
     
     // py::register_exception<ripple::LogicError>(m, "LogicError");
@@ -510,10 +661,20 @@ PYBIND11_MODULE(plugin_transactor, m) {
 
     m
         .def("accountKeylet", &ripple::keylet::account)
+        .def("escrowKeylet", &ripple::keylet::escrow)
         .def("signersKeylet", &ripple::keylet::signers)
+        .def("ownerDirKeylet", &ripple::keylet::ownerDir)
         .def("preflight1", &ripple::preflight1)
         .def("preflight2", &ripple::preflight2)
         .def("isTesSuccess", &ripple::isTesSuccess)
+        .def("makeSLE",
+            [](const ripple::Keylet &keylet) {
+                return std::make_shared<ripple::SLE>(keylet);
+            },
+            py::return_value_policy::move
+        )
+        .def("describeOwnerDir", &ripple::describeOwnerDir)
+        .def("adjustOwnerCount", &ripple::adjustOwnerCount)
         ;
     
 
@@ -522,9 +683,22 @@ PYBIND11_MODULE(plugin_transactor, m) {
     m.attr("tfUniversalMask") = ripple::tfUniversalMask;
     m.attr("sfRegularKey") = WSF{(void *)&ripple::sfRegularKey};
     m.attr("sfAccount") = WSF{(void *)&ripple::sfAccount};
+    m.attr("sfAmount") = WSF{(void *)&ripple::sfAmount};
+    m.attr("sfFinishAfter") = WSF{(void *)&ripple::sfFinishAfter};
+    m.attr("sfCancelAfter") = WSF{(void *)&ripple::sfCancelAfter};
+    m.attr("sfCondition") = WSF{(void *)&ripple::sfCondition};
+    m.attr("sfBalance") = WSF{(void *)&ripple::sfBalance};
+    m.attr("sfSourceTag") = WSF{(void *)&ripple::sfSourceTag};
+    m.attr("sfDestinationTag") = WSF{(void *)&ripple::sfDestinationTag};
+    m.attr("sfDestination") = WSF{(void *)&ripple::sfDestination};
+    m.attr("sfOwnerNode") = WSF{(void *)&ripple::sfOwnerNode};
+    m.attr("sfOwnerCount") = WSF{(void *)&ripple::sfOwnerCount};
     // m.attr("sfRegularKey") = TWSF<std::decay_t<decltype(ripple::sfRegularKey)>>{
     //   (void *)&ripple::sfRegularKey};
     // m.attr("sfAccount") = TWSF<std::decay_t<decltype(ripple::sfAccount)>>{
     //   (void *)&ripple::sfAccount};
     m.attr("fixMasterKeyAsRegularKey") = ripple::fixMasterKeyAsRegularKey;
+    m.attr("fix1543") = ripple::fix1543;
+    m.attr("fix1571") = ripple::fix1571;
+    m.attr("zeroAmount") = beast::zero;
 }

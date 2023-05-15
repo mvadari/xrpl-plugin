@@ -116,8 +116,10 @@ class CMakeBuild(build_ext):
         if not build_temp.exists():
             build_temp.mkdir(parents=True)
 
-        subprocess.run(["conan", "install", ext.sourcedir, "--build", "missing", "--settings", f"build_type={cfg}"], cwd=build_temp, check=True)
-        cmake_args += [f"-DCMAKE_TOOLCHAIN_FILE:FILEPATH=build/generators/conan_toolchain.cmake"]
+        conan_cmake = "build/generators/conan_toolchain.cmake"
+        if not os.path.exists(os.path.join(os.getcwd(), conan_cmake)):
+            subprocess.run(["conan", "install", ext.sourcedir, "--build", "missing", "--settings", f"build_type={cfg}"], cwd=build_temp, check=True)
+        cmake_args += [f"-DCMAKE_TOOLCHAIN_FILE:FILEPATH={conan_cmake}"]
         subprocess.run(
             ["cmake", ext.sourcedir] + cmake_args, cwd=build_temp, check=True
         )

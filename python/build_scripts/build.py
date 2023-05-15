@@ -45,8 +45,8 @@ public:
     static TER
     preclaim(PreclaimContext const& ctx);
 
-    TER
-    doApply() override;
+    static TER
+    doApply(ripple::ApplyContext& ctx, ripple::XRPAmount mPriorBalance, ripple::XRPAmount mSourceBalance);
 }};
 
 //------------------------------------------------------------------------------
@@ -56,8 +56,8 @@ public:
 #endif"""
 
 
-def generate_cpp(tx_name, module_name, python_folder): 
-    return f"""#include <ripple/app/tx/impl/{tx_name}.h>
+def generate_cpp(tx_name, tx_type, module_name, python_folder): 
+    return f"""#include "{tx_name}.h"
 #include <ripple/app/tx/impl/Transactor.h>
 #include <ripple/basics/Log.h>
 #include <ripple/basics/XRPAmount.h>
@@ -139,7 +139,71 @@ ripple::TER
 doApply(ripple::ApplyContext& ctx, ripple::XRPAmount mPriorBalance, ripple::XRPAmount mSourceBalance)
 {{
     return ripple::doApply(ctx, mPriorBalance, mSourceBalance);
-}}"""
+}}
+
+extern "C"
+char const*
+getTxName()
+{{
+    return "{tx_name}";
+}}
+
+struct FakeSOElement {{
+    int fieldCode;
+    ripple::SOEStyle style;
+}};
+
+extern "C"
+std::vector<FakeSOElement>
+getTxFormat()
+{{
+    return std::vector<FakeSOElement>{{
+        {{ripple::sfDestination.getCode(), ripple::soeREQUIRED}},
+        {{ripple::sfAmount.getCode(), ripple::soeREQUIRED}},
+        {{ripple::sfCondition.getCode(), ripple::soeOPTIONAL}},
+        {{ripple::sfCancelAfter.getCode(), ripple::soeOPTIONAL}},
+        {{ripple::sfFinishAfter.getCode(), ripple::soeOPTIONAL}},
+        {{ripple::sfDestinationTag.getCode(), ripple::soeOPTIONAL}},
+        {{ripple::sfTicketSequence.getCode(), ripple::soeOPTIONAL}},
+    }};
+}}
+
+struct SFieldInfo {{
+    int typeId;
+    int fieldValue;
+    const char * txtName;
+}};
+
+extern "C"
+std::vector<int>
+getSTypes()
+{{
+    return std::vector<int>{{}};
+}}
+
+extern "C"
+std::vector<SFieldInfo>
+getSFields()
+{{
+    return std::vector<SFieldInfo>{{}};
+}}
+
+extern "C"
+std::uint16_t
+getTxType()
+{{
+    return {tx_type};
+}}
+
+extern "C"
+std::string
+getTTName()
+{{
+    return "tt{module_name.upper()}";
+}}
+
+
+"""
 
 
 def create_files(python_file):
@@ -150,6 +214,7 @@ def create_files(python_file):
     module_name = abs_python_file[(last_slash+1):-3]
     module = importlib.import_module(module_name)
     tx_name = module.tx_name
+    tx_type = module.tx_type
     # TODO: add logic to check validity of Python transactors
     # TODO: switch to Jinja
     # TODO: add logic to only generate the methods that exist in Python
@@ -159,7 +224,7 @@ def create_files(python_file):
         f.write(generate_header(tx_name))
 
     with open(f"{tx_name}.cpp", "w") as f:
-        f.write(generate_cpp(tx_name, module_name, python_folder))
+        f.write(generate_cpp(tx_name, tx_type, module_name, python_folder))
     
     return os.path.abspath(f"{tx_name}.cpp"), module_name
 
