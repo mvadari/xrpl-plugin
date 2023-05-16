@@ -1,4 +1,4 @@
-use std::ffi::CString;
+use std::ffi::{c_char, CString};
 use std::pin::Pin;
 use std::str::Utf8Error;
 use std::vec;
@@ -8,10 +8,13 @@ use xrpl_rust_sdk_core::core::crypto::ToFromBase58;
 use xrpl_rust_sdk_core::core::types::AccountId;
 use plugin_transactor::{Feature, PreclaimContext, preflight1, preflight2, PreflightContext, SField, STTx, TF_UNIVERSAL_MASK, Transactor};
 use plugin_transactor::transactor::SOElement;
-use rippled_bridge::{NotTEC, ParseLeafTypeFnPtr, rippled, SOEStyle, STypeFromSFieldFnPtr, STypeFromSITFnPtr, TEMcodes, TER, TEScodes, XRPAmount};
-use rippled_bridge::rippled::{account, asString, FakeSOElement, getVLBuffer, make_empty_stype, make_stvar, make_stype, OptionalSTVar, push_soelement, SerialIter, SFieldInfo, sfRegularKey, sfTicketSequence, STBase, STypeExport, Value};
+use rippled_bridge::{CreateNewSFieldPtr, NotTEC, ParseLeafTypeFnPtr, rippled, SOEStyle, STypeFromSFieldFnPtr, STypeFromSITFnPtr, TEMcodes, TER, TEScodes, XRPAmount};
+use rippled_bridge::rippled::{account, asString, FakeSOElement, getVLBuffer, make_empty_stype, make_stvar, make_stype, OptionalSTVar, push_soelement, SerialIter, SFieldInfo, sfRegularKey, sfTicketSequence, STBase, STPluginType, STypeExport, Value};
 
 struct DummyTx2;
+
+pub const STI_ACCOUNT2: i32 = 24;
+pub const REGULAR_KEY2: i32 = 1;
 
 impl Transactor for DummyTx2 {
     fn pre_flight(ctx: PreflightContext) -> NotTEC {
@@ -24,12 +27,13 @@ impl Transactor for DummyTx2 {
             return TEMcodes::temINVALID_FLAG.into();
         }
 
-        println!("RegularKey: {:?}", ctx.tx().get_account_id(&SField::sf_regular_key()).encode_base58());
+        let sf_regular_key = SField::get_plugin_field(STI_ACCOUNT2, REGULAR_KEY2);
+        // println!("RegularKey: {:?}", ctx.tx().get_plugin_type(&sf_regular_key).encode_base58());
         println!("Account: {:?}", ctx.tx().get_account_id(&SField::sf_account()).encode_base58());
 
         if ctx.rules().enabled(&Feature::fix_master_key_as_regular_key()) &&
-            ctx.tx().is_field_present(&SField::sf_regular_key()) &&
-            ctx.tx().get_account_id(&SField::sf_regular_key()) == ctx.tx().get_account_id(&SField::sf_account()) {
+            ctx.tx().is_field_present(&sf_regular_key) &&
+            ctx.tx().get_plugin_type(&sf_regular_key) == ctx.tx().get_account_id(&SField::sf_account()) {
             return TEMcodes::temBAD_REGKEY.into();
         }
 
@@ -85,6 +89,17 @@ pub fn getTxType() -> u16 {
 }
 
 #[no_mangle]
+extern "C" fn createNewSType(
+    tid: i32,
+    fv: i32,
+    field_name: *const c_char,
+) -> &'static rippled::SField {
+    unsafe {
+        rippled::constructSField(tid, fv, field_name)
+    }
+}
+
+#[no_mangle]
 extern "C" fn parseLeafTypeSTAccount2(
     field: &rippled::SField,
     json_name: &CxxString,
@@ -120,7 +135,7 @@ extern "C" fn parseLeafTypeSTAccount2(
     } else {
         rippled::invalid_data(error, json_name, field_name);
         rippled::make_empty_stvar_opt().into_raw()
-    }
+    };
 }
 
 // 8ac000
@@ -128,10 +143,10 @@ extern "C" fn parseLeafTypeSTAccount2(
 #[no_mangle]
 extern "C" fn constructNewSType(
     sit: Pin<&mut SerialIter>,
-    name: &rippled::SField
-) -> *mut STBase {
+    name: &rippled::SField,
+) -> *mut STPluginType {
     let buffer = getVLBuffer(sit);
-    return make_stype(name, buffer).into_raw()
+    return make_stype(name, buffer).into_raw();
 }
 
 #[no_mangle]
@@ -143,9 +158,11 @@ extern "C" fn constructNewSType2(
 
 #[no_mangle]
 pub fn getSTypes(mut s_types: Pin<&mut CxxVector<STypeExport>>) {
+    // TODO: Might need to call registerSType from here as well
     unsafe {
         rippled::push_stype_export(
             24,
+            CreateNewSFieldPtr(createNewSType),
             ParseLeafTypeFnPtr(parseLeafTypeSTAccount2),
             STypeFromSITFnPtr(constructNewSType),
             STypeFromSFieldFnPtr(constructNewSType2),
@@ -167,6 +184,7 @@ pub fn getSFields(mut s_fields: Pin<&mut CxxVector<SFieldInfo>>) {
     let field_names = FIELD_NAMES_ONCE.get_or_init(|| {
         vec![CString::new("RegularKey2").unwrap()]
     });
+    // TODO: Might need to create a new sfield like sfQualityIn2() in SetTrust
     unsafe {
         rippled::push_sfield_info(24, 1, field_names.get(0).unwrap().as_ptr(), s_fields)
     }

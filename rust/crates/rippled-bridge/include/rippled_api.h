@@ -51,6 +51,12 @@ void setAccountID(
                 ripple::AccountID const& v
 );
 
+void setPluginType(
+        std::shared_ptr<ripple::SLE>const & sle,
+        ripple::SField const& field,
+        ripple::STPluginType const& v
+);
+
 void makeFieldAbsent(
         std::shared_ptr<ripple::SLE>const & sle,
         ripple::SField const& field
@@ -103,12 +109,13 @@ typedef const OptionalSTVar* (*parseLeafTypePtr)(
 
 struct STypeExport {
     int typeId;
-//    createNewSFieldPtr createPtr;
+    ripple::createNewSFieldPtr createPtr;
     parseLeafTypePtr parsePtr;
     ripple::constructSTypePtr constructPtr;
     ripple::constructSTypePtr2 constructPtr2;
 };
 
+using CreateNewSFieldPtr = ripple::SField const& (*)(int tid, int fv, const char* fn);
 using ParseLeafTypeFnPtr = const OptionalSTVar* (*)(
 ripple::SField const&,
 std::string const&,
@@ -121,7 +128,7 @@ using STypeFromSITFnPtr = ripple::STBase* (*)(ripple::SerialIter&, ripple::SFiel
 using STypeFromSFieldFnPtr = ripple::STBase* (*)(ripple::SField const&);
 
 void push_soelement(int field_code, ripple::SOEStyle style, std::vector<ripple::FakeSOElement>& vec);
-void push_stype_export(int tid, ParseLeafTypeFnPtr parseLeafTypeFn, STypeFromSITFnPtr sTypeFromSitFnPtr, STypeFromSFieldFnPtr sTypeFromSFieldFnPtr, std::vector<STypeExport>& vec);
+void push_stype_export(int tid, CreateNewSFieldPtr createNewSFieldPtr, ParseLeafTypeFnPtr parseLeafTypeFn, STypeFromSITFnPtr sTypeFromSitFnPtr, STypeFromSFieldFnPtr sTypeFromSFieldFnPtr, std::vector<STypeExport>& vec);
 void push_sfield_info(int tid, int fv, const char * txt_name, std::vector<ripple::SFieldInfo>& vec);
 
 ripple::SField const& constructSField(int tid, int fv, const char* fn);
@@ -138,8 +145,11 @@ void invalid_data(Json::Value& error, std::string const& json_name, std::string 
 std::unique_ptr<std::string> asString(Json::Value const& value);
 
 std::unique_ptr<ripple::Buffer> getVLBuffer(ripple::SerialIter& sit);
-std::unique_ptr<ripple::STBase> make_stype(ripple::SField const& field, std::unique_ptr<ripple::Buffer> buffer);
+std::unique_ptr<ripple::STPluginType> make_stype(ripple::SField const& field, std::unique_ptr<ripple::Buffer> buffer);
 std::unique_ptr<ripple::STBase> make_empty_stype(ripple::SField const& field);
+ripple::SField const& getSField(int type_id, int field_id);
+
+
 /*using TypedSTPluginType = ripple::TypedField<ripple::STPluginType>;
 ripple::SField const & makeTypedField(int tid, int fv, const char* fn);*/
 #endif //PLUGIN_TRANSACTOR_BLOBSTORE_H

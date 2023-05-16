@@ -60,14 +60,19 @@ pub fn do_apply(mut ctx: Pin<&mut ApplyContext>, m_prior_balance: XRPAmount, m_s
         setFlag(&sle, LedgerSpecificFlags::lsfPasswordSpent.into());
     }
 
-    if upcast(ctx.getTx()).isFieldPresent(sfRegularKey()) {
-        setAccountID(&sle, sfRegularKey(), &upcast(ctx.getTx()).getAccountID(sfRegularKey()));
+    if upcast(ctx.getTx()).isFieldPresent(getSField(24, 1)) {
+        // setPluginType(&sle, sfRegularKey(), upcast(ctx.getTx()).getPluginType(getSField(24, 1)));
+        // TODO: This crashes rippled because we are trying to set AccountRoot.RegularKey to an STPluginType'd
+        //   field, but AccountRoot.RegularKey is an STAccount field. In reality, you'd never try to do this so
+        //   we're not spending any time right now to get it to work, but if you did want to, you'd have to
+        //   somehow convert an STPluginType to an STAccount before setting the field.
+        setPluginType(&sle, getSField(24, 1), upcast(ctx.getTx()).getPluginType(getSField(24, 1)));
     } else {
         if sle.deref().isFlag(LedgerSpecificFlags::lsfDisableMaster.into()) & !ctx.as_mut().view().peek(&signers(&account)).is_null() {
             return TECcodes::tecNO_ALTERNATIVE_KEY.into();
         }
 
-        makeFieldAbsent(&sle,sfRegularKey());
+        makeFieldAbsent(&sle,getSField(24, 1));
     }
 
     return TEScodes::tesSUCCESS.into();

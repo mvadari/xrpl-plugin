@@ -58,6 +58,14 @@ void setAccountID(
     sle->setAccountID(field, v);
 }
 
+void setPluginType(
+        std::shared_ptr<ripple::SLE>const & sle,
+        ripple::SField const& field,
+        ripple::STPluginType const& v
+) {
+    sle->setPluginType(field, v);
+}
+
 void makeFieldAbsent(
         std::shared_ptr<ripple::SLE>const & sle,
 ripple::SField const& field
@@ -74,8 +82,8 @@ void push_soelement(int field_code, ripple::SOEStyle style, std::vector<ripple::
     vec.push_back({field_code, style});
 }
 
-void push_stype_export(int tid, ParseLeafTypeFnPtr parseLeafTypeFn, STypeFromSITFnPtr sTypeFromSitFnPtr, STypeFromSFieldFnPtr sTypeFromSFieldFnPtr, std::vector<STypeExport>& vec) {
-    vec.push_back({tid, parseLeafTypeFn, sTypeFromSitFnPtr, sTypeFromSFieldFnPtr});
+void push_stype_export(int tid, CreateNewSFieldPtr createNewSFieldPtr, ParseLeafTypeFnPtr parseLeafTypeFn, STypeFromSITFnPtr sTypeFromSitFnPtr, STypeFromSFieldFnPtr sTypeFromSFieldFnPtr, std::vector<STypeExport>& vec) {
+    vec.push_back({tid, createNewSFieldPtr, parseLeafTypeFn, sTypeFromSitFnPtr, sTypeFromSFieldFnPtr});
 }
 
 void push_sfield_info(int tid, int fv, const char * txt_name, std::vector<ripple::SFieldInfo>& vec) {
@@ -85,7 +93,7 @@ void push_sfield_info(int tid, int fv, const char * txt_name, std::vector<ripple
 ripple::SField const& constructSField(int tid, int fv, const char* fn) {
     if (ripple::SField const& field = ripple::SField::getField(ripple::field_code(tid, fv)); field != ripple::sfInvalid)
         return field;
-    return *(new ripple::SField(tid, fv, fn));
+    return *(new ripple::TypedField<ripple::STPluginType>(tid, fv, fn));
 }
 
 std::unique_ptr<OptionalSTVar> make_stvar(ripple::SField const& field, rust::Slice<const uint8_t> slice) {
@@ -111,12 +119,16 @@ std::unique_ptr<ripple::Buffer> getVLBuffer(ripple::SerialIter& sit) {
     return std::make_unique<ripple::Buffer>(buffer);
 }
 
-std::unique_ptr<ripple::STBase> make_stype(ripple::SField const& field, std::unique_ptr<ripple::Buffer> buffer) {
-    return std::make_unique<ripple::STBase>(ripple::STPluginType(field, ripple::Buffer(buffer.get()->data(), buffer.get()->size())));
+std::unique_ptr<ripple::STPluginType> make_stype(ripple::SField const& field, std::unique_ptr<ripple::Buffer> buffer) {
+    return std::make_unique<ripple::STPluginType>(ripple::STPluginType(field, ripple::Buffer(buffer.get()->data(), buffer.get()->size())));
 }
 
 std::unique_ptr<ripple::STBase> make_empty_stype(ripple::SField const& field) {
     return std::make_unique<ripple::STBase>(ripple::STPluginType(field));
+}
+
+ripple::SField const& getSField(int type_id, int field_id) {
+    return ripple::SField::getField(ripple::field_code(type_id, field_id));
 }
 
 /*ripple::SField const & makeTypedField(int tid, int fv, const char* fn) {

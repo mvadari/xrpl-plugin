@@ -1,5 +1,8 @@
+extern crate core;
+
 pub mod transactor;
 
+use core::slice;
 pub use transactor::Transactor;
 
 use xrpl_rust_sdk_core::core::types::AccountId;
@@ -49,12 +52,42 @@ impl STTx<'_> {
         rippled_bridge::rippled::upcast(self.instance).getAccountID(field.instance).into()
     }
 
+    pub fn get_plugin_type(&self, field: &SField) -> STPluginType {
+        STPluginType::new(self.as_st_object().getPluginType(field.instance))
+    }
+
     pub fn is_field_present(&self, field: &SField) -> bool {
         self.as_st_object().isFieldPresent(field.instance)
     }
 
     fn as_st_object(&self) -> &rippled_bridge::rippled::STObject {
         rippled_bridge::rippled::upcast(self.instance)
+    }
+}
+
+pub struct STPluginType<'a> {
+    instance: &'a rippled_bridge::rippled::STPluginType
+}
+
+impl AsRef<[u8]> for STPluginType<'_> {
+    fn as_ref(&self) -> &[u8] {
+        unsafe {
+            let data: *const u8 = self.instance.data();
+            let size: usize = self.instance.size();
+            slice::from_raw_parts(data, size)
+        }
+    }
+}
+
+impl <T> PartialEq<T> for STPluginType<'_> where T: AsRef<[u8]> {
+    fn eq(&self, other: &T) -> bool {
+        self.as_ref() == other.as_ref()
+    }
+}
+
+impl STPluginType<'_> {
+    pub(crate) fn new<'a>(instance: &'a rippled_bridge::rippled::STPluginType) -> STPluginType<'a> {
+        STPluginType { instance }
     }
 }
 
@@ -72,6 +105,12 @@ impl SField<'_> {
     pub fn sf_account() -> Self {
         SField {
             instance: rippled_bridge::rippled::sfAccount()
+        }
+    }
+
+    pub fn get_plugin_field(type_id: i32, field_id: i32) -> Self {
+        SField {
+            instance: rippled_bridge::rippled::getSField(type_id, field_id)
         }
     }
 }

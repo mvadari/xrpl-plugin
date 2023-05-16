@@ -17,7 +17,7 @@ pub use dummy_tx_rs::pre_claim;
 pub use dummy_tx_rs::do_apply;
 pub use ter::{TER, NotTEC, TEFcodes, TEMcodes, TELcodes, TECcodes, TEScodes, TERcodes};
 pub use flags::{LedgerSpecificFlags, ApplyFlags};
-use crate::rippled::{OptionalSTVar, SerialIter, SField, STBase, Value};
+use crate::rippled::{OptionalSTVar, SerialIter, SField, STBase, STPluginType, Value};
 
 // Also try this
 /*#[no_mangle]
@@ -124,6 +124,7 @@ pub mod rippled {
         #[namespace = "Json"]
         pub type Value;
         pub type Buffer;
+        pub type STPluginType;
 
         ////////////////////////////////
         // Functions implemented in C++.
@@ -150,6 +151,7 @@ pub mod rippled {
         include!("rippled-bridge/include/rippled_api.h");
 
         pub type STypeExport;
+        pub type CreateNewSFieldPtr = super::CreateNewSFieldPtr;
         pub type ParseLeafTypeFnPtr = super::ParseLeafTypeFnPtr;
         pub type STypeFromSITFnPtr = super::STypeFromSITFnPtr;
         pub type STypeFromSFieldFnPtr = super::STypeFromSFieldFnPtr;
@@ -183,10 +185,12 @@ pub mod rippled {
         pub fn isFlag(self: &SLE, f: u32) -> bool;
 
         pub fn getAccountID(self: &STObject, field: &SField) -> AccountID;
+        pub fn getPluginType(self: &STObject, field: &SField) -> &'static STPluginType;
 
         pub fn sfRegularKey() -> &'static SField;
         pub fn sfAccount() -> &'static SField;
         pub fn sfTicketSequence() -> &'static SField;
+        pub fn getSField(type_id: i32, field_id: i32) -> &'static SField;
 
         pub fn getCode(self: &SField) -> i32;
 
@@ -206,12 +210,15 @@ pub mod rippled {
 
         pub fn setFlag(sle: &SharedPtr<SLE>, f: u32) -> bool;
         pub fn setAccountID(sle: &SharedPtr<SLE>, field: &SField, v: &AccountID);
+        pub fn setPluginType(sle: &SharedPtr<SLE>, field: &SField, v: &STPluginType);
+
         pub fn makeFieldAbsent(sle: &SharedPtr<SLE>, field: &SField);
         pub fn minimumFee(app: Pin<&mut Application>, baseFee: XRPAmount, fees: &Fees, flags: ApplyFlags) -> XRPAmount;
 
         pub fn push_soelement(field_code: i32, style: SOEStyle, vec: Pin<&mut CxxVector<FakeSOElement>>);
         pub unsafe fn push_stype_export(
             tid: i32,
+            create_new_sfield_fn: CreateNewSFieldPtr,
             parse_leaf_type_fn: ParseLeafTypeFnPtr,
             from_sit_constructor_ptr: STypeFromSITFnPtr,
             from_sfield_constructor_ptr: STypeFromSFieldFnPtr,
@@ -226,12 +233,28 @@ pub mod rippled {
         pub fn bad_type(error: Pin<&mut Value>, json_name: &CxxString, field_name: &CxxString);
         pub fn invalid_data(error: Pin<&mut Value>, json_name: &CxxString, field_name: &CxxString);
         pub fn getVLBuffer(sit: Pin<&mut SerialIter>) -> UniquePtr<Buffer>;
-        pub fn make_stype(field: &SField, buffer: UniquePtr<Buffer>) -> UniquePtr<STBase>;
+        pub fn make_stype(field: &SField, buffer: UniquePtr<Buffer>) -> UniquePtr<STPluginType>;
         pub fn make_empty_stype(field: &SField) -> UniquePtr<STBase>;
+        pub unsafe fn constructSField(tid: i32, fv: i32, fname: *const c_char) -> &'static SField;
+
+        pub unsafe fn data(self: &STPluginType) -> *const u8;
+        pub fn size(self: &STPluginType) -> usize;
     }
 }
 
+#[repr(transparent)]
+pub struct CreateNewSFieldPtr(
+    pub extern "C" fn(
+        tid: i32,
+        fv: i32,
+        field_name: *const c_char
+    ) -> &'static SField
+);
 
+unsafe impl ExternType for CreateNewSFieldPtr {
+    type Id = type_id!("CreateNewSFieldPtr");
+    type Kind = Trivial;
+}
 
 // https://github.com/dtolnay/cxx/issues/895#issuecomment-913095541
 #[repr(transparent)]
@@ -256,7 +279,7 @@ pub struct STypeFromSITFnPtr(
     pub extern "C" fn(
         sit: Pin<&mut SerialIter>,
         name: &SField
-    ) -> *mut STBase
+    ) -> *mut STPluginType
 );
 
 unsafe impl ExternType for STypeFromSITFnPtr {
