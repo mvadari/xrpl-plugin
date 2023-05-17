@@ -37,6 +37,7 @@ from plugin_transactor import (
     soeOPTIONAL,
     sfDestinationTag,
     sfTicketSequence,
+    sfAccount2,
 )
 
 tx_name = "NewEscrowCreate"
@@ -51,6 +52,13 @@ tx_format = [
     (sfDestinationTag, soeOPTIONAL),
     (sfTicketSequence, soeOPTIONAL)
 ]
+
+
+# def createNewSField(cls, field_value, field_name):
+#     print(cls.__name__, field_name, field_value)
+
+
+# sfCancelAfter2 = createNewSField(STUInt32, "sfCancelAfter2", 47)
 
 
 def after(now, mark):

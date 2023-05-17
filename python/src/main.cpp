@@ -20,11 +20,11 @@ struct WSF {
   };
 };
 
-// template <class T> struct TWSF : WSF {
-//   operator ripple::TypedField<T> const &() const {
-//     return *static_cast<ripple::TypedField<T> *>(f_);
-//   };
-// };
+template <class T> struct TWSF : WSF {
+  operator ripple::TypedField<T> const &() const {
+    return *static_cast<ripple::TypedField<T> *>(f_);
+  };
+};
 
 namespace py = pybind11;
 
@@ -306,7 +306,11 @@ PYBIND11_MODULE(plugin_transactor, m) {
                 return "sf" + static_cast<ripple::SField const&>(wsf).getName();
             }
         );
-    // py::class_<TWSF<ripple::TypedField<ripple::STAccount>>> TWSF_STAccount(m, "TWSF");
+    py::class_<TWSF<ripple::STAccount>, WSF> TWSF_STAccount(m, "TWSF_STAccount");
+    py::class_<TWSF<ripple::STAmount>, WSF> TWSF_STAmount(m, "TWSF_STAmount");
+    py::class_<TWSF<ripple::STUInt32>, WSF> TWSF_STUInt32(m, "TWSF_STUInt32");
+    py::class_<TWSF<ripple::STUInt64>, WSF> TWSF_STUInt64(m, "TWSF_STUInt64");
+    py::class_<TWSF<ripple::STBlob>, WSF> TWSF_STBlob(m, "TWSF_STBlob");
 
 
     py::class_<ripple::AccountID> AccountID(m, "AccountID");
@@ -689,23 +693,20 @@ PYBIND11_MODULE(plugin_transactor, m) {
     m.attr("tfFullyCanonicalSig") = ripple::tfFullyCanonicalSig;
     m.attr("tfUniversal") = ripple::tfUniversal;
     m.attr("tfUniversalMask") = ripple::tfUniversalMask;
-    m.attr("sfRegularKey") = WSF{(void *)&ripple::sfRegularKey};
-    m.attr("sfAccount") = WSF{(void *)&ripple::sfAccount};
-    m.attr("sfAmount") = WSF{(void *)&ripple::sfAmount};
-    m.attr("sfFinishAfter") = WSF{(void *)&ripple::sfFinishAfter};
-    m.attr("sfCancelAfter") = WSF{(void *)&ripple::sfCancelAfter};
-    m.attr("sfCondition") = WSF{(void *)&ripple::sfCondition};
-    m.attr("sfBalance") = WSF{(void *)&ripple::sfBalance};
-    m.attr("sfSourceTag") = WSF{(void *)&ripple::sfSourceTag};
-    m.attr("sfDestinationTag") = WSF{(void *)&ripple::sfDestinationTag};
-    m.attr("sfTicketSequence") = WSF{(void *)&ripple::sfTicketSequence};
-    m.attr("sfDestination") = WSF{(void *)&ripple::sfDestination};
-    m.attr("sfOwnerNode") = WSF{(void *)&ripple::sfOwnerNode};
-    m.attr("sfOwnerCount") = WSF{(void *)&ripple::sfOwnerCount};
-    // m.attr("sfRegularKey") = TWSF<std::decay_t<decltype(ripple::sfRegularKey)>>{
-    //   (void *)&ripple::sfRegularKey};
-    // m.attr("sfAccount") = TWSF<std::decay_t<decltype(ripple::sfAccount)>>{
-    //   (void *)&ripple::sfAccount};
+    m.attr("sfAccount2") = TWSF<ripple::STAccount>{(void *)&ripple::sfOwnerCount};
+    m.attr("sfRegularKey") = TWSF<ripple::STAccount>{(void *)&ripple::sfRegularKey};
+    m.attr("sfAccount") = TWSF<ripple::STAccount>{(void *)&ripple::sfAccount};
+    m.attr("sfAmount") = TWSF<ripple::STAmount>{(void *)&ripple::sfAmount};
+    m.attr("sfFinishAfter") = TWSF<ripple::STUInt32>{(void *)&ripple::sfFinishAfter};
+    m.attr("sfCancelAfter") = TWSF<ripple::STUInt32>{(void *)&ripple::sfCancelAfter};
+    m.attr("sfCondition") = TWSF<ripple::STBlob>{(void *)&ripple::sfCondition};
+    m.attr("sfBalance") = TWSF<ripple::STAmount>{(void *)&ripple::sfBalance};
+    m.attr("sfSourceTag") = TWSF<ripple::STUInt32>{(void *)&ripple::sfSourceTag};
+    m.attr("sfDestinationTag") = TWSF<ripple::STUInt32>{(void *)&ripple::sfDestinationTag};
+    m.attr("sfTicketSequence") = TWSF<ripple::STUInt32>{(void *)&ripple::sfTicketSequence};
+    m.attr("sfDestination") = TWSF<ripple::STAccount>{(void *)&ripple::sfDestination};
+    m.attr("sfOwnerNode") = TWSF<ripple::STUInt64>{(void *)&ripple::sfOwnerNode};
+    m.attr("sfOwnerCount") = TWSF<ripple::STUInt32>{(void *)&ripple::sfOwnerCount};
     m.attr("fixMasterKeyAsRegularKey") = ripple::fixMasterKeyAsRegularKey;
     m.attr("fix1543") = ripple::fix1543;
     m.attr("fix1571") = ripple::fix1571;
