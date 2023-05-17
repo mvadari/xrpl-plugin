@@ -15,7 +15,7 @@ from plugin_transactor import (
 )
 
 tx_name = "DummyTx"
-
+tx_type = 30
 
 def preflight(ctx):
     if (preflight1ret := preflight1(ctx)) != tesSUCCESS:

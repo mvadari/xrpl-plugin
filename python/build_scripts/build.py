@@ -72,8 +72,9 @@ def generate_cpp(tx_name, tx_type, module_name, python_folder):
 namespace py = pybind11;
 using namespace pybind11::literals; // to bring in the `_a` literal
 
-namespace ripple {{
+using namespace ripple;
 
+extern "C"
 NotTEC
 preflight(PreflightContext const& ctx)
 {{
@@ -89,6 +90,7 @@ preflight(PreflightContext const& ctx)
     }}
 }}
 
+extern "C"
 TER
 preclaim(PreclaimContext const& ctx)
 {{
@@ -99,6 +101,7 @@ preclaim(PreclaimContext const& ctx)
     return TER::fromInt(preclaimReturn.cast<int>());
 }}
 
+extern "C"
 TER
 doApply(ApplyContext& ctx, XRPAmount mPriorBalance, XRPAmount mSourceBalance)
 {{
@@ -111,21 +114,6 @@ doApply(ApplyContext& ctx, XRPAmount mPriorBalance, XRPAmount mSourceBalance)
         mSourceBalance);
     return TER::fromInt(doApplyReturn.cast<int>());
 }}
-}}
-
-extern "C"
-ripple::NotTEC
-preflight(ripple::PreflightContext const& ctx)
-{{
-    return ripple::preflight(ctx);
-}}
-
-extern "C"
-ripple::TER
-preclaim(ripple::PreclaimContext const& ctx)
-{{
-    return ripple::preclaim(ctx);
-}}
 
 extern "C"
 ripple::XRPAmount
@@ -135,23 +123,39 @@ calculateBaseFee(ripple::ReadView const& view, ripple::STTx const& tx)
 }}
 
 extern "C"
-ripple::TER
-doApply(ripple::ApplyContext& ctx, ripple::XRPAmount mPriorBalance, ripple::XRPAmount mSourceBalance)
-{{
-    return ripple::doApply(ctx, mPriorBalance, mSourceBalance);
-}}
-
-extern "C"
 char const*
 getTxName()
 {{
-    return "{tx_name}";
+    static std::string const r = []{{
+        py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+        py::module_::import("sys").attr("path").attr("append")("{python_folder}");
+        py::object tx_name = py::module_::import("{module_name}").attr("tx_name");
+        return tx_name.cast<std::string>();
+    }}(); 
+    return r.c_str();
 }}
 
 struct FakeSOElement {{
     int fieldCode;
     ripple::SOEStyle style;
 }};
+
+extern "C"
+std::uint16_t
+getTxType()
+{{
+    py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+    py::module_::import("sys").attr("path").attr("append")("{python_folder}");
+    py::object tx_type = py::module_::import("{module_name}").attr("tx_type");
+    return tx_type.cast<std::uint16_t>();
+}}
+
+extern "C"
+std::string
+getTTName()
+{{
+    return "tt{module_name.upper()}";
+}}
 
 extern "C"
 std::vector<FakeSOElement>
@@ -168,12 +172,6 @@ getTxFormat()
     }};
 }}
 
-struct SFieldInfo {{
-    int typeId;
-    int fieldValue;
-    const char * txtName;
-}};
-
 extern "C"
 std::vector<int>
 getSTypes()
@@ -187,22 +185,6 @@ getSFields()
 {{
     return std::vector<SFieldInfo>{{}};
 }}
-
-extern "C"
-std::uint16_t
-getTxType()
-{{
-    return {tx_type};
-}}
-
-extern "C"
-std::string
-getTTName()
-{{
-    return "tt{module_name.upper()}";
-}}
-
-
 """
 
 

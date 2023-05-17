@@ -32,11 +32,16 @@ from plugin_transactor import (
     describeOwnerDir,
     tecDIR_FULL,
     sfOwnerNode,
-    adjustOwnerCount
+    adjustOwnerCount,
+    soeREQUIRED,
+    soeOPTIONAL,
+    sfDestinationTag,
+    sfTicketSequence,
+    STUInt32,
 )
 
 tx_name = "NewEscrowCreate"
-tx_type = 20
+tx_type = 47
 
 
 def after(now, mark):

@@ -396,11 +396,6 @@ PYBIND11_MODULE(plugin_transactor, m) {
     py::class_<ripple::STObject, std::shared_ptr<ripple::STObject>> STObject(m, "STObject");
     STObject
         .def("isFlag", &ripple::STObject::isFlag)
-        .def_property_readonly("Account",
-            [](const ripple::STObject &obj) {
-                return obj[ripple::sfAccount];
-            }
-        )
         .def("getAccountID",
             [](const ripple::STObject &obj, const WSF &wsf) {
                 return obj.getAccountID(static_cast<ripple::SField const&>(wsf));
