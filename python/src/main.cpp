@@ -286,6 +286,13 @@ PYBIND11_MODULE(plugin_transactor, m) {
     py::implicitly_convertible<ripple::TEFcodes, ripple::TER>();
     py::implicitly_convertible<ripple::TECcodes, ripple::TER>();
     py::implicitly_convertible<ripple::NotTEC, ripple::TER>();
+
+    py::enum_<ripple::SOEStyle>(m, "SOEStyle")
+        .value("soeINVALID", ripple::SOEStyle::soeINVALID)
+        .value("soeREQUIRED", ripple::SOEStyle::soeREQUIRED)
+        .value("soeOPTIONAL", ripple::SOEStyle::soeOPTIONAL)
+        .value("soeDEFAULT", ripple::SOEStyle::soeDEFAULT)
+        .export_values();
     
     /*
     * Small classes
@@ -293,6 +300,12 @@ PYBIND11_MODULE(plugin_transactor, m) {
 
     py::class_<ripple::SField> SField(m, "SField");
     py::class_<WSF> PythonWSF(m, "WSF");
+    PythonWSF
+        .def("__repr__",
+            [](const WSF &wsf) {
+                return "sf" + static_cast<ripple::SField const&>(wsf).getName();
+            }
+        );
     // py::class_<TWSF<ripple::TypedField<ripple::STAccount>>> TWSF_STAccount(m, "TWSF");
 
 
@@ -685,6 +698,7 @@ PYBIND11_MODULE(plugin_transactor, m) {
     m.attr("sfBalance") = WSF{(void *)&ripple::sfBalance};
     m.attr("sfSourceTag") = WSF{(void *)&ripple::sfSourceTag};
     m.attr("sfDestinationTag") = WSF{(void *)&ripple::sfDestinationTag};
+    m.attr("sfTicketSequence") = WSF{(void *)&ripple::sfTicketSequence};
     m.attr("sfDestination") = WSF{(void *)&ripple::sfDestination};
     m.attr("sfOwnerNode") = WSF{(void *)&ripple::sfOwnerNode};
     m.attr("sfOwnerCount") = WSF{(void *)&ripple::sfOwnerCount};

@@ -69,10 +69,19 @@ def generate_cpp(tx_name, tx_type, module_name, python_folder):
 #include <ripple/protocol/st.h>
 
 #include <pybind11/embed.h> // everything needed for embedding
+#include <pybind11/stl.h>
+
 namespace py = pybind11;
 using namespace pybind11::literals; // to bring in the `_a` literal
 
 using namespace ripple;
+
+struct WSF {{
+  void *f_;
+  operator ripple::SField const &() const {{
+    return *static_cast<ripple::SField *>(f_);
+  }};
+}};
 
 extern "C"
 NotTEC
@@ -126,13 +135,13 @@ extern "C"
 char const*
 getTxName()
 {{
-    static std::string const r = []{{
+    static std::string const txName = []{{
         py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
         py::module_::import("sys").attr("path").attr("append")("{python_folder}");
         py::object tx_name = py::module_::import("{module_name}").attr("tx_name");
         return tx_name.cast<std::string>();
     }}(); 
-    return r.c_str();
+    return txName.c_str();
 }}
 
 struct FakeSOElement {{
@@ -161,15 +170,21 @@ extern "C"
 std::vector<FakeSOElement>
 getTxFormat()
 {{
-    return std::vector<FakeSOElement>{{
-        {{ripple::sfDestination.getCode(), ripple::soeREQUIRED}},
-        {{ripple::sfAmount.getCode(), ripple::soeREQUIRED}},
-        {{ripple::sfCondition.getCode(), ripple::soeOPTIONAL}},
-        {{ripple::sfCancelAfter.getCode(), ripple::soeOPTIONAL}},
-        {{ripple::sfFinishAfter.getCode(), ripple::soeOPTIONAL}},
-        {{ripple::sfDestinationTag.getCode(), ripple::soeOPTIONAL}},
-        {{ripple::sfTicketSequence.getCode(), ripple::soeOPTIONAL}},
-    }};
+    static std::vector<FakeSOElement> const txFormat = []{{
+        std::vector<FakeSOElement> temp = {{}};
+        py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+        py::module_::import("sys").attr("path").attr("append")("{python_folder}");
+        auto tx_format = py::module_::import("{module_name}").attr("tx_format").cast<std::vector<py::object>>();
+        for (py::object variable: tx_format)
+        {{
+            py::tuple tup = variable.cast<py::tuple>();
+            WSF sfield = tup[0].cast<WSF>();
+            SOEStyle varType = tup[1].cast<SOEStyle>();
+            temp.emplace_back(FakeSOElement{{static_cast<ripple::SField const&>(sfield).getCode(), varType}});
+        }}
+        return temp;
+    }}();
+    return txFormat;
 }}
 
 extern "C"

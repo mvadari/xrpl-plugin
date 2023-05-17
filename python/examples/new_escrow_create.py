@@ -37,11 +37,20 @@ from plugin_transactor import (
     soeOPTIONAL,
     sfDestinationTag,
     sfTicketSequence,
-    STUInt32,
 )
 
 tx_name = "NewEscrowCreate"
 tx_type = 47
+
+tx_format = [
+    (sfDestination, soeREQUIRED),
+    (sfAmount, soeREQUIRED),
+    (sfCondition, soeOPTIONAL),
+    (sfCancelAfter, soeOPTIONAL),
+    (sfFinishAfter, soeOPTIONAL),
+    (sfDestinationTag, soeOPTIONAL),
+    (sfTicketSequence, soeOPTIONAL)
+]
 
 
 def after(now, mark):
