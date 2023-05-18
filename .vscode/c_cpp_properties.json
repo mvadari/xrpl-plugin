@@ -4,7 +4,8 @@
             "name": "Mac",
             "includePath": [
                 "${workspaceFolder}/**",
-                "~/.conan/data"
+                "~/.conan/data",
+                "~/.conan/data/boost/1.77.0/_/_/package/4487565cef5463d0b192b189b027a6f0186fbca7/include"
             ],
             "defines": [],
             "macFrameworkPath": [

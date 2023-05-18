@@ -110,10 +110,14 @@
         "filesystem": "cpp"
     },
     "cSpell.words": [
+        "INSUF",
+        "JLOG",
         "keylet",
         "NFTOKEN",
         "Optionaled",
         "PAYCHAN",
-        "Preclaim"
+        "Preclaim",
+        "stvar",
+        "trustlines"
     ]
 }
