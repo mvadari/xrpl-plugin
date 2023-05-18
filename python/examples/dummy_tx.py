@@ -11,11 +11,18 @@ from plugin_transactor import (
     lsfDisableMaster,
     tecNO_ALTERNATIVE_KEY,
     sfRegularKey,
+    sfTicketSequence,
     sfAccount,
+    soeOPTIONAL,
 )
 
 tx_name = "DummyTx"
 tx_type = 30
+tx_format = [
+    (sfRegularKey, soeOPTIONAL),
+    (sfTicketSequence, soeOPTIONAL)
+]
+
 
 def preflight(ctx):
     if (preflight1ret := preflight1(ctx)) != tesSUCCESS:
