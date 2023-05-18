@@ -194,11 +194,32 @@ getSTypes()
     return std::vector<int>{{}};
 }}
 
+
 extern "C"
 std::vector<SFieldInfo>
 getSFields()
 {{
-    return std::vector<SFieldInfo>{{}};
+    static std::vector<SFieldInfo> const sFields = []{{
+        std::vector<SFieldInfo> temp = {{}};
+        py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+        py::module_::import("sys").attr("path").attr("append")("{python_folder}");
+        py::module pluginImport = py::module_::import("{module_name}");
+        if (!hasattr(pluginImport, "new_sfields")) {{
+            return temp;
+        }}
+        auto new_sfields = pluginImport.attr("new_sfields").cast<std::vector<py::object>>();
+        for (py::object variable: new_sfields)
+        {{
+            WSF wrappedSField = variable.cast<WSF>();
+            SField sfield = static_cast<ripple::SField const&>(wrappedSField);
+            temp.emplace_back(SFieldInfo{{
+                sfield.fieldType,
+                sfield.fieldValue,
+                sfield.jsonName}});
+        }}
+        return temp;
+    }}();
+    return sFields;
 }}
 """
 

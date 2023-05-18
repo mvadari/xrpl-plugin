@@ -51,7 +51,9 @@ def create_new_sfield(cls, field_name, field_value):
     return create_fn(field_value, field_name)
 
 
-sfCancelAfter2 = create_new_sfield(STUInt32, "CancelAfter2", 47)
+sfFinishAfter2 = create_new_sfield(STUInt32, "FinishAfter2", 47)
+
+new_sfields = [sfFinishAfter2]
 
 tx_name = "NewEscrowCreate"
 tx_type = 47
@@ -60,8 +62,8 @@ tx_format = [
     (sfDestination, soeREQUIRED),
     (sfAmount, soeREQUIRED),
     (sfCondition, soeOPTIONAL),
-    (sfCancelAfter2, soeOPTIONAL),
-    (sfFinishAfter, soeOPTIONAL),
+    (sfCancelAfter, soeOPTIONAL),
+    (sfFinishAfter2, soeOPTIONAL),
     (sfDestinationTag, soeOPTIONAL),
     (sfTicketSequence, soeOPTIONAL)
 ]
@@ -86,17 +88,17 @@ def preflight(ctx):
     # if amount <= zeroAmount:  # TODO: get this part working
     #     return temBAD_AMOUNT
 
-    if not ctx.tx.isFieldPresent(sfCancelAfter2) and \
-        not ctx.tx.isFieldPresent(sfFinishAfter):
+    if not ctx.tx.isFieldPresent(sfCancelAfter) and \
+        not ctx.tx.isFieldPresent(sfFinishAfter2):
         return temBAD_EXPIRATION
 
-    if ctx.tx.isFieldPresent(sfCancelAfter2) and \
-        ctx.tx.isFieldPresent(sfFinishAfter) and \
-            ctx.tx[sfCancelAfter2] <= ctx.tx[sfFinishAfter]:
+    if ctx.tx.isFieldPresent(sfCancelAfter) and \
+        ctx.tx.isFieldPresent(sfFinishAfter2) and \
+            ctx.tx[sfCancelAfter] <= ctx.tx[sfFinishAfter2]:
         return temBAD_EXPIRATION
 
     if ctx.rules.enabled(fix1571):
-        if not ctx.tx.isFieldPresent(sfFinishAfter) and \
+        if not ctx.tx.isFieldPresent(sfFinishAfter2) and \
             not ctx.tx.isFieldPresent(sfCondition):
             return temMALFORMED
     
@@ -111,12 +113,12 @@ def doApply(ctx, _mPriorBalance, _mSourceBalance):
     close_time = ctx.view().info().parent_close_time
 
     if ctx.view().rules().enabled(fix1571):
-        if ctx.tx.isFieldPresent(sfCancelAfter2) and \
-            after(close_time, ctx.tx[sfCancelAfter2]):
+        if ctx.tx.isFieldPresent(sfCancelAfter) and \
+            after(close_time, ctx.tx[sfCancelAfter]):
             return tecNO_PERMISSION
 
-        if ctx.tx.isFieldPresent(sfFinishAfter) and \
-            after(close_time, ctx.tx[sfFinishAfter]):
+        if ctx.tx.isFieldPresent(sfFinishAfter2) and \
+            after(close_time, ctx.tx[sfFinishAfter2]):
             return tecNO_PERMISSION
     
     account = ctx.tx[sfAccount]
@@ -142,7 +144,7 @@ def doApply(ctx, _mPriorBalance, _mSourceBalance):
     keylet = escrowKeylet(account, ctx.tx.getSeqProxy().value())
     slep = makeSLE(keylet)
     slep[sfAccount] = account
-    print("HIIIIIIIIIIII")
+    # print("HIIIIIIIIIIII")
     # print(ctx.tx[sfAmount])
     slep.setAmount(sfAmount, ctx.tx[sfAmount])
     # slep[sfAmount] = amount
