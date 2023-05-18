@@ -26,6 +26,36 @@ template <class T> struct TWSF : WSF {
   };
 };
 
+template <typename T>
+int getSTId() { return 0; }
+
+template <>
+int getSTId<ripple::SF_AMOUNT>() { return ripple::STI_AMOUNT; }
+
+template <> 
+int getSTId<ripple::SF_ACCOUNT>() { return ripple::STI_ACCOUNT; }
+
+template <> 
+int getSTId<ripple::SF_UINT32>() { return ripple::STI_UINT32; }
+
+template <class T>
+T const&
+newSField(const int fieldValue, char const* fieldName)
+{
+    if (ripple::SField const& field = ripple::SField::getField(fieldName); field != ripple::sfInvalid)
+        return static_cast<T const&>(field);
+    T const* newSField = new T(getSTId<T>(), fieldValue, fieldName);
+    return *newSField;
+}
+
+template <class T>
+TWSF<T>
+wrappedNewSField(const int fieldValue, std::string const fieldName)
+{
+    ripple::TypedField<T> const& sfield = newSField<ripple::TypedField<T>>(fieldValue, fieldName.c_str());
+    return TWSF<T>{(void *)&sfield};
+}
+
 namespace py = pybind11;
 
 PYBIND11_MODULE(plugin_transactor, m) {
@@ -274,11 +304,11 @@ PYBIND11_MODULE(plugin_transactor, m) {
                 return "sf" + static_cast<ripple::SField const&>(wsf).getName();
             }
         );
-    py::class_<TWSF<ripple::STAccount>, WSF> TWSF_STAccount(m, "TWSF_STAccount");
-    py::class_<TWSF<ripple::STAmount>, WSF> TWSF_STAmount(m, "TWSF_STAmount");
-    py::class_<TWSF<ripple::STUInt32>, WSF> TWSF_STUInt32(m, "TWSF_STUInt32");
-    py::class_<TWSF<ripple::STUInt64>, WSF> TWSF_STUInt64(m, "TWSF_STUInt64");
-    py::class_<TWSF<ripple::STBlob>, WSF> TWSF_STBlob(m, "TWSF_STBlob");
+    py::class_<TWSF<ripple::STAccount>, WSF> TWSF_STAccount(m, "SF_ACCOUNT");
+    py::class_<TWSF<ripple::STAmount>, WSF> TWSF_STAmount(m, "SF_AMOUNT");
+    py::class_<TWSF<ripple::STUInt32>, WSF> TWSF_STUInt32(m, "SF_UINT32");
+    py::class_<TWSF<ripple::STUInt64>, WSF> TWSF_STUInt64(m, "SF_UINT64");
+    py::class_<TWSF<ripple::STBlob>, WSF> TWSF_STBlob(m, "SF_VL");
 
 
     py::class_<ripple::AccountID> AccountID(m, "AccountID");
@@ -350,6 +380,8 @@ PYBIND11_MODULE(plugin_transactor, m) {
     // py::class_<ripple::STInteger, ripple::STBase> STInteger(m, "STInteger");
     py::class_<ripple::STAccount, ripple::STBase> STAccount(m, "STAccount");
     py::class_<ripple::STBlob, ripple::STBase> STBlob(m, "STBlob");
+    py::class_<ripple::STUInt32, ripple::STBase> STUInt32(m, "STUInt32");
+    py::class_<ripple::STUInt64, ripple::STBase> STUInt64(m, "STUInt64");
     py::class_<ripple::STAmount, ripple::STBase> STAmount(m, "STAmount");
     STAmount
         .def(py::init<ripple::STAmount &>())
@@ -685,6 +717,9 @@ PYBIND11_MODULE(plugin_transactor, m) {
         )
         .def("describeOwnerDir", &ripple::describeOwnerDir)
         .def("adjustOwnerCount", &ripple::adjustOwnerCount)
+        .def("createNewSField_STAccount", &wrappedNewSField<ripple::STAccount>)
+        .def("createNewSField_STAmount", &wrappedNewSField<ripple::STAmount>)
+        .def("createNewSField_STUInt32", &wrappedNewSField<ripple::STUInt32>)
         ;
     
 

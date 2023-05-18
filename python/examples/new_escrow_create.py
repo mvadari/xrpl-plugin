@@ -38,7 +38,20 @@ from plugin_transactor import (
     sfDestinationTag,
     sfTicketSequence,
     sfAccount2,
+    STUInt32,
+    STBase,
 )
+import plugin_transactor
+
+# TODO: helper function, move this to the package
+def create_new_sfield(cls, field_name, field_value):
+    if not issubclass(cls, STBase):
+        raise Exception("SField must be of an `ST` type.")
+    create_fn = getattr(plugin_transactor, f"createNewSField_{cls.__name__}")
+    return create_fn(field_value, field_name)
+
+
+sfCancelAfter2 = create_new_sfield(STUInt32, "CancelAfter2", 47)
 
 tx_name = "NewEscrowCreate"
 tx_type = 47
@@ -47,18 +60,11 @@ tx_format = [
     (sfDestination, soeREQUIRED),
     (sfAmount, soeREQUIRED),
     (sfCondition, soeOPTIONAL),
-    (sfCancelAfter, soeOPTIONAL),
+    (sfCancelAfter2, soeOPTIONAL),
     (sfFinishAfter, soeOPTIONAL),
     (sfDestinationTag, soeOPTIONAL),
     (sfTicketSequence, soeOPTIONAL)
 ]
-
-
-# def createNewSField(cls, field_value, field_name):
-#     print(cls.__name__, field_name, field_value)
-
-
-# sfCancelAfter2 = createNewSField(STUInt32, "sfCancelAfter2", 47)
 
 
 def after(now, mark):
@@ -80,13 +86,13 @@ def preflight(ctx):
     # if amount <= zeroAmount:  # TODO: get this part working
     #     return temBAD_AMOUNT
 
-    if not ctx.tx.isFieldPresent(sfCancelAfter) and \
+    if not ctx.tx.isFieldPresent(sfCancelAfter2) and \
         not ctx.tx.isFieldPresent(sfFinishAfter):
         return temBAD_EXPIRATION
 
-    if ctx.tx.isFieldPresent(sfCancelAfter) and \
+    if ctx.tx.isFieldPresent(sfCancelAfter2) and \
         ctx.tx.isFieldPresent(sfFinishAfter) and \
-            ctx.tx[sfCancelAfter] <= ctx.tx[sfFinishAfter]:
+            ctx.tx[sfCancelAfter2] <= ctx.tx[sfFinishAfter]:
         return temBAD_EXPIRATION
 
     if ctx.rules.enabled(fix1571):
@@ -105,8 +111,8 @@ def doApply(ctx, _mPriorBalance, _mSourceBalance):
     close_time = ctx.view().info().parent_close_time
 
     if ctx.view().rules().enabled(fix1571):
-        if ctx.tx.isFieldPresent(sfCancelAfter) and \
-            after(close_time, ctx.tx[sfCancelAfter]):
+        if ctx.tx.isFieldPresent(sfCancelAfter2) and \
+            after(close_time, ctx.tx[sfCancelAfter2]):
             return tecNO_PERMISSION
 
         if ctx.tx.isFieldPresent(sfFinishAfter) and \
