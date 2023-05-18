@@ -73,7 +73,7 @@ def preflight(ctx):
     if (preflight1ret := preflight1(ctx)) != tesSUCCESS:
         return preflight1ret
     
-    amount = ctx.tx.getAmount(sfAmount)
+    amount = ctx.tx[sfAmount]
     if not amount.is_xrp():
         return temBAD_AMOUNT
     
@@ -86,7 +86,7 @@ def preflight(ctx):
 
     if ctx.tx.isFieldPresent(sfCancelAfter) and \
         ctx.tx.isFieldPresent(sfFinishAfter) and \
-            ctx.tx.getU32(sfCancelAfter) <= ctx.tx.getU32(sfFinishAfter):
+            ctx.tx[sfCancelAfter] <= ctx.tx[sfFinishAfter]:
         return temBAD_EXPIRATION
 
     if ctx.rules.enabled(fix1571):
@@ -106,27 +106,27 @@ def doApply(ctx, _mPriorBalance, _mSourceBalance):
 
     if ctx.view().rules().enabled(fix1571):
         if ctx.tx.isFieldPresent(sfCancelAfter) and \
-            after(close_time, ctx.tx.getU32(sfCancelAfter)):
+            after(close_time, ctx.tx[sfCancelAfter]):
             return tecNO_PERMISSION
 
         if ctx.tx.isFieldPresent(sfFinishAfter) and \
-            after(close_time, ctx.tx.getU32(sfFinishAfter)):
+            after(close_time, ctx.tx[sfFinishAfter]):
             return tecNO_PERMISSION
     
-    account = ctx.tx.getAccountID(sfAccount)
+    account = ctx.tx[sfAccount]
     sle = ctx.view().peek(accountKeylet(account))
     if not sle:
         return tecINTERNAL
     
-    balance = STAmount(sle.getAmount(sfBalance)).xrp()
-    reserve = ctx.view().fees().accountReserve(sle.getU32(sfOwnerCount) + 1)
+    balance = STAmount(sle[sfBalance]).xrp()
+    reserve = ctx.view().fees().accountReserve(sle[sfOwnerCount] + 1)
     if balance < reserve:
         return tecINSUFFICIENT_RESERVE
     
-    if balance < reserve + STAmount(ctx.tx.getAmount(sfAmount)).xrp():
+    if balance < reserve + STAmount(ctx.tx[sfAmount]).xrp():
         return tecUNFUNDED
     
-    sled = ctx.view().peek(accountKeylet(ctx.tx.getAccountID(sfDestination)))
+    sled = ctx.view().peek(accountKeylet(ctx.tx[sfDestination]))
     if not sled:
         return tecNO_DST
     # TODO: implement dest tag check
@@ -135,9 +135,13 @@ def doApply(ctx, _mPriorBalance, _mSourceBalance):
 
     keylet = escrowKeylet(account, ctx.tx.getSeqProxy().value())
     slep = makeSLE(keylet)
-    slep.setAccountID(sfAccount, account)
-    slep.setAmount(sfAmount, ctx.tx.getAmount(sfAmount))
-    slep.setAccountID(sfDestination, ctx.tx.getAccountID(sfDestination))
+    slep[sfAccount] = account
+    print("HIIIIIIIIIIII")
+    # print(ctx.tx[sfAmount])
+    slep.setAmount(sfAmount, ctx.tx[sfAmount])
+    # slep[sfAmount] = amount
+    # print(amount, slep[sfAmount], type(slep[sfAmount]), type(amount), type(sfAmount))
+    slep[sfDestination] = ctx.tx[sfDestination]
     ctx.view().insert(slep)
 
     page = ctx.view().dirInsert(account, keylet)
@@ -145,13 +149,16 @@ def doApply(ctx, _mPriorBalance, _mSourceBalance):
         return tecDIR_FULL
     slep.setU64(sfOwnerNode, page)
 
-    if (destination := ctx.tx.getAccountID(sfDestination)) != account:
+    if (destination := ctx.tx[sfDestination]) != account:
         page2 = ctx.view().dirInsert(destination, keylet)
         if page2 is None:
             return tecDIR_FULL
         slep.setU64(sfOwnerNode, page2)
 
-    sle.setAmount(sfBalance, sle.getAmount(sfBalance) - ctx.tx.getAmount(sfAmount))
+    sle.setAmount(sfBalance, sle[sfBalance] - ctx.tx[sfAmount])
+    # print(sle[sfBalance], ctx.tx[sfAmount])
+    # sle[sfBalance] = sle[sfBalance] - ctx.tx[sfAmount]
+    # print(sle[sfBalance])
     adjustOwnerCount(ctx.view(), sle, 1, ctx.journal)
     ctx.view().update(sle)
 

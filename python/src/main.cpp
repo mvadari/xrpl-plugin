@@ -33,38 +33,6 @@ PYBIND11_MODULE(plugin_transactor, m) {
     /*
     * Enums
     */
-
-    // py::enum_<ripple::TxType>(m, "TxType")
-    //     .value("ttPAYMENT", ripple::TxType::ttPAYMENT)
-    //     .value("ttESCROW_CREATE", ripple::TxType::ttESCROW_CREATE)
-    //     .value("ttESCROW_FINISH", ripple::TxType::ttESCROW_FINISH)
-    //     .value("ttACCOUNT_SET", ripple::TxType::ttACCOUNT_SET)
-    //     .value("ttESCROW_CANCEL", ripple::TxType::ttESCROW_CANCEL)
-    //     .value("ttREGULAR_KEY_SET", ripple::TxType::ttREGULAR_KEY_SET)
-    //     .value("ttOFFER_CREATE", ripple::TxType::ttOFFER_CREATE)
-    //     .value("ttOFFER_CANCEL", ripple::TxType::ttOFFER_CANCEL)
-    //     .value("ttTICKET_CREATE", ripple::TxType::ttTICKET_CREATE)
-    //     .value("ttSIGNER_LIST_SET", ripple::TxType::ttSIGNER_LIST_SET)
-    //     .value("ttPAYCHAN_CREATE", ripple::TxType::ttPAYCHAN_CREATE)
-    //     .value("ttPAYCHAN_FUND", ripple::TxType::ttPAYCHAN_FUND)
-    //     .value("ttPAYCHAN_CLAIM", ripple::TxType::ttPAYCHAN_CLAIM)
-    //     .value("ttCHECK_CREATE", ripple::TxType::ttCHECK_CREATE)
-    //     .value("ttCHECK_CASH", ripple::TxType::ttCHECK_CASH)
-    //     .value("ttCHECK_CANCEL", ripple::TxType::ttCHECK_CANCEL)
-    //     .value("ttDEPOSIT_PREAUTH", ripple::TxType::ttDEPOSIT_PREAUTH)
-    //     .value("ttTRUST_SET", ripple::TxType::ttTRUST_SET)
-    //     .value("ttACCOUNT_DELETE", ripple::TxType::ttACCOUNT_DELETE)
-    //     .value("ttHOOK_SET", ripple::TxType::ttHOOK_SET)
-    //     .value("ttNFTOKEN_MINT", ripple::TxType::ttNFTOKEN_MINT)
-    //     .value("ttNFTOKEN_BURN", ripple::TxType::ttNFTOKEN_BURN)
-    //     .value("ttNFTOKEN_CREATE_OFFER", ripple::TxType::ttNFTOKEN_CREATE_OFFER)
-    //     .value("ttNFTOKEN_CANCEL_OFFER", ripple::TxType::ttNFTOKEN_CANCEL_OFFER)
-    //     .value("ttNFTOKEN_ACCEPT_OFFER", ripple::TxType::ttNFTOKEN_ACCEPT_OFFER)
-    //     .value("ttDUMMY_TX", ripple::TxType::ttDUMMY_TX)
-    //     .value("ttAMENDMENT", ripple::TxType::ttAMENDMENT)
-    //     .value("ttFEE", ripple::TxType::ttFEE)
-    //     .value("ttUNL_MODIFY", ripple::TxType::ttUNL_MODIFY)
-    //     .export_values();
     
     py::enum_<ripple::LedgerEntryType>(m, "LedgerEntryType")
         .value("ltACCOUNT_ROOT", ripple::LedgerEntryType::ltACCOUNT_ROOT)
@@ -413,6 +381,36 @@ PYBIND11_MODULE(plugin_transactor, m) {
     py::class_<ripple::STObject, std::shared_ptr<ripple::STObject>> STObject(m, "STObject");
     STObject
         .def("isFlag", &ripple::STObject::isFlag)
+        .def("__getitem__", [](const ripple::STObject &obj, TWSF<ripple::STAccount> sf) {
+            return obj[static_cast<ripple::TypedField<ripple::STAccount> const&>(sf)];
+        })
+        .def("__getitem__", [](const ripple::STObject &obj, TWSF<ripple::STAmount> sf) {
+            return obj[static_cast<ripple::TypedField<ripple::STAmount> const&>(sf)];
+        })
+        .def("__getitem__", [](const ripple::STObject &obj, TWSF<ripple::STUInt32> sf) {
+            return obj[static_cast<ripple::TypedField<ripple::STUInt32> const&>(sf)];
+        })
+        .def("__getitem__", [](const ripple::STObject &obj, TWSF<ripple::STUInt64> sf) {
+            return obj[static_cast<ripple::TypedField<ripple::STUInt64> const&>(sf)];
+        })
+        .def("__getitem__", [](const ripple::STObject &obj, TWSF<ripple::STBlob> sf) {
+            return obj[static_cast<ripple::TypedField<ripple::STBlob> const&>(sf)];
+        })
+        .def("__setitem__", [](const ripple::STObject &obj, TWSF<ripple::STAccount> sf, ripple::STAccount::value_type value) {
+            obj[static_cast<ripple::TypedField<ripple::STAccount> const&>(sf)] = value;
+        })
+        // .def("__setitem__", [](const ripple::STObject &obj, TWSF<ripple::STAmount> sf, ripple::STAmount value) {
+        //     obj[static_cast<ripple::TypedField<ripple::STAmount> const&>(sf)] = value;
+        // }) TODO: fix this
+        // .def("__setitem__", [](const ripple::STObject &obj, TWSF<ripple::STUInt32> sf, std::uint32_t value) {
+        //     obj[static_cast<ripple::TypedField<ripple::STUInt32> const&>(sf)] = value;
+        // }) TODO: fix this
+        // .def("__setitem__", [](const ripple::STObject &obj, TWSF<ripple::STUInt64> sf, std::uint64_t value) {
+        //     obj[static_cast<ripple::TypedField<ripple::STUInt64> const&>(sf)] = value;
+        // }) TODO: fix this
+        .def("__setitem__", [](const ripple::STObject &obj, TWSF<ripple::STBlob> sf, ripple::STBlob::value_type value) {
+            obj[static_cast<ripple::TypedField<ripple::STBlob> const&>(sf)] = value;
+        })
         .def("getAccountID",
             [](const ripple::STObject &obj, const WSF &wsf) {
                 return obj.getAccountID(static_cast<ripple::SField const&>(wsf));
