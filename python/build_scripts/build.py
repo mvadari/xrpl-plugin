@@ -91,11 +91,18 @@ preflight(PreflightContext const& ctx)
     py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
     py::module_::import("sys").attr("path").attr("append")("{python_folder}");
     py::object preflight = py::module_::import("{module_name}").attr("preflight");
-    py::object preflightReturn = preflight(py::cast(ctx, py::return_value_policy::reference));
     try {{
-        return preflightReturn.cast<NotTEC>();
-    }} catch (const py::cast_error &) {{ // TODO: figure out the exact error that is thrown
-        return NotTEC::fromInt(preflightReturn.cast<int>());
+        py::object preflightReturn = preflight(py::cast(ctx, py::return_value_policy::reference));
+        try {{
+            return preflightReturn.cast<NotTEC>();
+        }} catch (const py::cast_error &) {{ // TODO: figure out the exact error that is thrown
+            return NotTEC::fromInt(preflightReturn.cast<int>());
+        }}
+    }} catch (py::error_already_set& e) {{
+        // Print the error message
+        const char* errorMessage = e.what();
+        std::cout << "Python Error: " << errorMessage << std::endl;
+        throw;
     }}
 }}
 
@@ -106,8 +113,15 @@ preclaim(PreclaimContext const& ctx)
     py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
     py::module_::import("sys").attr("path").attr("append")("{python_folder}");
     py::object preclaim = py::module_::import("{module_name}").attr("preclaim");
-    py::object preclaimReturn = preclaim(py::cast(ctx, py::return_value_policy::reference));
-    return TER::fromInt(preclaimReturn.cast<int>());
+    try {{
+        py::object preclaimReturn = preclaim(py::cast(ctx, py::return_value_policy::reference));
+        return TER::fromInt(preclaimReturn.cast<int>());
+    }} catch (py::error_already_set& e) {{
+        // Print the error message
+        const char* errorMessage = e.what();
+        std::cout << "Python Error: " << errorMessage << std::endl;
+        throw;
+    }}
 }}
 
 extern "C"
@@ -117,11 +131,18 @@ doApply(ApplyContext& ctx, XRPAmount mPriorBalance, XRPAmount mSourceBalance)
     py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
     py::module_::import("sys").attr("path").attr("append")("{python_folder}");
     py::object doApplyFn = py::module_::import("{module_name}").attr("doApply");
-    py::object doApplyReturn = doApplyFn(
-        py::cast(ctx, py::return_value_policy::reference),
-        mPriorBalance,
-        mSourceBalance);
-    return TER::fromInt(doApplyReturn.cast<int>());
+    try {{
+        py::object doApplyReturn = doApplyFn(
+            py::cast(ctx, py::return_value_policy::reference),
+            mPriorBalance,
+            mSourceBalance);
+        return TER::fromInt(doApplyReturn.cast<int>());
+    }} catch (py::error_already_set& e) {{
+        // Print the error message
+        const char* errorMessage = e.what();
+        std::cout << "Python Error: " << errorMessage << std::endl;
+        throw;
+    }}
 }}
 
 extern "C"

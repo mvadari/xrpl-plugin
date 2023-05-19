@@ -56,6 +56,19 @@ wrappedNewSField(const int fieldValue, std::string const fieldName)
     return TWSF<T>{(void *)&sfield};
 }
 
+ripple::SField const& constructCustomSField(int tid, int fv, const char* fn) {
+    if (ripple::SField const& field = ripple::SField::getField(ripple::field_code(tid, fv)); field != ripple::sfInvalid)
+        return field;
+    return *(new ripple::TypedField<ripple::STPluginType>(tid, fv, fn));
+}
+
+TWSF<ripple::STPluginType>
+constructCustomWrappedSField(int tid, const char* fn, int fv)
+{
+    ripple::SField const& sfield = constructCustomSField(tid, fv, fn);
+    return TWSF<ripple::STPluginType>{(void *)&sfield};
+}
+
 namespace py = pybind11;
 
 PYBIND11_MODULE(plugin_transactor, m) {
@@ -309,13 +322,20 @@ PYBIND11_MODULE(plugin_transactor, m) {
     py::class_<TWSF<ripple::STUInt32>, WSF> TWSF_STUInt32(m, "SF_UINT32");
     py::class_<TWSF<ripple::STUInt64>, WSF> TWSF_STUInt64(m, "SF_UINT64");
     py::class_<TWSF<ripple::STBlob>, WSF> TWSF_STBlob(m, "SF_VL");
+    py::class_<TWSF<ripple::STPluginType>, WSF> TWSF_STPluginType(m, "SF_PLUGINTYPE");
 
 
     py::class_<ripple::AccountID> AccountID(m, "AccountID");
     AccountID
+        .def(py::init<>())
         .def("toBase58",
             [](const ripple::AccountID &a) {
                 return ripple::toBase58(a);
+            }
+        )
+        .def("to_buffer",
+            [](const ripple::AccountID &a) {
+                return ripple::Buffer(a.data(), a.size());
             }
         )
         .def(py::self == py::self)
@@ -365,10 +385,15 @@ PYBIND11_MODULE(plugin_transactor, m) {
     SeqProxy
         .def("value", &ripple::SeqProxy::value)
     ;
+    
+    py::class_<ripple::Buffer> Buffer(m, "Buffer");
+
 
     /*
     * STObjects
     */
+
+    py::class_<ripple::detail::STVar> STVar(m, "STVar");
 
     py::class_<ripple::STBase> STBase(m, "STBase");
     STBase
@@ -382,6 +407,7 @@ PYBIND11_MODULE(plugin_transactor, m) {
     py::class_<ripple::STBlob, ripple::STBase> STBlob(m, "STBlob");
     py::class_<ripple::STUInt32, ripple::STBase> STUInt32(m, "STUInt32");
     py::class_<ripple::STUInt64, ripple::STBase> STUInt64(m, "STUInt64");
+    py::class_<ripple::STPluginType, ripple::STBase> STPluginType(m, "STPluginType");
     py::class_<ripple::STAmount, ripple::STBase> STAmount(m, "STAmount");
     STAmount
         .def(py::init<ripple::STAmount &>())
@@ -427,6 +453,9 @@ PYBIND11_MODULE(plugin_transactor, m) {
         })
         .def("__getitem__", [](const ripple::STObject &obj, TWSF<ripple::STBlob> sf) {
             return obj[static_cast<ripple::TypedField<ripple::STBlob> const&>(sf)];
+        })
+        .def("__getitem__", [](const ripple::STObject &obj, TWSF<ripple::STPluginType> sf) {
+            return obj[static_cast<ripple::TypedField<ripple::STPluginType> const&>(sf)];
         })
         .def("__setitem__", [](const ripple::STObject &obj, TWSF<ripple::STAccount> sf, ripple::STAccount::value_type value) {
             obj[static_cast<ripple::TypedField<ripple::STAccount> const&>(sf)] = value;
@@ -720,6 +749,33 @@ PYBIND11_MODULE(plugin_transactor, m) {
         .def("createNewSField_STAccount", &wrappedNewSField<ripple::STAccount>)
         .def("createNewSField_STAmount", &wrappedNewSField<ripple::STAmount>)
         .def("createNewSField_STUInt32", &wrappedNewSField<ripple::STUInt32>)
+        .def("createNewSField_STPluginType", &wrappedNewSField<ripple::STPluginType>)
+        .def("constructCustomSField", &constructCustomWrappedSField)
+        .def("make_name", &ripple::make_name)
+        // .def("not_an_object", &ripple::not_an_object)
+        .def("not_an_array", &ripple::not_an_array)
+        .def("unknown_field", &ripple::unknown_field)
+        .def("out_of_range", &ripple::out_of_range)
+        .def("bad_type", &ripple::bad_type)
+        .def("unknown_type", &ripple::unknown_type)
+        // .def("invalid_data", &ripple::invalid_data)
+        .def("array_expected", &ripple::array_expected)
+        .def("string_expected", &ripple::string_expected)
+        .def("too_deep", &ripple::too_deep)
+        .def("singleton_expected", &ripple::singleton_expected)
+        .def("template_mismatch", &ripple::template_mismatch)
+        .def("non_object_in_array", &ripple::non_object_in_array)
+        .def("make_stplugintype", 
+            [](const WSF &wsf, ripple::Buffer& b) {
+                ripple::SField f = static_cast<ripple::SField const&>(wsf);
+                return ripple::detail::make_stvar<ripple::STPluginType>(f, b.data(), b.size());
+            }
+        )
+        // .def("make_stplugintype", 
+        //     [](ripple::SField const& f, void const* data, std::size_t size) {
+        //         return ripple::detail::make_stvar<ripple::STPluginType>(f, data, size);
+        //     }
+        // )
         ;
     
 

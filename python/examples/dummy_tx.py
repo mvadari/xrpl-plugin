@@ -34,7 +34,7 @@ def preflight(ctx):
 
     if ctx.rules.enabled(fixMasterKeyAsRegularKey) and \
         ctx.tx.isFieldPresent(sfRegularKey) and \
-            ctx.tx.getAccountID(sfRegularKey) == ctx.tx.getAccountID(sfAccount):
+            ctx.tx[sfRegularKey] == ctx.tx[sfAccount]:
         return temBAD_REGKEY
 
     return preflight2(ctx)
@@ -43,15 +43,15 @@ def preclaim(ctx):
     return tesSUCCESS
 
 def doApply(ctx, _mPriorBalance, _mSourceBalance):
-    account = ctx.tx.getAccountID(sfAccount)
+    account = ctx.tx[sfAccount]
     sle = ctx.view().peek(accountKeylet(account))
     # skip weird fee stuff
     if ctx.tx.isFieldPresent(sfRegularKey):
-        sle.setAccountID(sfRegularKey, ctx.tx.getAccountID(sfRegularKey))
+        sle.setAccountID(sfRegularKey, ctx.tx[sfRegularKey])
     else:
         # Account has disabled master key and no multi-signer signer list.
         if sle.isFlag(lsfDisableMaster) and not ctx.view().peek(signersKeylet(account)):
             return tecNO_ALTERNATIVE_KEY
 
-        sle.makeFieldAbsent(sfRegularKey)
+        del sle[sfRegularKey]
     return tesSUCCESS
