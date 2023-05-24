@@ -112,6 +112,8 @@
         "format": "cpp"
     },
     "cSpell.words": [
+        "delitem",
+        "getitem",
         "INSUF",
         "JLOG",
         "keylet",
@@ -119,6 +121,8 @@
         "Optionaled",
         "PAYCHAN",
         "Preclaim",
+        "repr",
+        "setitem",
         "stvar",
         "trustlines"
     ]
