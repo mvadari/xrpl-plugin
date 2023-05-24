@@ -67,13 +67,24 @@ def generate_cpp(tx_name, tx_type, module_name, python_folder):
 #include <ripple/protocol/TER.h>
 #include <ripple/protocol/TxFlags.h>
 #include <ripple/protocol/st.h>
+#include <map>
 
 #include <pybind11/embed.h> // everything needed for embedding
+#include <pybind11/stl.h>
+
 namespace py = pybind11;
 using namespace pybind11::literals; // to bring in the `_a` literal
 
-namespace ripple {{
+using namespace ripple;
 
+struct WSF {{
+  void *f_;
+  operator ripple::SField const &() const {{
+    return *static_cast<ripple::SField *>(f_);
+  }};
+}};
+
+extern "C"
 NotTEC
 preflight(PreflightContext const& ctx)
 {{
@@ -81,50 +92,58 @@ preflight(PreflightContext const& ctx)
     py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
     py::module_::import("sys").attr("path").attr("append")("{python_folder}");
     py::object preflight = py::module_::import("{module_name}").attr("preflight");
-    py::object preflightReturn = preflight(py::cast(ctx, py::return_value_policy::reference));
     try {{
-        return preflightReturn.cast<NotTEC>();
-    }} catch (const py::cast_error &) {{ // TODO: figure out the exact error that is thrown
-        return NotTEC::fromInt(preflightReturn.cast<int>());
+        py::object preflightReturn = preflight(py::cast(ctx, py::return_value_policy::reference));
+        try {{
+            return preflightReturn.cast<NotTEC>();
+        }} catch (const py::cast_error &) {{ // TODO: figure out the exact error that is thrown
+            return NotTEC::fromInt(preflightReturn.cast<int>());
+        }}
+    }} catch (py::error_already_set& e) {{
+        // Print the error message
+        const char* errorMessage = e.what();
+        std::cout << "Python Error: " << errorMessage << std::endl;
+        throw;
     }}
 }}
 
+extern "C"
 TER
 preclaim(PreclaimContext const& ctx)
 {{
     py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
     py::module_::import("sys").attr("path").attr("append")("{python_folder}");
     py::object preclaim = py::module_::import("{module_name}").attr("preclaim");
-    py::object preclaimReturn = preclaim(py::cast(ctx, py::return_value_policy::reference));
-    return TER::fromInt(preclaimReturn.cast<int>());
+    try {{
+        py::object preclaimReturn = preclaim(py::cast(ctx, py::return_value_policy::reference));
+        return TER::fromInt(preclaimReturn.cast<int>());
+    }} catch (py::error_already_set& e) {{
+        // Print the error message
+        const char* errorMessage = e.what();
+        std::cout << "Python Error: " << errorMessage << std::endl;
+        throw;
+    }}
 }}
 
+extern "C"
 TER
 doApply(ApplyContext& ctx, XRPAmount mPriorBalance, XRPAmount mSourceBalance)
 {{
     py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
     py::module_::import("sys").attr("path").attr("append")("{python_folder}");
     py::object doApplyFn = py::module_::import("{module_name}").attr("doApply");
-    py::object doApplyReturn = doApplyFn(
-        py::cast(ctx, py::return_value_policy::reference),
-        mPriorBalance,
-        mSourceBalance);
-    return TER::fromInt(doApplyReturn.cast<int>());
-}}
-}}
-
-extern "C"
-ripple::NotTEC
-preflight(ripple::PreflightContext const& ctx)
-{{
-    return ripple::preflight(ctx);
-}}
-
-extern "C"
-ripple::TER
-preclaim(ripple::PreclaimContext const& ctx)
-{{
-    return ripple::preclaim(ctx);
+    try {{
+        py::object doApplyReturn = doApplyFn(
+            py::cast(ctx, py::return_value_policy::reference),
+            mPriorBalance,
+            mSourceBalance);
+        return TER::fromInt(doApplyReturn.cast<int>());
+    }} catch (py::error_already_set& e) {{
+        // Print the error message
+        const char* errorMessage = e.what();
+        std::cout << "Python Error: " << errorMessage << std::endl;
+        throw;
+    }}
 }}
 
 extern "C"
@@ -135,17 +154,16 @@ calculateBaseFee(ripple::ReadView const& view, ripple::STTx const& tx)
 }}
 
 extern "C"
-ripple::TER
-doApply(ripple::ApplyContext& ctx, ripple::XRPAmount mPriorBalance, ripple::XRPAmount mSourceBalance)
-{{
-    return ripple::doApply(ctx, mPriorBalance, mSourceBalance);
-}}
-
-extern "C"
 char const*
 getTxName()
 {{
-    return "{tx_name}";
+    static std::string const txName = []{{
+        py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+        py::module_::import("sys").attr("path").attr("append")("{python_folder}");
+        py::object tx_name = py::module_::import("{module_name}").attr("tx_name");
+        return tx_name.cast<std::string>();
+    }}(); 
+    return txName.c_str();
 }}
 
 struct FakeSOElement {{
@@ -154,45 +172,13 @@ struct FakeSOElement {{
 }};
 
 extern "C"
-std::vector<FakeSOElement>
-getTxFormat()
-{{
-    return std::vector<FakeSOElement>{{
-        {{ripple::sfDestination.getCode(), ripple::soeREQUIRED}},
-        {{ripple::sfAmount.getCode(), ripple::soeREQUIRED}},
-        {{ripple::sfCondition.getCode(), ripple::soeOPTIONAL}},
-        {{ripple::sfCancelAfter.getCode(), ripple::soeOPTIONAL}},
-        {{ripple::sfFinishAfter.getCode(), ripple::soeOPTIONAL}},
-        {{ripple::sfDestinationTag.getCode(), ripple::soeOPTIONAL}},
-        {{ripple::sfTicketSequence.getCode(), ripple::soeOPTIONAL}},
-    }};
-}}
-
-struct SFieldInfo {{
-    int typeId;
-    int fieldValue;
-    const char * txtName;
-}};
-
-extern "C"
-std::vector<int>
-getSTypes()
-{{
-    return std::vector<int>{{}};
-}}
-
-extern "C"
-std::vector<SFieldInfo>
-getSFields()
-{{
-    return std::vector<SFieldInfo>{{}};
-}}
-
-extern "C"
 std::uint16_t
 getTxType()
 {{
-    return {tx_type};
+    py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+    py::module_::import("sys").attr("path").attr("append")("{python_folder}");
+    py::object tx_type = py::module_::import("{module_name}").attr("tx_type");
+    return tx_type.cast<std::uint16_t>();
 }}
 
 extern "C"
@@ -202,7 +188,134 @@ getTTName()
     return "tt{module_name.upper()}";
 }}
 
+extern "C"
+std::vector<FakeSOElement>
+getTxFormat()
+{{
+    static std::vector<FakeSOElement> const txFormat = []{{
+        std::vector<FakeSOElement> temp = {{}};
+        py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+        py::module_::import("sys").attr("path").attr("append")("{python_folder}");
+        auto tx_format = py::module_::import("{module_name}").attr("tx_format").cast<std::vector<py::object>>();
+        for (py::object variable: tx_format)
+        {{
+            py::tuple tup = variable.cast<py::tuple>();
+            WSF sfield = tup[0].cast<WSF>();
+            SOEStyle varType = tup[1].cast<SOEStyle>();
+            temp.emplace_back(FakeSOElement{{static_cast<ripple::SField const&>(sfield).getCode(), varType}});
+        }}
+        return temp;
+    }}();
+    return txFormat;
+}}
 
+struct STypeExport {{
+    int typeId;
+    parseLeafTypePtr parsePtr;
+}};
+
+static std::map<int, std::string> parseSTypeFunctions;
+
+std::optional<ripple::detail::STVar>
+parseLeafTypePython(
+    ripple::SField const& field,
+    std::string const& json_name,
+    std::string const& fieldName,
+    ripple::SField const* name,
+    Json::Value const& value,
+    Json::Value& error)
+{{
+    if (auto it = parseSTypeFunctions.find(field.fieldType);
+        it != parseSTypeFunctions.end())
+    {{
+        WSF wrappedField = WSF{{(void *)&field}};
+        WSF wrappedName = WSF{{(void *)name}};
+        py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+        try {{
+            py::module_::import("sys").attr("path").attr("append")("{python_folder}");
+            py::object parseFn = py::module_::import("{module_name}").attr(it->second.c_str());
+            py::object returnObj = parseFn(
+                py::cast(wrappedField, py::return_value_policy::reference),
+                json_name,
+                fieldName,
+                wrappedName,
+                value);
+            py::tuple tup = returnObj.cast<py::tuple>();
+            if (!tup[1].is_none())
+            {{
+                error = tup[1].cast<Json::Value>();
+                std::optional<detail::STVar> ret;
+                return ret;
+            }}
+            auto const stVar = tup[0].cast<std::optional<ripple::detail::STVar>>();
+            return tup[0].cast<std::optional<ripple::detail::STVar>>();
+        }} catch (py::error_already_set& e) {{
+            // Print the error message
+            const char* errorMessage = e.what();
+            std::cout << "Python Error: " << errorMessage << std::endl;
+            throw;
+        }}
+    }}
+
+    std::optional<detail::STVar> ret;
+    error = unknown_type(json_name, fieldName, field.fieldType);
+    return ret;
+}}
+
+
+extern "C"
+std::vector<STypeExport>
+getSTypes()
+{{
+    static std::vector<STypeExport> const sTypes = []{{
+        std::vector<STypeExport> temp = {{}};
+        py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+        py::module_::import("sys").attr("path").attr("append")("{python_folder}");
+        py::module pluginImport = py::module_::import("{module_name}");
+        if (!hasattr(pluginImport, "new_stypes")) {{
+            return temp;
+        }}
+        auto new_stypes = pluginImport.attr("new_stypes").cast<std::vector<py::object>>();
+        for (py::object variable: new_stypes)
+        {{
+            py::tuple tup = variable.cast<py::tuple>();
+            int typeId = tup[0].cast<int>();
+            py::function parseFn = tup[1].cast<py::function>();
+            parseSTypeFunctions.insert({{typeId, parseFn.attr("__name__").cast<std::string>()}});
+            temp.emplace_back(STypeExport{{typeId, parseLeafTypePython}});
+        }}
+        return temp;
+    }}();
+    return sTypes;
+}}
+
+
+extern "C"
+std::vector<SFieldInfo>
+getSFields()
+{{
+    static std::vector<SFieldInfo> const sFields = []{{
+        std::vector<SFieldInfo> temp = {{}};
+        py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+        py::module_::import("sys").attr("path").attr("append")("{python_folder}");
+        py::module pluginImport = py::module_::import("{module_name}");
+        if (!hasattr(pluginImport, "new_sfields")) {{
+            return temp;
+        }}
+        auto new_sfields = pluginImport.attr("new_sfields").cast<std::vector<py::object>>();
+        for (py::object variable: new_sfields)
+        {{
+            WSF wrappedSField = variable.cast<WSF>();
+            SField sfield = static_cast<ripple::SField const&>(wrappedSField);
+            temp.emplace_back(SFieldInfo{{
+                sfield.fieldType,
+                sfield.fieldValue,
+                sfield.jsonName}});
+        }}
+        return temp;
+    }}();
+    return sFields;
+}}
 """
 
 

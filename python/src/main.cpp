@@ -7,7 +7,9 @@
 #include <ripple/protocol/TxFlags.h>
 #include <ripple/protocol/Feature.h>
 #include <ripple/ledger/View.h>
+#include <ripple/protocol/impl/STVar.h>
 #include <map>
+#include <iostream>
 #include <string>
 
 #define STRINGIFY(x) #x
@@ -20,11 +22,54 @@ struct WSF {
   };
 };
 
-// template <class T> struct TWSF : WSF {
-//   operator ripple::TypedField<T> const &() const {
-//     return *static_cast<ripple::TypedField<T> *>(f_);
-//   };
-// };
+template <class T> struct TWSF : WSF {
+  operator ripple::TypedField<T> const &() const {
+    return *static_cast<ripple::TypedField<T> *>(f_);
+  };
+};
+
+template <typename T>
+int getSTId() { return 0; }
+
+template <>
+int getSTId<ripple::SF_AMOUNT>() { return ripple::STI_AMOUNT; }
+
+template <> 
+int getSTId<ripple::SF_ACCOUNT>() { return ripple::STI_ACCOUNT; }
+
+template <> 
+int getSTId<ripple::SF_UINT32>() { return ripple::STI_UINT32; }
+
+template <class T>
+T const&
+newSField(const int fieldValue, char const* fieldName)
+{
+    if (ripple::SField const& field = ripple::SField::getField(fieldName); field != ripple::sfInvalid)
+        return static_cast<T const&>(field);
+    T const* newSField = new T(getSTId<T>(), fieldValue, fieldName);
+    return *newSField;
+}
+
+template <class T>
+TWSF<T>
+wrappedNewSField(const int fieldValue, std::string const fieldName)
+{
+    ripple::TypedField<T> const& sfield = newSField<ripple::TypedField<T>>(fieldValue, fieldName.c_str());
+    return TWSF<T>{(void *)&sfield};
+}
+
+ripple::SField const& constructCustomSField(int tid, int fv, const char* fn) {
+    if (ripple::SField const& field = ripple::SField::getField(ripple::field_code(tid, fv)); field != ripple::sfInvalid)
+        return field;
+    return *(new ripple::TypedField<ripple::STPluginType>(tid, fv, fn));
+}
+
+TWSF<ripple::STPluginType>
+constructCustomWrappedSField(int tid, const char* fn, int fv)
+{
+    ripple::SField const& sfield = constructCustomSField(tid, fv, fn);
+    return TWSF<ripple::STPluginType>{(void *)&sfield};
+}
 
 namespace py = pybind11;
 
@@ -33,38 +78,6 @@ PYBIND11_MODULE(plugin_transactor, m) {
     /*
     * Enums
     */
-
-    // py::enum_<ripple::TxType>(m, "TxType")
-    //     .value("ttPAYMENT", ripple::TxType::ttPAYMENT)
-    //     .value("ttESCROW_CREATE", ripple::TxType::ttESCROW_CREATE)
-    //     .value("ttESCROW_FINISH", ripple::TxType::ttESCROW_FINISH)
-    //     .value("ttACCOUNT_SET", ripple::TxType::ttACCOUNT_SET)
-    //     .value("ttESCROW_CANCEL", ripple::TxType::ttESCROW_CANCEL)
-    //     .value("ttREGULAR_KEY_SET", ripple::TxType::ttREGULAR_KEY_SET)
-    //     .value("ttOFFER_CREATE", ripple::TxType::ttOFFER_CREATE)
-    //     .value("ttOFFER_CANCEL", ripple::TxType::ttOFFER_CANCEL)
-    //     .value("ttTICKET_CREATE", ripple::TxType::ttTICKET_CREATE)
-    //     .value("ttSIGNER_LIST_SET", ripple::TxType::ttSIGNER_LIST_SET)
-    //     .value("ttPAYCHAN_CREATE", ripple::TxType::ttPAYCHAN_CREATE)
-    //     .value("ttPAYCHAN_FUND", ripple::TxType::ttPAYCHAN_FUND)
-    //     .value("ttPAYCHAN_CLAIM", ripple::TxType::ttPAYCHAN_CLAIM)
-    //     .value("ttCHECK_CREATE", ripple::TxType::ttCHECK_CREATE)
-    //     .value("ttCHECK_CASH", ripple::TxType::ttCHECK_CASH)
-    //     .value("ttCHECK_CANCEL", ripple::TxType::ttCHECK_CANCEL)
-    //     .value("ttDEPOSIT_PREAUTH", ripple::TxType::ttDEPOSIT_PREAUTH)
-    //     .value("ttTRUST_SET", ripple::TxType::ttTRUST_SET)
-    //     .value("ttACCOUNT_DELETE", ripple::TxType::ttACCOUNT_DELETE)
-    //     .value("ttHOOK_SET", ripple::TxType::ttHOOK_SET)
-    //     .value("ttNFTOKEN_MINT", ripple::TxType::ttNFTOKEN_MINT)
-    //     .value("ttNFTOKEN_BURN", ripple::TxType::ttNFTOKEN_BURN)
-    //     .value("ttNFTOKEN_CREATE_OFFER", ripple::TxType::ttNFTOKEN_CREATE_OFFER)
-    //     .value("ttNFTOKEN_CANCEL_OFFER", ripple::TxType::ttNFTOKEN_CANCEL_OFFER)
-    //     .value("ttNFTOKEN_ACCEPT_OFFER", ripple::TxType::ttNFTOKEN_ACCEPT_OFFER)
-    //     .value("ttDUMMY_TX", ripple::TxType::ttDUMMY_TX)
-    //     .value("ttAMENDMENT", ripple::TxType::ttAMENDMENT)
-    //     .value("ttFEE", ripple::TxType::ttFEE)
-    //     .value("ttUNL_MODIFY", ripple::TxType::ttUNL_MODIFY)
-    //     .export_values();
     
     py::enum_<ripple::LedgerEntryType>(m, "LedgerEntryType")
         .value("ltACCOUNT_ROOT", ripple::LedgerEntryType::ltACCOUNT_ROOT)
@@ -286,21 +299,62 @@ PYBIND11_MODULE(plugin_transactor, m) {
     py::implicitly_convertible<ripple::TEFcodes, ripple::TER>();
     py::implicitly_convertible<ripple::TECcodes, ripple::TER>();
     py::implicitly_convertible<ripple::NotTEC, ripple::TER>();
+
+    py::enum_<ripple::SOEStyle>(m, "SOEStyle")
+        .value("soeINVALID", ripple::SOEStyle::soeINVALID)
+        .value("soeREQUIRED", ripple::SOEStyle::soeREQUIRED)
+        .value("soeOPTIONAL", ripple::SOEStyle::soeOPTIONAL)
+        .value("soeDEFAULT", ripple::SOEStyle::soeDEFAULT)
+        .export_values();
     
     /*
     * Small classes
     */
 
-    py::class_<ripple::SField> SField(m, "SField");
-    py::class_<WSF> PythonWSF(m, "WSF");
-    // py::class_<TWSF<ripple::TypedField<ripple::STAccount>>> TWSF_STAccount(m, "TWSF");
+    py::class_<WSF> PythonWSF(m, "SField");
+    PythonWSF
+        .def_property_readonly("fieldCode",
+            [](const WSF &wsf) {
+                return static_cast<ripple::SField const&>(wsf).fieldCode;
+            }
+        )
+        .def("__repr__",
+            [](const WSF &wsf) {
+                return "sf" + static_cast<ripple::SField const&>(wsf).getName();
+            }
+        )
+        ;
+    py::class_<TWSF<ripple::STAccount>, WSF> TWSF_STAccount(m, "SF_ACCOUNT");
+    py::class_<TWSF<ripple::STAmount>, WSF> TWSF_STAmount(m, "SF_AMOUNT");
+    py::class_<TWSF<ripple::STUInt32>, WSF> TWSF_STUInt32(m, "SF_UINT32");
+    py::class_<TWSF<ripple::STUInt64>, WSF> TWSF_STUInt64(m, "SF_UINT64");
+    py::class_<TWSF<ripple::STBlob>, WSF> TWSF_STBlob(m, "SF_VL");
+    py::class_<TWSF<ripple::STPluginType>, WSF> TWSF_STPluginType(m, "SF_PLUGINTYPE");
 
 
     py::class_<ripple::AccountID> AccountID(m, "AccountID");
     AccountID
+        .def(py::init<>())
+        .def(py::init<ripple::Slice>())
+        .def("parseHex",
+            [](ripple::AccountID acct, std::string const& hex) {
+                return acct.parseHex(hex);
+            }
+        )
         .def("toBase58",
             [](const ripple::AccountID &a) {
                 return ripple::toBase58(a);
+            }
+        )
+        .def("to_buffer",
+            [](const ripple::AccountID &a) {
+                return ripple::Buffer(a.data(), a.size());
+            },
+            py::return_value_policy::move
+        )
+        .def("from_buffer",
+            [](const ripple::Buffer &buf) {
+                return ripple::AccountID::fromVoid(std::move(buf.data()));
             }
         )
         .def(py::self == py::self)
@@ -343,6 +397,21 @@ PYBIND11_MODULE(plugin_transactor, m) {
             }
         );
     
+    py::class_<ripple::Slice> Slice(m, "Slice");
+    Slice
+        .def("to_buffer",
+            [](const ripple::Slice &slice) {
+                return ripple::Buffer(slice.data(), slice.size());
+            },
+            py::return_value_policy::move
+        )
+        .def("__repr__",
+            [](const ripple::Slice &slice) {
+                return strHex(slice);
+            }
+        )
+    ;
+    
     py::class_<beast::Zero> BeastZero(m, "BeastZero");
     py::class_<beast::Journal> Journal(m, "Journal");
 
@@ -350,25 +419,56 @@ PYBIND11_MODULE(plugin_transactor, m) {
     SeqProxy
         .def("value", &ripple::SeqProxy::value)
     ;
+    
+    py::class_<ripple::Buffer> Buffer(m, "Buffer");
+    Buffer
+        .def("__repr__",
+            [](const ripple::Buffer &buf) {
+                return strHex(buf);
+            }
+        );
+
+    py::class_<Json::Value> JsonValue(m, "JsonValue");
+    JsonValue
+        .def("isString", &Json::Value::isString)
+        .def("asString", &Json::Value::asString)
+        .def("__repr__", &Json::Value::asCString);
 
     /*
     * STObjects
     */
 
+    py::class_<ripple::detail::STVar> STVar(m, "STVar");
+    STVar
+        .def("get",
+            [](const ripple::detail::STVar &var) {
+                return var.get();
+            }
+        );
+
     py::class_<ripple::STBase> STBase(m, "STBase");
     STBase
+        .def("getFName",
+            [](const ripple::STBase &obj) {
+                ripple::SField const& f = obj.getFName();
+                // TODO: make this general
+                return TWSF<ripple::STPluginType>{(void *)&f};
+            }
+        )
         .def("__repr__",
             [](const ripple::STBase &obj) {
                 return obj.getFullText();
             }
         );
-    // py::class_<ripple::STInteger, ripple::STBase> STInteger(m, "STInteger");
     py::class_<ripple::STAccount, ripple::STBase> STAccount(m, "STAccount");
     py::class_<ripple::STBlob, ripple::STBase> STBlob(m, "STBlob");
+    py::class_<ripple::STUInt32, ripple::STBase> STUInt32(m, "STUInt32");
+    py::class_<ripple::STUInt64, ripple::STBase> STUInt64(m, "STUInt64");
+    py::class_<ripple::STPluginType, ripple::STBase> STPluginType(m, "STPluginType");
     py::class_<ripple::STAmount, ripple::STBase> STAmount(m, "STAmount");
     STAmount
         .def(py::init<ripple::STAmount &>())
-        .def("is_xrp", 
+        .def("is_xrp",
             [](const ripple::STAmount &amt) {
                 return ripple::isXRP(amt);
             }
@@ -383,12 +483,24 @@ PYBIND11_MODULE(plugin_transactor, m) {
         .def(py::self > py::self)
         .def(py::self <= py::self)
         .def(py::self >= py::self)
-        // .def(py::self == beast::Zero())
-        // .def(py::self != beast::Zero())
-        // .def(py::self < beast::Zero())
-        // .def(py::self > beast::Zero())
-        // .def(py::self <= beast::Zero())
-        // .def(py::self >= beast::Zero())
+        .def("__eq__", [](const ripple::STAmount &a, beast::Zero b) {
+            return a == b;
+        }, py::is_operator())
+        .def("__ne__", [](const ripple::STAmount &a, beast::Zero b) {
+            return a != b;
+        }, py::is_operator())
+        .def("__lt__", [](const ripple::STAmount &a, beast::Zero b) {
+            return a < b;
+        }, py::is_operator())
+        .def("__le__", [](const ripple::STAmount &a, beast::Zero b) {
+            return a <= b;
+        }, py::is_operator())
+        .def("__gt__", [](const ripple::STAmount &a, beast::Zero b) {
+            return a > b;
+        }, py::is_operator())
+        .def("__ge__", [](const ripple::STAmount &a, beast::Zero b) {
+            return a >= b;
+        }, py::is_operator())
         .def(-py::self)
         .def(py::self - py::self)
     ;
@@ -396,11 +508,39 @@ PYBIND11_MODULE(plugin_transactor, m) {
     py::class_<ripple::STObject, std::shared_ptr<ripple::STObject>> STObject(m, "STObject");
     STObject
         .def("isFlag", &ripple::STObject::isFlag)
-        .def_property_readonly("Account",
-            [](const ripple::STObject &obj) {
-                return obj[ripple::sfAccount];
-            }
-        )
+        .def("__getitem__", [](const ripple::STObject &obj, TWSF<ripple::STAccount> sf) {
+            return obj[static_cast<ripple::TypedField<ripple::STAccount> const&>(sf)];
+        }, py::return_value_policy::move)
+        .def("__getitem__", [](const ripple::STObject &obj, TWSF<ripple::STAmount> sf) {
+            return obj[static_cast<ripple::TypedField<ripple::STAmount> const&>(sf)];
+        }, py::return_value_policy::move)
+        .def("__getitem__", [](const ripple::STObject &obj, TWSF<ripple::STUInt32> sf) {
+            return obj[static_cast<ripple::TypedField<ripple::STUInt32> const&>(sf)];
+        }, py::return_value_policy::move)
+        .def("__getitem__", [](const ripple::STObject &obj, TWSF<ripple::STUInt64> sf) {
+            return obj[static_cast<ripple::TypedField<ripple::STUInt64> const&>(sf)];
+        }, py::return_value_policy::move)
+        .def("__getitem__", [](const ripple::STObject &obj, TWSF<ripple::STBlob> sf) {
+            return obj[static_cast<ripple::TypedField<ripple::STBlob> const&>(sf)];
+        }, py::return_value_policy::move)
+        .def("__getitem__", [](const ripple::STObject &obj, TWSF<ripple::STPluginType> sf) {
+            return obj[static_cast<ripple::TypedField<ripple::STPluginType> const&>(sf)];
+        }, py::return_value_policy::move) // TODO: avoid doing a memory allocation every time this is called
+        .def("__setitem__", [](ripple::STObject &obj, TWSF<ripple::STAccount> sf, ripple::STAccount::value_type value) {
+            obj[static_cast<ripple::TypedField<ripple::STAccount> const&>(sf)] = value;
+        })
+        .def("__setitem__", [](ripple::STObject &obj, TWSF<ripple::STAmount> sf, ripple::STAmount value) {
+            obj[static_cast<ripple::TypedField<ripple::STAmount> const&>(sf)] = value;
+        })
+        .def("__setitem__", [](ripple::STObject &obj, TWSF<ripple::STUInt32> sf, std::uint32_t value) {
+            obj[static_cast<ripple::TypedField<ripple::STUInt32> const&>(sf)] = value;
+        })
+        .def("__setitem__", [](ripple::STObject &obj, TWSF<ripple::STUInt64> sf, std::uint64_t value) {
+            obj[static_cast<ripple::TypedField<ripple::STUInt64> const&>(sf)] = value;
+        })
+        .def("__setitem__", [](ripple::STObject &obj, TWSF<ripple::STBlob> sf, ripple::STBlob::value_type value) {
+            obj[static_cast<ripple::TypedField<ripple::STBlob> const&>(sf)] = value;
+        })
         .def("getAccountID",
             [](const ripple::STObject &obj, const WSF &wsf) {
                 return obj.getAccountID(static_cast<ripple::SField const&>(wsf));
@@ -471,6 +611,11 @@ PYBIND11_MODULE(plugin_transactor, m) {
                 return obj.makeFieldAbsent(static_cast<ripple::SField const&>(wsf));
             }
         )
+        .def("__delitem__",  // del obj[sfSField]
+            [](ripple::STObject &obj, const WSF &wsf) {
+                return obj.makeFieldAbsent(static_cast<ripple::SField const&>(wsf));
+            }
+        )
         // .def("at",
         //     [](const ripple::STObject &obj, const WSF<T> &wsf) {
         //         return obj[static_cast<ripple::TypedField<T> const&>(wsf)];
@@ -487,6 +632,11 @@ PYBIND11_MODULE(plugin_transactor, m) {
         //         ripple::Throw<std::logic_error>("No SField " + fieldName + ".");
         //     }
         // )
+        .def("__repr__",
+            [](const ripple::STObject &obj) {
+                return obj.getFullText();
+            }
+        )
         .def(py::self == py::self)
         .def(py::self != py::self);
 
@@ -675,28 +825,66 @@ PYBIND11_MODULE(plugin_transactor, m) {
         )
         .def("describeOwnerDir", &ripple::describeOwnerDir)
         .def("adjustOwnerCount", &ripple::adjustOwnerCount)
+        .def("createNewSField_STAccount", &wrappedNewSField<ripple::STAccount>)
+        .def("createNewSField_STAmount", &wrappedNewSField<ripple::STAmount>)
+        .def("createNewSField_STUInt32", &wrappedNewSField<ripple::STUInt32>)
+        .def("createNewSField_STPluginType", &wrappedNewSField<ripple::STPluginType>)
+        .def("constructCustomSField", &constructCustomWrappedSField)
+        .def("make_name", &ripple::make_name)
+        // .def("not_an_object", &ripple::not_an_object)
+        .def("not_an_array", &ripple::not_an_array)
+        .def("unknown_field", &ripple::unknown_field)
+        .def("out_of_range", &ripple::out_of_range)
+        .def("bad_type", &ripple::bad_type)
+        .def("unknown_type", &ripple::unknown_type)
+        .def("invalid_data", 
+            [](std::string const& object, std::string const& field) {
+                return ripple::invalid_data(object, field);
+            }
+        )
+        .def("invalid_data", 
+            [](std::string const& object) {
+                return ripple::invalid_data(object);
+            }
+        )
+        .def("array_expected", &ripple::array_expected)
+        .def("string_expected", &ripple::string_expected)
+        .def("too_deep", &ripple::too_deep)
+        .def("singleton_expected", &ripple::singleton_expected)
+        .def("template_mismatch", &ripple::template_mismatch)
+        .def("non_object_in_array", &ripple::non_object_in_array)
+        .def("parseBase58", 
+            [](std::string const& base58) {
+                return ripple::parseBase58<ripple::AccountID>(base58);
+            }
+        )
+        .def("make_stplugintype", 
+            [](const WSF &wsf, ripple::Buffer& b) {
+                ripple::SField const &f = static_cast<ripple::SField const&>(wsf);
+                auto const stVar = ripple::detail::make_stvar<ripple::STPluginType>(f, b.data(), b.size());
+                return stVar;
+            },
+            py::return_value_policy::move
+        )
         ;
     
 
     m.attr("tfFullyCanonicalSig") = ripple::tfFullyCanonicalSig;
     m.attr("tfUniversal") = ripple::tfUniversal;
     m.attr("tfUniversalMask") = ripple::tfUniversalMask;
-    m.attr("sfRegularKey") = WSF{(void *)&ripple::sfRegularKey};
-    m.attr("sfAccount") = WSF{(void *)&ripple::sfAccount};
-    m.attr("sfAmount") = WSF{(void *)&ripple::sfAmount};
-    m.attr("sfFinishAfter") = WSF{(void *)&ripple::sfFinishAfter};
-    m.attr("sfCancelAfter") = WSF{(void *)&ripple::sfCancelAfter};
-    m.attr("sfCondition") = WSF{(void *)&ripple::sfCondition};
-    m.attr("sfBalance") = WSF{(void *)&ripple::sfBalance};
-    m.attr("sfSourceTag") = WSF{(void *)&ripple::sfSourceTag};
-    m.attr("sfDestinationTag") = WSF{(void *)&ripple::sfDestinationTag};
-    m.attr("sfDestination") = WSF{(void *)&ripple::sfDestination};
-    m.attr("sfOwnerNode") = WSF{(void *)&ripple::sfOwnerNode};
-    m.attr("sfOwnerCount") = WSF{(void *)&ripple::sfOwnerCount};
-    // m.attr("sfRegularKey") = TWSF<std::decay_t<decltype(ripple::sfRegularKey)>>{
-    //   (void *)&ripple::sfRegularKey};
-    // m.attr("sfAccount") = TWSF<std::decay_t<decltype(ripple::sfAccount)>>{
-    //   (void *)&ripple::sfAccount};
+    m.attr("sfRegularKey") = TWSF<ripple::STAccount>{(void *)&ripple::sfRegularKey};
+    m.attr("sfAccount") = TWSF<ripple::STAccount>{(void *)&ripple::sfAccount};
+    m.attr("sfAmount") = TWSF<ripple::STAmount>{(void *)&ripple::sfAmount};
+    m.attr("sfFinishAfter") = TWSF<ripple::STUInt32>{(void *)&ripple::sfFinishAfter};
+    m.attr("sfCancelAfter") = TWSF<ripple::STUInt32>{(void *)&ripple::sfCancelAfter};
+    m.attr("sfCondition") = TWSF<ripple::STBlob>{(void *)&ripple::sfCondition};
+    m.attr("sfBalance") = TWSF<ripple::STAmount>{(void *)&ripple::sfBalance};
+    m.attr("sfSourceTag") = TWSF<ripple::STUInt32>{(void *)&ripple::sfSourceTag};
+    m.attr("sfDestinationTag") = TWSF<ripple::STUInt32>{(void *)&ripple::sfDestinationTag};
+    m.attr("sfTicketSequence") = TWSF<ripple::STUInt32>{(void *)&ripple::sfTicketSequence};
+    m.attr("sfDestination") = TWSF<ripple::STAccount>{(void *)&ripple::sfDestination};
+    m.attr("sfOwnerNode") = TWSF<ripple::STUInt64>{(void *)&ripple::sfOwnerNode};
+    m.attr("sfOwnerCount") = TWSF<ripple::STUInt32>{(void *)&ripple::sfOwnerCount};
     m.attr("fixMasterKeyAsRegularKey") = ripple::fixMasterKeyAsRegularKey;
     m.attr("fix1543") = ripple::fix1543;
     m.attr("fix1571") = ripple::fix1571;
