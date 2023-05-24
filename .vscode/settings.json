@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "*.gyp": "jsonc",
         "__bit_reference": "cpp",
         "__bits": "cpp",
         "__config": "cpp",
@@ -107,7 +108,8 @@
         "*.inc": "cpp",
         "__memory": "cpp",
         "scoped_allocator": "cpp",
-        "filesystem": "cpp"
+        "filesystem": "cpp",
+        "format": "cpp"
     },
     "cSpell.words": [
         "INSUF",

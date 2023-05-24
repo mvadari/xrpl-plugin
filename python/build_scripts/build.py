@@ -67,6 +67,7 @@ def generate_cpp(tx_name, tx_type, module_name, python_folder):
 #include <ripple/protocol/TER.h>
 #include <ripple/protocol/TxFlags.h>
 #include <ripple/protocol/st.h>
+#include <map>
 
 #include <pybind11/embed.h> // everything needed for embedding
 #include <pybind11/stl.h>
@@ -208,11 +209,84 @@ getTxFormat()
     return txFormat;
 }}
 
+struct STypeExport {{
+    int typeId;
+    parseLeafTypePtr parsePtr;
+}};
+
+static std::map<int, std::string> parseSTypeFunctions;
+
+std::optional<ripple::detail::STVar>
+parseLeafTypePython(
+    ripple::SField const& field,
+    std::string const& json_name,
+    std::string const& fieldName,
+    ripple::SField const* name,
+    Json::Value const& value,
+    Json::Value& error)
+{{
+    if (auto it = parseSTypeFunctions.find(field.fieldType);
+        it != parseSTypeFunctions.end())
+    {{
+        WSF wrappedField = WSF{{(void *)&field}};
+        WSF wrappedName = WSF{{(void *)name}};
+        py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+        try {{
+            py::module_::import("sys").attr("path").attr("append")("{python_folder}");
+            py::object parseFn = py::module_::import("{module_name}").attr(it->second.c_str());
+            py::object returnObj = parseFn(
+                py::cast(wrappedField, py::return_value_policy::reference),
+                json_name,
+                fieldName,
+                wrappedName,
+                value);
+            py::tuple tup = returnObj.cast<py::tuple>();
+            if (!tup[1].is_none())
+            {{
+                error = tup[1].cast<Json::Value>();
+                std::optional<detail::STVar> ret;
+                return ret;
+            }}
+            auto const stVar = tup[0].cast<std::optional<ripple::detail::STVar>>();
+            return tup[0].cast<std::optional<ripple::detail::STVar>>();
+        }} catch (py::error_already_set& e) {{
+            // Print the error message
+            const char* errorMessage = e.what();
+            std::cout << "Python Error: " << errorMessage << std::endl;
+            throw;
+        }}
+    }}
+
+    std::optional<detail::STVar> ret;
+    error = unknown_type(json_name, fieldName, field.fieldType);
+    return ret;
+}}
+
+
 extern "C"
-std::vector<int>
+std::vector<STypeExport>
 getSTypes()
 {{
-    return std::vector<int>{{}};
+    static std::vector<STypeExport> const sTypes = []{{
+        std::vector<STypeExport> temp = {{}};
+        py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+        py::module_::import("sys").attr("path").attr("append")("{python_folder}");
+        py::module pluginImport = py::module_::import("{module_name}");
+        if (!hasattr(pluginImport, "new_stypes")) {{
+            return temp;
+        }}
+        auto new_stypes = pluginImport.attr("new_stypes").cast<std::vector<py::object>>();
+        for (py::object variable: new_stypes)
+        {{
+            py::tuple tup = variable.cast<py::tuple>();
+            int typeId = tup[0].cast<int>();
+            py::function parseFn = tup[1].cast<py::function>();
+            parseSTypeFunctions.insert({{typeId, parseFn.attr("__name__").cast<std::string>()}});
+            temp.emplace_back(STypeExport{{typeId, parseLeafTypePython}});
+        }}
+        return temp;
+    }}();
+    return sTypes;
 }}
 
 

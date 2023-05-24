@@ -7,7 +7,9 @@
 #include <ripple/protocol/TxFlags.h>
 #include <ripple/protocol/Feature.h>
 #include <ripple/ledger/View.h>
+#include <ripple/protocol/impl/STVar.h>
 #include <map>
+#include <iostream>
 #include <string>
 
 #define STRINGIFY(x) #x
@@ -309,14 +311,19 @@ PYBIND11_MODULE(plugin_transactor, m) {
     * Small classes
     */
 
-    py::class_<ripple::SField> SField(m, "SField");
-    py::class_<WSF> PythonWSF(m, "WSF");
+    py::class_<WSF> PythonWSF(m, "SField");
     PythonWSF
+        .def_property_readonly("fieldCode",
+            [](const WSF &wsf) {
+                return static_cast<ripple::SField const&>(wsf).fieldCode;
+            }
+        )
         .def("__repr__",
             [](const WSF &wsf) {
                 return "sf" + static_cast<ripple::SField const&>(wsf).getName();
             }
-        );
+        )
+        ;
     py::class_<TWSF<ripple::STAccount>, WSF> TWSF_STAccount(m, "SF_ACCOUNT");
     py::class_<TWSF<ripple::STAmount>, WSF> TWSF_STAmount(m, "SF_AMOUNT");
     py::class_<TWSF<ripple::STUInt32>, WSF> TWSF_STUInt32(m, "SF_UINT32");
@@ -328,6 +335,12 @@ PYBIND11_MODULE(plugin_transactor, m) {
     py::class_<ripple::AccountID> AccountID(m, "AccountID");
     AccountID
         .def(py::init<>())
+        .def(py::init<ripple::Slice>())
+        .def("parseHex",
+            [](ripple::AccountID acct, std::string const& hex) {
+                return acct.parseHex(hex);
+            }
+        )
         .def("toBase58",
             [](const ripple::AccountID &a) {
                 return ripple::toBase58(a);
@@ -336,6 +349,12 @@ PYBIND11_MODULE(plugin_transactor, m) {
         .def("to_buffer",
             [](const ripple::AccountID &a) {
                 return ripple::Buffer(a.data(), a.size());
+            },
+            py::return_value_policy::move
+        )
+        .def("from_buffer",
+            [](const ripple::Buffer &buf) {
+                return ripple::AccountID::fromVoid(std::move(buf.data()));
             }
         )
         .def(py::self == py::self)
@@ -378,6 +397,21 @@ PYBIND11_MODULE(plugin_transactor, m) {
             }
         );
     
+    py::class_<ripple::Slice> Slice(m, "Slice");
+    Slice
+        .def("to_buffer",
+            [](const ripple::Slice &slice) {
+                return ripple::Buffer(slice.data(), slice.size());
+            },
+            py::return_value_policy::move
+        )
+        .def("__repr__",
+            [](const ripple::Slice &slice) {
+                return strHex(slice);
+            }
+        )
+    ;
+    
     py::class_<beast::Zero> BeastZero(m, "BeastZero");
     py::class_<beast::Journal> Journal(m, "Journal");
 
@@ -387,22 +421,45 @@ PYBIND11_MODULE(plugin_transactor, m) {
     ;
     
     py::class_<ripple::Buffer> Buffer(m, "Buffer");
+    Buffer
+        .def("__repr__",
+            [](const ripple::Buffer &buf) {
+                return strHex(buf);
+            }
+        );
 
+    py::class_<Json::Value> JsonValue(m, "JsonValue");
+    JsonValue
+        .def("isString", &Json::Value::isString)
+        .def("asString", &Json::Value::asString)
+        .def("__repr__", &Json::Value::asCString);
 
     /*
     * STObjects
     */
 
     py::class_<ripple::detail::STVar> STVar(m, "STVar");
+    STVar
+        .def("get",
+            [](const ripple::detail::STVar &var) {
+                return var.get();
+            }
+        );
 
     py::class_<ripple::STBase> STBase(m, "STBase");
     STBase
+        .def("getFName",
+            [](const ripple::STBase &obj) {
+                ripple::SField const& f = obj.getFName();
+                // TODO: make this general
+                return TWSF<ripple::STPluginType>{(void *)&f};
+            }
+        )
         .def("__repr__",
             [](const ripple::STBase &obj) {
                 return obj.getFullText();
             }
         );
-    // py::class_<ripple::STInteger, ripple::STBase> STInteger(m, "STInteger");
     py::class_<ripple::STAccount, ripple::STBase> STAccount(m, "STAccount");
     py::class_<ripple::STBlob, ripple::STBase> STBlob(m, "STBlob");
     py::class_<ripple::STUInt32, ripple::STBase> STUInt32(m, "STUInt32");
@@ -411,7 +468,7 @@ PYBIND11_MODULE(plugin_transactor, m) {
     py::class_<ripple::STAmount, ripple::STBase> STAmount(m, "STAmount");
     STAmount
         .def(py::init<ripple::STAmount &>())
-        .def("is_xrp", 
+        .def("is_xrp",
             [](const ripple::STAmount &amt) {
                 return ripple::isXRP(amt);
             }
@@ -426,12 +483,24 @@ PYBIND11_MODULE(plugin_transactor, m) {
         .def(py::self > py::self)
         .def(py::self <= py::self)
         .def(py::self >= py::self)
-        // .def(py::self == beast::Zero())
-        // .def(py::self != beast::Zero())
-        // .def(py::self < beast::Zero())
-        // .def(py::self > beast::Zero())
-        // .def(py::self <= beast::Zero())
-        // .def(py::self >= beast::Zero())
+        .def("__eq__", [](const ripple::STAmount &a, beast::Zero b) {
+            return a == b;
+        }, py::is_operator())
+        .def("__ne__", [](const ripple::STAmount &a, beast::Zero b) {
+            return a != b;
+        }, py::is_operator())
+        .def("__lt__", [](const ripple::STAmount &a, beast::Zero b) {
+            return a < b;
+        }, py::is_operator())
+        .def("__le__", [](const ripple::STAmount &a, beast::Zero b) {
+            return a <= b;
+        }, py::is_operator())
+        .def("__gt__", [](const ripple::STAmount &a, beast::Zero b) {
+            return a > b;
+        }, py::is_operator())
+        .def("__ge__", [](const ripple::STAmount &a, beast::Zero b) {
+            return a >= b;
+        }, py::is_operator())
         .def(-py::self)
         .def(py::self - py::self)
     ;
@@ -441,35 +510,35 @@ PYBIND11_MODULE(plugin_transactor, m) {
         .def("isFlag", &ripple::STObject::isFlag)
         .def("__getitem__", [](const ripple::STObject &obj, TWSF<ripple::STAccount> sf) {
             return obj[static_cast<ripple::TypedField<ripple::STAccount> const&>(sf)];
-        })
+        }, py::return_value_policy::move)
         .def("__getitem__", [](const ripple::STObject &obj, TWSF<ripple::STAmount> sf) {
             return obj[static_cast<ripple::TypedField<ripple::STAmount> const&>(sf)];
-        })
+        }, py::return_value_policy::move)
         .def("__getitem__", [](const ripple::STObject &obj, TWSF<ripple::STUInt32> sf) {
             return obj[static_cast<ripple::TypedField<ripple::STUInt32> const&>(sf)];
-        })
+        }, py::return_value_policy::move)
         .def("__getitem__", [](const ripple::STObject &obj, TWSF<ripple::STUInt64> sf) {
             return obj[static_cast<ripple::TypedField<ripple::STUInt64> const&>(sf)];
-        })
+        }, py::return_value_policy::move)
         .def("__getitem__", [](const ripple::STObject &obj, TWSF<ripple::STBlob> sf) {
             return obj[static_cast<ripple::TypedField<ripple::STBlob> const&>(sf)];
-        })
+        }, py::return_value_policy::move)
         .def("__getitem__", [](const ripple::STObject &obj, TWSF<ripple::STPluginType> sf) {
             return obj[static_cast<ripple::TypedField<ripple::STPluginType> const&>(sf)];
-        })
-        .def("__setitem__", [](const ripple::STObject &obj, TWSF<ripple::STAccount> sf, ripple::STAccount::value_type value) {
+        }, py::return_value_policy::move) // TODO: avoid doing a memory allocation every time this is called
+        .def("__setitem__", [](ripple::STObject &obj, TWSF<ripple::STAccount> sf, ripple::STAccount::value_type value) {
             obj[static_cast<ripple::TypedField<ripple::STAccount> const&>(sf)] = value;
         })
-        // .def("__setitem__", [](const ripple::STObject &obj, TWSF<ripple::STAmount> sf, ripple::STAmount value) {
-        //     obj[static_cast<ripple::TypedField<ripple::STAmount> const&>(sf)] = value;
-        // }) TODO: fix this
-        // .def("__setitem__", [](const ripple::STObject &obj, TWSF<ripple::STUInt32> sf, std::uint32_t value) {
-        //     obj[static_cast<ripple::TypedField<ripple::STUInt32> const&>(sf)] = value;
-        // }) TODO: fix this
-        // .def("__setitem__", [](const ripple::STObject &obj, TWSF<ripple::STUInt64> sf, std::uint64_t value) {
-        //     obj[static_cast<ripple::TypedField<ripple::STUInt64> const&>(sf)] = value;
-        // }) TODO: fix this
-        .def("__setitem__", [](const ripple::STObject &obj, TWSF<ripple::STBlob> sf, ripple::STBlob::value_type value) {
+        .def("__setitem__", [](ripple::STObject &obj, TWSF<ripple::STAmount> sf, ripple::STAmount value) {
+            obj[static_cast<ripple::TypedField<ripple::STAmount> const&>(sf)] = value;
+        })
+        .def("__setitem__", [](ripple::STObject &obj, TWSF<ripple::STUInt32> sf, std::uint32_t value) {
+            obj[static_cast<ripple::TypedField<ripple::STUInt32> const&>(sf)] = value;
+        })
+        .def("__setitem__", [](ripple::STObject &obj, TWSF<ripple::STUInt64> sf, std::uint64_t value) {
+            obj[static_cast<ripple::TypedField<ripple::STUInt64> const&>(sf)] = value;
+        })
+        .def("__setitem__", [](ripple::STObject &obj, TWSF<ripple::STBlob> sf, ripple::STBlob::value_type value) {
             obj[static_cast<ripple::TypedField<ripple::STBlob> const&>(sf)] = value;
         })
         .def("getAccountID",
@@ -542,6 +611,11 @@ PYBIND11_MODULE(plugin_transactor, m) {
                 return obj.makeFieldAbsent(static_cast<ripple::SField const&>(wsf));
             }
         )
+        .def("__delitem__",  // del obj[sfSField]
+            [](ripple::STObject &obj, const WSF &wsf) {
+                return obj.makeFieldAbsent(static_cast<ripple::SField const&>(wsf));
+            }
+        )
         // .def("at",
         //     [](const ripple::STObject &obj, const WSF<T> &wsf) {
         //         return obj[static_cast<ripple::TypedField<T> const&>(wsf)];
@@ -558,6 +632,11 @@ PYBIND11_MODULE(plugin_transactor, m) {
         //         ripple::Throw<std::logic_error>("No SField " + fieldName + ".");
         //     }
         // )
+        .def("__repr__",
+            [](const ripple::STObject &obj) {
+                return obj.getFullText();
+            }
+        )
         .def(py::self == py::self)
         .def(py::self != py::self);
 
@@ -758,31 +837,41 @@ PYBIND11_MODULE(plugin_transactor, m) {
         .def("out_of_range", &ripple::out_of_range)
         .def("bad_type", &ripple::bad_type)
         .def("unknown_type", &ripple::unknown_type)
-        // .def("invalid_data", &ripple::invalid_data)
+        .def("invalid_data", 
+            [](std::string const& object, std::string const& field) {
+                return ripple::invalid_data(object, field);
+            }
+        )
+        .def("invalid_data", 
+            [](std::string const& object) {
+                return ripple::invalid_data(object);
+            }
+        )
         .def("array_expected", &ripple::array_expected)
         .def("string_expected", &ripple::string_expected)
         .def("too_deep", &ripple::too_deep)
         .def("singleton_expected", &ripple::singleton_expected)
         .def("template_mismatch", &ripple::template_mismatch)
         .def("non_object_in_array", &ripple::non_object_in_array)
-        .def("make_stplugintype", 
-            [](const WSF &wsf, ripple::Buffer& b) {
-                ripple::SField f = static_cast<ripple::SField const&>(wsf);
-                return ripple::detail::make_stvar<ripple::STPluginType>(f, b.data(), b.size());
+        .def("parseBase58", 
+            [](std::string const& base58) {
+                return ripple::parseBase58<ripple::AccountID>(base58);
             }
         )
-        // .def("make_stplugintype", 
-        //     [](ripple::SField const& f, void const* data, std::size_t size) {
-        //         return ripple::detail::make_stvar<ripple::STPluginType>(f, data, size);
-        //     }
-        // )
+        .def("make_stplugintype", 
+            [](const WSF &wsf, ripple::Buffer& b) {
+                ripple::SField const &f = static_cast<ripple::SField const&>(wsf);
+                auto const stVar = ripple::detail::make_stvar<ripple::STPluginType>(f, b.data(), b.size());
+                return stVar;
+            },
+            py::return_value_policy::move
+        )
         ;
     
 
     m.attr("tfFullyCanonicalSig") = ripple::tfFullyCanonicalSig;
     m.attr("tfUniversal") = ripple::tfUniversal;
     m.attr("tfUniversalMask") = ripple::tfUniversalMask;
-    m.attr("sfAccount2") = TWSF<ripple::STAccount>{(void *)&ripple::sfOwnerCount};
     m.attr("sfRegularKey") = TWSF<ripple::STAccount>{(void *)&ripple::sfRegularKey};
     m.attr("sfAccount") = TWSF<ripple::STAccount>{(void *)&ripple::sfAccount};
     m.attr("sfAmount") = TWSF<ripple::STAmount>{(void *)&ripple::sfAmount};
