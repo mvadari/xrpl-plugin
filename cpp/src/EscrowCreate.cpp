@@ -46,6 +46,11 @@ typedef std::optional<ripple::detail::STVar> (*parseLeafTypePtr)(
     Json::Value const&,
     Json::Value&);
 
+typedef std::int64_t (*visitEntryXRPChangePtr)(
+    bool isDelete,
+    std::shared_ptr<ripple::SLE const> const& entry,
+    bool isBefore);
+
 struct STypeExport {
     int typeId;
     createNewSFieldPtr createPtr;
@@ -519,12 +524,25 @@ getTTName()
     return "ttESCROW_CREATE2";
 }
 
+std::int64_t visitEntryXRPChange(
+    bool isDelete,
+    std::shared_ptr<ripple::SLE const> const& entry,
+    bool isBefore)
+{
+    if (isBefore) {
+        return -1 * (*entry)[ripple::sfAmount].xrp().drops();
+    }
+    if (isDelete) return 0;
+    return (*entry)[ripple::sfAmount].xrp().drops();
+}
+
 struct LedgerObjectInfo {
     std::uint16_t objectType;
     char const* objectName; // CamelCase
     char const* objectRpcName; // snake_case
     std::vector<FakeSOElement> objectFormat;
     bool isDeletionBlocker;
+    visitEntryXRPChangePtr visitEntryXRPChange;
     // FakeSOElement[] innerObjectFormat; // optional
 };
 
@@ -551,7 +569,8 @@ getLedgerObjects()
                 {ripple::sfPreviousTxnLgrSeq.getCode(),    ripple::soeREQUIRED},
                 {ripple::sfDestinationNode.getCode(),      ripple::soeOPTIONAL},
             },
-            false
+            false,
+            visitEntryXRPChange
         }
     };
 }
