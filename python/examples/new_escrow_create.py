@@ -20,7 +20,6 @@ from plugin_transactor import (
     tecINTERNAL,
     sfBalance,
     STAmount,
-    sfBalance,
     sfOwnerCount,
     tecUNFUNDED,
     tecINSUFFICIENT_RESERVE,
@@ -45,10 +44,23 @@ from plugin_transactor import (
     AccountID,
     make_stplugintype,
     sfFinishAfter,
-    parseBase58,
     invalid_data,
+    sfSourceTag,
+    sfPreviousTxnID,
+    sfPreviousTxnLgrSeq,
+    sfDestinationNode,
+    SField,
+    SOEStyle,
+    indexHash,
+    Keylet,
+    registerLedgerObject,
+    STLedgerEntry,
+    parseBase58
 )
 import plugin_transactor
+from dataclasses import dataclass
+
+from typing import Callable, List, Optional, Tuple
 
 # TODO: helper function, move this to the package
 def create_new_sfield(cls, field_name, field_value):
@@ -89,18 +101,70 @@ def parse_account2(field, json_name, field_name, _name, value):
 
 sfDestination2 = constructCustomSField(STI_ACCOUNT2, "Destination2", 1)
 
-new_stypes = [(STI_ACCOUNT2, parse_account2)]
-new_sfields = [sfFinishAfter2, sfDestination2]
+# new_stypes = [(STI_ACCOUNT2, parse_account2)]
+# new_sfields = [sfFinishAfter2, sfDestination2]
+
+@dataclass(frozen=True)
+class NewLedgerObject:
+    object_type: int
+    object_name: str
+    object_rpc_name: str
+    object_format: List[Tuple[SField, SOEStyle]]
+    is_deletion_blocker: bool = False
+    visit_entry_xrp_change: Optional[Callable[[bool, STLedgerEntry, bool], int]] = None
+
+    def __post_init__(self):
+        registerLedgerObject(self.object_type, self.object_name, self.object_format)
+
+
+ltNEW_ESCROW = 0x74
+NEW_ESCROW_NAMESPACE = ord('t')
+
+
+def visit_entry_xrp_change_escrow(is_delete, entry, is_before):
+    if is_before:
+        return -1 * entry[sfAmount].xrp().drops
+    if is_delete:
+        return 0
+    return entry[sfAmount].xrp().drops
+
+
+new_ledger_objects = [
+    NewLedgerObject(
+        ltNEW_ESCROW,
+        "NewEscrow",
+        "new_escrow",
+        [
+            (sfAccount,              soeREQUIRED),
+            (sfDestination,          soeREQUIRED),
+            (sfAmount,               soeREQUIRED),
+            (sfCondition,            soeOPTIONAL),
+            (sfCancelAfter,          soeOPTIONAL),
+            (sfFinishAfter,          soeOPTIONAL),
+            (sfSourceTag,            soeOPTIONAL),
+            (sfDestinationTag,       soeOPTIONAL),
+            (sfOwnerNode,            soeREQUIRED),
+            (sfPreviousTxnID,        soeREQUIRED),
+            (sfPreviousTxnLgrSeq,    soeREQUIRED),
+            (sfDestinationNode,      soeOPTIONAL),
+        ],
+        True,
+        visit_entry_xrp_change_escrow
+    )
+]
+
+def new_escrow_keylet(src, seq):
+    return Keylet(ltNEW_ESCROW, indexHash(NEW_ESCROW_NAMESPACE, src, seq))
 
 tx_name = "NewEscrowCreate"
 tx_type = 47
 
 tx_format = [
-    (sfDestination2, soeREQUIRED),
+    (sfDestination, soeREQUIRED),
     (sfAmount, soeREQUIRED),
     (sfCondition, soeOPTIONAL),
     (sfCancelAfter, soeOPTIONAL),
-    (sfFinishAfter2, soeOPTIONAL),
+    (sfFinishAfter, soeOPTIONAL),
     (sfDestinationTag, soeOPTIONAL),
     (sfTicketSequence, soeOPTIONAL)
 ]
@@ -122,20 +186,20 @@ def preflight(ctx):
     if not amount.is_xrp():
         return temBAD_AMOUNT
 
-    if amount <= zeroAmount:
+    if amount < zeroAmount:
         return temBAD_AMOUNT
 
     if not ctx.tx.isFieldPresent(sfCancelAfter) and \
-        not ctx.tx.isFieldPresent(sfFinishAfter2):
+        not ctx.tx.isFieldPresent(sfFinishAfter):
         return temBAD_EXPIRATION
 
     if ctx.tx.isFieldPresent(sfCancelAfter) and \
-        ctx.tx.isFieldPresent(sfFinishAfter2) and \
-            ctx.tx[sfCancelAfter] <= ctx.tx[sfFinishAfter2]:
+        ctx.tx.isFieldPresent(sfFinishAfter) and \
+            ctx.tx[sfCancelAfter] <= ctx.tx[sfFinishAfter]:
         return temBAD_EXPIRATION
 
     if ctx.rules.enabled(fix1571):
-        if not ctx.tx.isFieldPresent(sfFinishAfter2) and \
+        if not ctx.tx.isFieldPresent(sfFinishAfter) and \
             not ctx.tx.isFieldPresent(sfCondition):
             return temMALFORMED
 
@@ -154,8 +218,8 @@ def doApply(ctx, _mPriorBalance, _mSourceBalance):
             after(close_time, ctx.tx[sfCancelAfter]):
             return tecNO_PERMISSION
 
-        if ctx.tx.isFieldPresent(sfFinishAfter2) and \
-            after(close_time, ctx.tx[sfFinishAfter2]):
+        if ctx.tx.isFieldPresent(sfFinishAfter) and \
+            after(close_time, ctx.tx[sfFinishAfter]):
             return tecNO_PERMISSION
     
     account = ctx.tx[sfAccount]
@@ -171,7 +235,7 @@ def doApply(ctx, _mPriorBalance, _mSourceBalance):
     if balance < reserve + STAmount(ctx.tx[sfAmount]).xrp():
         return tecUNFUNDED
 
-    dest_acct = AccountID.from_buffer(ctx.tx[sfDestination2])
+    dest_acct = ctx.tx[sfDestination]
 
     sled = ctx.view().peek(accountKeylet(dest_acct))
     if not sled:
@@ -180,7 +244,7 @@ def doApply(ctx, _mPriorBalance, _mSourceBalance):
 
     # TODO: implement deposit auth check
 
-    keylet = escrowKeylet(account, ctx.tx.getSeqProxy().value())
+    keylet = new_escrow_keylet(account, ctx.tx.getSeqProxy().value())
     slep = makeSLE(keylet)
     slep[sfAccount] = account
     amount = ctx.tx[sfAmount]

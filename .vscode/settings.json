@@ -114,6 +114,7 @@
     "cSpell.words": [
         "delitem",
         "getitem",
+        "hasattr",
         "INSUF",
         "JLOG",
         "keylet",
@@ -123,7 +124,10 @@
         "Preclaim",
         "repr",
         "setitem",
+        "sfield",
+        "sfields",
         "stvar",
+        "stypes",
         "trustlines"
     ]
 }
