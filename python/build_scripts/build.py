@@ -46,7 +46,7 @@ public:
     preclaim(PreclaimContext const& ctx);
 
     static TER
-    doApply(ripple::ApplyContext& ctx, ripple::XRPAmount mPriorBalance, ripple::XRPAmount mSourceBalance);
+    doApply(ApplyContext& ctx, XRPAmount mPriorBalance, XRPAmount mSourceBalance);
 }};
 
 //------------------------------------------------------------------------------
@@ -79,8 +79,8 @@ using namespace ripple;
 
 struct WSF {{
   void *f_;
-  operator ripple::SField const &() const {{
-    return *static_cast<ripple::SField *>(f_);
+  operator SField const &() const {{
+    return *static_cast<SField *>(f_);
   }};
 }};
 
@@ -147,10 +147,10 @@ doApply(ApplyContext& ctx, XRPAmount mPriorBalance, XRPAmount mSourceBalance)
 }}
 
 extern "C"
-ripple::XRPAmount
-calculateBaseFee(ripple::ReadView const& view, ripple::STTx const& tx)
+XRPAmount
+calculateBaseFee(ReadView const& view, STTx const& tx)
 {{
-    return ripple::Transactor::calculateBaseFee(view, tx);
+    return Transactor::calculateBaseFee(view, tx);
 }}
 
 extern "C"
@@ -184,11 +184,11 @@ getTTName()
 }}
 
 extern "C"
-std::vector<ripple::FakeSOElement>
+std::vector<FakeSOElement>
 getTxFormat()
 {{
-    static std::vector<ripple::FakeSOElement> const txFormat = []{{
-        std::vector<ripple::FakeSOElement> temp = {{}};
+    static std::vector<FakeSOElement> const txFormat = []{{
+        std::vector<FakeSOElement> temp = {{}};
         py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
         py::module_::import("sys").attr("path").attr("append")("{python_folder}");
         auto tx_format = py::module_::import("{module_name}").attr("tx_format").cast<std::vector<py::object>>();
@@ -197,7 +197,7 @@ getTxFormat()
             py::tuple tup = variable.cast<py::tuple>();
             WSF sfield = tup[0].cast<WSF>();
             SOEStyle varType = tup[1].cast<SOEStyle>();
-            temp.emplace_back(ripple::FakeSOElement{{static_cast<ripple::SField const&>(sfield).getCode(), varType}});
+            temp.emplace_back(FakeSOElement{{static_cast<SField const&>(sfield).getCode(), varType}});
         }}
         return temp;
     }}();
@@ -211,12 +211,12 @@ struct STypeExport {{
 
 static std::map<int, std::string> parseSTypeFunctions;
 
-std::optional<ripple::detail::STVar>
+std::optional<detail::STVar>
 parseLeafTypePython(
-    ripple::SField const& field,
+    SField const& field,
     std::string const& json_name,
     std::string const& fieldName,
-    ripple::SField const* name,
+    SField const* name,
     Json::Value const& value,
     Json::Value& error)
 {{
@@ -242,8 +242,8 @@ parseLeafTypePython(
                 std::optional<detail::STVar> ret;
                 return ret;
             }}
-            auto const stVar = tup[0].cast<std::optional<ripple::detail::STVar>>();
-            return tup[0].cast<std::optional<ripple::detail::STVar>>();
+            auto const stVar = tup[0].cast<std::optional<detail::STVar>>();
+            return tup[0].cast<std::optional<detail::STVar>>();
         }} catch (py::error_already_set& e) {{
             // Print the error message
             const char* errorMessage = e.what();
@@ -301,7 +301,7 @@ getSFields()
         for (py::object variable: new_sfields)
         {{
             WSF wrappedSField = variable.cast<WSF>();
-            SField sfield = static_cast<ripple::SField const&>(wrappedSField);
+            SField sfield = static_cast<SField const&>(wrappedSField);
             temp.emplace_back(SFieldInfo{{
                 sfield.fieldType,
                 sfield.fieldValue,
@@ -314,14 +314,14 @@ getSFields()
 
 typedef std::int64_t (*visitEntryXRPChangePtr)(
     bool isDelete,
-    std::shared_ptr<ripple::SLE const> const& entry,
+    std::shared_ptr<SLE const> const& entry,
     bool isBefore);
 
 static std::map<int, std::string> visitEntryXRPChangeFunctions;
 
 std::int64_t visitEntryXRPChange(
     bool isDelete,
-    std::shared_ptr<ripple::SLE const> const& entry,
+    std::shared_ptr<SLE const> const& entry,
     bool isBefore)
 {{
     if (auto it = visitEntryXRPChangeFunctions.find(entry->getType());
@@ -349,20 +349,20 @@ struct LedgerObjectInfoInternal {{
     std::uint16_t objectType;
     std::string objectName; // CamelCase
     std::string objectRpcName; // snake_case
-    std::vector<ripple::FakeSOElement> objectFormat;
+    std::vector<FakeSOElement> objectFormat;
     bool isDeletionBlocker;
     std::optional<visitEntryXRPChangePtr> visitEntryXRPChange;
-    // ripple::FakeSOElement[] innerObjectFormat; // optional
+    // FakeSOElement[] innerObjectFormat; // optional
 }};
 
 struct LedgerObjectInfo {{
     std::uint16_t objectType;
     char const* objectName; // CamelCase
     char const* objectRpcName; // snake_case
-    std::vector<ripple::FakeSOElement> objectFormat;
+    std::vector<FakeSOElement> objectFormat;
     bool isDeletionBlocker;
     std::optional<visitEntryXRPChangePtr> visitEntryXRPChange;
-    // ripple::FakeSOElement[] innerObjectFormat; // optional
+    // FakeSOElement[] innerObjectFormat; // optional
 }};
 
 LedgerObjectInfo
@@ -391,15 +391,15 @@ getLedgerObjects()
         auto objects = module.attr("new_ledger_objects").cast<std::vector<py::object>>();
         for (py::object object: objects)
         {{
-            std::vector<ripple::FakeSOElement> objectFormat{{}};
+            std::vector<FakeSOElement> objectFormat{{}};
             auto pythonObjectFormat = object.attr("object_format").cast<std::vector<py::object>>();
             for (py::object variable: pythonObjectFormat)
             {{
                 py::tuple tup = variable.cast<py::tuple>();
                 WSF sfield = tup[0].cast<WSF>();
                 SOEStyle varType = tup[1].cast<SOEStyle>();
-                objectFormat.emplace_back(ripple::FakeSOElement{{
-                    static_cast<ripple::SField const&>(sfield).getCode(),
+                objectFormat.emplace_back(FakeSOElement{{
+                    static_cast<SField const&>(sfield).getCode(),
                     varType}});
             }}
             auto const objectType = object.attr("object_type").cast<std::uint16_t>();
