@@ -8,6 +8,7 @@
 #include <ripple/protocol/Feature.h>
 #include <ripple/ledger/View.h>
 #include <ripple/protocol/impl/STVar.h>
+#include <ripple/protocol/digest.h>
 #include <map>
 #include <iostream>
 #include <string>
@@ -61,6 +62,7 @@ wrappedNewSField(const int fieldValue, std::string const fieldName)
 ripple::SField const& constructCustomSField(int tid, int fv, const char* fn) {
     if (ripple::SField const& field = ripple::SField::getField(ripple::field_code(tid, fv)); field != ripple::sfInvalid)
         return field;
+    ripple::registerSType(tid);
     return *(new ripple::TypedField<ripple::STPluginType>(tid, fv, fn));
 }
 
@@ -69,6 +71,13 @@ constructCustomWrappedSField(int tid, const char* fn, int fv)
 {
     ripple::SField const& sfield = constructCustomSField(tid, fv, fn);
     return TWSF<ripple::STPluginType>{(void *)&sfield};
+}
+
+template <class... Args>
+static ripple::uint256
+indexHash(std::uint16_t space, Args const&... args)
+{
+    return ripple::sha512Half(space, args...);
 }
 
 namespace py = pybind11;
@@ -541,6 +550,9 @@ PYBIND11_MODULE(plugin_transactor, m) {
         .def("__setitem__", [](ripple::STObject &obj, TWSF<ripple::STBlob> sf, ripple::STBlob::value_type value) {
             obj[static_cast<ripple::TypedField<ripple::STBlob> const&>(sf)] = value;
         })
+        .def("__setitem__", [](ripple::STObject &obj, TWSF<ripple::STPluginType> sf, ripple::STPluginType::value_type value) {
+            obj[static_cast<ripple::TypedField<ripple::STPluginType> const&>(sf)] = value;
+        })
         .def("getAccountID",
             [](const ripple::STObject &obj, const WSF &wsf) {
                 return obj.getAccountID(static_cast<ripple::SField const&>(wsf));
@@ -706,6 +718,7 @@ PYBIND11_MODULE(plugin_transactor, m) {
     
     py::class_<ripple::Keylet> Keylet(m, "Keylet");
     Keylet
+        .def(py::init<std::uint16_t, ripple::uint256>())
         .def_property_readonly("type",
             [](const ripple::Keylet &keylet) {
                 return keylet.type;
@@ -823,6 +836,21 @@ PYBIND11_MODULE(plugin_transactor, m) {
             },
             py::return_value_policy::move
         )
+        .def("registerLedgerObject",
+            [](std::uint16_t objectType,
+                char const* objectName,
+                std::vector<py::object> objectFormat)
+            {
+                std::vector<ripple::FakeSOElement> temp{};
+                for (py::object variable: objectFormat)
+                {
+                    py::tuple tup = variable.cast<py::tuple>();
+                    auto sfield = tup[0].cast<WSF>();
+                    auto varType = tup[1].cast<ripple::SOEStyle>();
+                    temp.emplace_back(ripple::FakeSOElement{static_cast<ripple::SField const&>(sfield).getCode(), varType});
+                }
+                ripple::registerLedgerObject(objectType, objectName, temp);
+            })
         .def("describeOwnerDir", &ripple::describeOwnerDir)
         .def("adjustOwnerCount", &ripple::adjustOwnerCount)
         .def("createNewSField_STAccount", &wrappedNewSField<ripple::STAccount>)
@@ -866,7 +894,10 @@ PYBIND11_MODULE(plugin_transactor, m) {
             },
             py::return_value_policy::move
         )
-        ;
+        // TODO: replace `indexHash` with a native Python implementation
+        .def("indexHash", &indexHash<>)
+        .def("indexHash", &indexHash<ripple::AccountID, std::uint32_t>)
+    ;
     
 
     m.attr("tfFullyCanonicalSig") = ripple::tfFullyCanonicalSig;
@@ -885,6 +916,9 @@ PYBIND11_MODULE(plugin_transactor, m) {
     m.attr("sfDestination") = TWSF<ripple::STAccount>{(void *)&ripple::sfDestination};
     m.attr("sfOwnerNode") = TWSF<ripple::STUInt64>{(void *)&ripple::sfOwnerNode};
     m.attr("sfOwnerCount") = TWSF<ripple::STUInt32>{(void *)&ripple::sfOwnerCount};
+    m.attr("sfPreviousTxnID") = TWSF<ripple::STUInt64>{(void *)&ripple::sfPreviousTxnID};
+    m.attr("sfPreviousTxnLgrSeq") = TWSF<ripple::STUInt64>{(void *)&ripple::sfPreviousTxnLgrSeq};
+    m.attr("sfDestinationNode") = TWSF<ripple::STUInt64>{(void *)&ripple::sfDestinationNode};
     m.attr("fixMasterKeyAsRegularKey") = ripple::fixMasterKeyAsRegularKey;
     m.attr("fix1543") = ripple::fix1543;
     m.attr("fix1571") = ripple::fix1571;

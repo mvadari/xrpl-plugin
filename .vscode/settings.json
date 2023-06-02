@@ -112,6 +112,9 @@
         "format": "cpp"
     },
     "cSpell.words": [
+        "delitem",
+        "getitem",
+        "hasattr",
         "INSUF",
         "JLOG",
         "keylet",
@@ -119,7 +122,13 @@
         "Optionaled",
         "PAYCHAN",
         "Preclaim",
+        "pybind",
+        "repr",
+        "setitem",
+        "sfield",
+        "sfields",
         "stvar",
+        "stypes",
         "trustlines"
     ]
 }

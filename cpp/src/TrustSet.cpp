@@ -17,7 +17,7 @@
 */
 //==============================================================================
 
-#include <ripple/app/tx/impl/SetTrust.h>
+#include "TrustSet.h"
 #include <ripple/basics/Log.h>
 #include <ripple/ledger/View.h>
 #include <ripple/protocol/Feature.h>
@@ -29,7 +29,6 @@
 
 
 typedef ripple::SField const& (*createNewSFieldPtr)(
-    ripple::SField::private_access_tag_t access,
     int tid,
     int fv,
     const char* fn);
@@ -101,13 +100,13 @@ constructNewSType2(SField const& name)
 
 template <class T>
 SField const&
-createNewSType(SField::private_access_tag_t access, int tid, int fv, const char* fn)
+createNewSType(int tid, int fv, const char* fn)
 {
     if (SField const& field = SField::getField(field_code(tid, fv)); field != sfInvalid)
         return field;
     // TODO: refactor
     // probably not a memory leak because the constructor adds the object to a map
-    return *(new T(access, tid, fv, fn));
+    return *(new T(tid, fv, fn));
 }
 
 std::optional<detail::STVar>
@@ -154,8 +153,6 @@ parseLeafTypeNew(
     }
 }
 
-static SField::private_access_tag_t access;
-
 // helper stuff that needs to be moved to rippled
 
 template <typename T>
@@ -181,7 +178,7 @@ newSField(const int fieldValue, char const* fieldName)
 {
     if (SField const& field = SField::getField(fieldName); field != sfInvalid)
         return static_cast<T const&>(field);
-    T const* newSField = new T(access, getSTId<T>(), fieldValue, fieldName);
+    T const* newSField = new T(getSTId<T>(), fieldValue, fieldName);
     return *newSField;
 }
 

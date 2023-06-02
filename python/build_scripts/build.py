@@ -46,7 +46,7 @@ public:
     preclaim(PreclaimContext const& ctx);
 
     static TER
-    doApply(ripple::ApplyContext& ctx, ripple::XRPAmount mPriorBalance, ripple::XRPAmount mSourceBalance);
+    doApply(ApplyContext& ctx, XRPAmount mPriorBalance, XRPAmount mSourceBalance);
 }};
 
 //------------------------------------------------------------------------------
@@ -56,7 +56,7 @@ public:
 #endif"""
 
 
-def generate_cpp(tx_name, tx_type, module_name, python_folder): 
+def generate_cpp(tx_name, tx_type, module_name, python_folder):
     return f"""#include "{tx_name}.h"
 #include <ripple/app/tx/impl/Transactor.h>
 #include <ripple/basics/Log.h>
@@ -79,8 +79,8 @@ using namespace ripple;
 
 struct WSF {{
   void *f_;
-  operator ripple::SField const &() const {{
-    return *static_cast<ripple::SField *>(f_);
+  operator SField const &() const {{
+    return *static_cast<SField *>(f_);
   }};
 }};
 
@@ -88,7 +88,7 @@ extern "C"
 NotTEC
 preflight(PreflightContext const& ctx)
 {{
-    
+
     py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
     py::module_::import("sys").attr("path").attr("append")("{python_folder}");
     py::object preflight = py::module_::import("{module_name}").attr("preflight");
@@ -147,10 +147,10 @@ doApply(ApplyContext& ctx, XRPAmount mPriorBalance, XRPAmount mSourceBalance)
 }}
 
 extern "C"
-ripple::XRPAmount
-calculateBaseFee(ripple::ReadView const& view, ripple::STTx const& tx)
+XRPAmount
+calculateBaseFee(ReadView const& view, STTx const& tx)
 {{
-    return ripple::Transactor::calculateBaseFee(view, tx);
+    return Transactor::calculateBaseFee(view, tx);
 }}
 
 extern "C"
@@ -162,14 +162,9 @@ getTxName()
         py::module_::import("sys").attr("path").attr("append")("{python_folder}");
         py::object tx_name = py::module_::import("{module_name}").attr("tx_name");
         return tx_name.cast<std::string>();
-    }}(); 
+    }}();
     return txName.c_str();
 }}
-
-struct FakeSOElement {{
-    int fieldCode;
-    ripple::SOEStyle style;
-}};
 
 extern "C"
 std::uint16_t
@@ -202,7 +197,7 @@ getTxFormat()
             py::tuple tup = variable.cast<py::tuple>();
             WSF sfield = tup[0].cast<WSF>();
             SOEStyle varType = tup[1].cast<SOEStyle>();
-            temp.emplace_back(FakeSOElement{{static_cast<ripple::SField const&>(sfield).getCode(), varType}});
+            temp.emplace_back(FakeSOElement{{static_cast<SField const&>(sfield).getCode(), varType}});
         }}
         return temp;
     }}();
@@ -216,12 +211,12 @@ struct STypeExport {{
 
 static std::map<int, std::string> parseSTypeFunctions;
 
-std::optional<ripple::detail::STVar>
+std::optional<detail::STVar>
 parseLeafTypePython(
-    ripple::SField const& field,
+    SField const& field,
     std::string const& json_name,
     std::string const& fieldName,
-    ripple::SField const* name,
+    SField const* name,
     Json::Value const& value,
     Json::Value& error)
 {{
@@ -247,8 +242,8 @@ parseLeafTypePython(
                 std::optional<detail::STVar> ret;
                 return ret;
             }}
-            auto const stVar = tup[0].cast<std::optional<ripple::detail::STVar>>();
-            return tup[0].cast<std::optional<ripple::detail::STVar>>();
+            auto const stVar = tup[0].cast<std::optional<detail::STVar>>();
+            return tup[0].cast<std::optional<detail::STVar>>();
         }} catch (py::error_already_set& e) {{
             // Print the error message
             const char* errorMessage = e.what();
@@ -306,7 +301,7 @@ getSFields()
         for (py::object variable: new_sfields)
         {{
             WSF wrappedSField = variable.cast<WSF>();
-            SField sfield = static_cast<ripple::SField const&>(wrappedSField);
+            SField sfield = static_cast<SField const&>(wrappedSField);
             temp.emplace_back(SFieldInfo{{
                 sfield.fieldType,
                 sfield.fieldValue,
@@ -315,6 +310,116 @@ getSFields()
         return temp;
     }}();
     return sFields;
+}}
+
+typedef std::int64_t (*visitEntryXRPChangePtr)(
+    bool isDelete,
+    std::shared_ptr<SLE const> const& entry,
+    bool isBefore);
+
+static std::map<int, std::string> visitEntryXRPChangeFunctions;
+
+std::int64_t visitEntryXRPChange(
+    bool isDelete,
+    std::shared_ptr<SLE const> const& entry,
+    bool isBefore)
+{{
+    if (auto it = visitEntryXRPChangeFunctions.find(entry->getType());
+        it != visitEntryXRPChangeFunctions.end())
+    {{
+        py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+        try {{
+            py::module_::import("sys").attr("path").attr("append")("{python_folder}");
+            py::object visitFn = py::module_::import("{module_name}").attr(it->second.c_str());
+            py::object returnObj = visitFn(
+                isDelete,
+                py::cast(entry, py::return_value_policy::reference),
+                isBefore);
+            return returnObj.cast<std::int64_t>();
+        }} catch (py::error_already_set& e) {{
+            // Print the error message
+            const char* errorMessage = e.what();
+            std::cout << "Python Error: " << errorMessage << std::endl;
+            throw;
+        }}
+    }}
+}}
+
+struct LedgerObjectInfoInternal {{
+    std::uint16_t objectType;
+    std::string objectName; // CamelCase
+    std::string objectRpcName; // snake_case
+    std::vector<FakeSOElement> objectFormat;
+    bool isDeletionBlocker;
+    std::optional<visitEntryXRPChangePtr> visitEntryXRPChange;
+    // FakeSOElement[] innerObjectFormat; // optional
+}};
+
+struct LedgerObjectInfo {{
+    std::uint16_t objectType;
+    char const* objectName; // CamelCase
+    char const* objectRpcName; // snake_case
+    std::vector<FakeSOElement> objectFormat;
+    bool isDeletionBlocker;
+    std::optional<visitEntryXRPChangePtr> visitEntryXRPChange;
+    // FakeSOElement[] innerObjectFormat; // optional
+}};
+
+LedgerObjectInfo
+mutate(LedgerObjectInfoInternal const& obj)
+{{
+    return LedgerObjectInfo{{
+        obj.objectType,
+        obj.objectName.c_str(),
+        obj.objectRpcName.c_str(),
+        obj.objectFormat,
+        obj.isDeletionBlocker,
+        obj.visitEntryXRPChange,
+    }};
+}}
+
+
+extern "C"
+std::vector<LedgerObjectInfo>
+getLedgerObjects()
+{{
+    static std::vector<LedgerObjectInfoInternal> const objects = []{{
+        py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+        py::module_::import("sys").attr("path").attr("append")("{python_folder}");
+        py::module_ module = py::module_::import("{module_name}");
+        std::vector<LedgerObjectInfoInternal> temp = {{}};
+        auto objects = module.attr("new_ledger_objects").cast<std::vector<py::object>>();
+        for (py::object object: objects)
+        {{
+            std::vector<FakeSOElement> objectFormat{{}};
+            auto pythonObjectFormat = object.attr("object_format").cast<std::vector<py::object>>();
+            for (py::object variable: pythonObjectFormat)
+            {{
+                py::tuple tup = variable.cast<py::tuple>();
+                WSF sfield = tup[0].cast<WSF>();
+                SOEStyle varType = tup[1].cast<SOEStyle>();
+                objectFormat.emplace_back(FakeSOElement{{
+                    static_cast<SField const&>(sfield).getCode(),
+                    varType}});
+            }}
+            auto const objectType = object.attr("object_type").cast<std::uint16_t>();
+            py::function visitFn = object.attr("visit_entry_xrp_change").cast<py::function>();
+            visitEntryXRPChangeFunctions.insert({{objectType, visitFn.attr("__name__").cast<std::string>()}});
+            temp.emplace_back(LedgerObjectInfoInternal{{
+                objectType,
+                object.attr("object_name").cast<std::string>(),
+                object.attr("object_rpc_name").cast<std::string>(),
+                std::move(objectFormat),
+                object.attr("is_deletion_blocker").cast<bool>(),
+                visitEntryXRPChange}});
+        }}
+        return temp;
+    }}();
+    static std::vector<LedgerObjectInfo> output;
+    output.reserve(objects.size());
+    std::transform(objects.begin(), objects.end(), std::back_inserter(output), mutate);
+
+    return output;
 }}
 """
 
@@ -331,7 +436,6 @@ def create_files(python_file):
     # TODO: add logic to check validity of Python transactors
     # TODO: switch to Jinja
     # TODO: add logic to only generate the methods that exist in Python
-
 
     with open(f"{tx_name}.h", "w") as f:
         f.write(generate_header(tx_name))
