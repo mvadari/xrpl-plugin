@@ -43,7 +43,6 @@ from plugin_transactor import (
     bad_type,
     AccountID,
     make_stplugintype,
-    sfFinishAfter,
     invalid_data,
     sfSourceTag,
     sfPreviousTxnID,
@@ -101,8 +100,8 @@ def parse_account2(field, json_name, field_name, _name, value):
 
 sfDestination2 = constructCustomSField(STI_ACCOUNT2, "Destination2", 1)
 
-# new_stypes = [(STI_ACCOUNT2, parse_account2)]
-# new_sfields = [sfFinishAfter2, sfDestination2]
+new_stypes = [(STI_ACCOUNT2, parse_account2)]
+new_sfields = [sfFinishAfter2, sfDestination2]
 
 @dataclass(frozen=True)
 class NewLedgerObject:
@@ -136,11 +135,11 @@ new_ledger_objects = [
         "new_escrow",
         [
             (sfAccount,              soeREQUIRED),
-            (sfDestination,          soeREQUIRED),
+            (sfDestination2,          soeREQUIRED),
             (sfAmount,               soeREQUIRED),
             (sfCondition,            soeOPTIONAL),
             (sfCancelAfter,          soeOPTIONAL),
-            (sfFinishAfter,          soeOPTIONAL),
+            (sfFinishAfter2,          soeOPTIONAL),
             (sfSourceTag,            soeOPTIONAL),
             (sfDestinationTag,       soeOPTIONAL),
             (sfOwnerNode,            soeREQUIRED),
@@ -160,11 +159,11 @@ tx_name = "NewEscrowCreate"
 tx_type = 47
 
 tx_format = [
-    (sfDestination, soeREQUIRED),
+    (sfDestination2, soeREQUIRED),
     (sfAmount, soeREQUIRED),
     (sfCondition, soeOPTIONAL),
     (sfCancelAfter, soeOPTIONAL),
-    (sfFinishAfter, soeOPTIONAL),
+    (sfFinishAfter2, soeOPTIONAL),
     (sfDestinationTag, soeOPTIONAL),
     (sfTicketSequence, soeOPTIONAL)
 ]
@@ -186,20 +185,20 @@ def preflight(ctx):
     if not amount.is_xrp():
         return temBAD_AMOUNT
 
-    if amount < zeroAmount:
+    if amount <= zeroAmount:
         return temBAD_AMOUNT
 
     if not ctx.tx.isFieldPresent(sfCancelAfter) and \
-        not ctx.tx.isFieldPresent(sfFinishAfter):
+        not ctx.tx.isFieldPresent(sfFinishAfter2):
         return temBAD_EXPIRATION
 
     if ctx.tx.isFieldPresent(sfCancelAfter) and \
-        ctx.tx.isFieldPresent(sfFinishAfter) and \
-            ctx.tx[sfCancelAfter] <= ctx.tx[sfFinishAfter]:
+        ctx.tx.isFieldPresent(sfFinishAfter2) and \
+            ctx.tx[sfCancelAfter] <= ctx.tx[sfFinishAfter2]:
         return temBAD_EXPIRATION
 
     if ctx.rules.enabled(fix1571):
-        if not ctx.tx.isFieldPresent(sfFinishAfter) and \
+        if not ctx.tx.isFieldPresent(sfFinishAfter2) and \
             not ctx.tx.isFieldPresent(sfCondition):
             return temMALFORMED
 
@@ -218,8 +217,8 @@ def doApply(ctx, _mPriorBalance, _mSourceBalance):
             after(close_time, ctx.tx[sfCancelAfter]):
             return tecNO_PERMISSION
 
-        if ctx.tx.isFieldPresent(sfFinishAfter) and \
-            after(close_time, ctx.tx[sfFinishAfter]):
+        if ctx.tx.isFieldPresent(sfFinishAfter2) and \
+            after(close_time, ctx.tx[sfFinishAfter2]):
             return tecNO_PERMISSION
     
     account = ctx.tx[sfAccount]
@@ -235,7 +234,7 @@ def doApply(ctx, _mPriorBalance, _mSourceBalance):
     if balance < reserve + STAmount(ctx.tx[sfAmount]).xrp():
         return tecUNFUNDED
 
-    dest_acct = ctx.tx[sfDestination]
+    dest_acct = AccountID.from_buffer(ctx.tx[sfDestination2])
 
     sled = ctx.view().peek(accountKeylet(dest_acct))
     if not sled:
@@ -249,7 +248,7 @@ def doApply(ctx, _mPriorBalance, _mSourceBalance):
     slep[sfAccount] = account
     amount = ctx.tx[sfAmount]
     slep[sfAmount] = amount
-    slep[sfDestination] = dest_acct
+    slep[sfDestination2] = ctx.tx[sfDestination2]
     ctx.view().insert(slep)
 
     page = ctx.view().dirInsert(account, keylet)

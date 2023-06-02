@@ -62,6 +62,7 @@ wrappedNewSField(const int fieldValue, std::string const fieldName)
 ripple::SField const& constructCustomSField(int tid, int fv, const char* fn) {
     if (ripple::SField const& field = ripple::SField::getField(ripple::field_code(tid, fv)); field != ripple::sfInvalid)
         return field;
+    ripple::registerSType(tid);
     return *(new ripple::TypedField<ripple::STPluginType>(tid, fv, fn));
 }
 
@@ -548,6 +549,9 @@ PYBIND11_MODULE(plugin_transactor, m) {
         })
         .def("__setitem__", [](ripple::STObject &obj, TWSF<ripple::STBlob> sf, ripple::STBlob::value_type value) {
             obj[static_cast<ripple::TypedField<ripple::STBlob> const&>(sf)] = value;
+        })
+        .def("__setitem__", [](ripple::STObject &obj, TWSF<ripple::STPluginType> sf, ripple::STPluginType::value_type value) {
+            obj[static_cast<ripple::TypedField<ripple::STPluginType> const&>(sf)] = value;
         })
         .def("getAccountID",
             [](const ripple::STObject &obj, const WSF &wsf) {
