@@ -1,3 +1,6 @@
+from typing import Callable, List, Optional, Tuple
+from dataclasses import dataclass
+
 from plugin_transactor import (
     tesSUCCESS,
     temINVALID_FLAG,
@@ -11,7 +14,6 @@ from plugin_transactor import (
     sfAmount,
     temBAD_AMOUNT,
     sfCancelAfter,
-    sfFinishAfter,
     temBAD_EXPIRATION,
     sfCondition,
     fix1571,
@@ -23,12 +25,8 @@ from plugin_transactor import (
     sfOwnerCount,
     tecUNFUNDED,
     tecINSUFFICIENT_RESERVE,
-    sfDestination,
     tecNO_DST,
     makeSLE,
-    escrowKeylet,
-    ownerDirKeylet,
-    describeOwnerDir,
     tecDIR_FULL,
     sfOwnerNode,
     adjustOwnerCount,
@@ -38,7 +36,6 @@ from plugin_transactor import (
     sfTicketSequence,
     STUInt32,
     STBase,
-    STPluginType,
     constructCustomSField,
     bad_type,
     AccountID,
@@ -57,9 +54,7 @@ from plugin_transactor import (
     parseBase58
 )
 import plugin_transactor
-from dataclasses import dataclass
 
-from typing import Callable, List, Optional, Tuple
 
 # TODO: helper function, move this to the package
 def create_new_sfield(cls, field_name, field_value):
@@ -71,14 +66,29 @@ def create_new_sfield(cls, field_name, field_value):
         # NOTE: This should never be hit in prod
         # It may be hit during dev work since not everything is implemented yet
         raise Exception(
-            f"`createNewSField` function does not exist for {cls.__name__}"    
+            f"`createNewSField` function does not exist for {cls.__name__}"
         )
     return create_fn(field_value, field_name)
+
+
+# TODO: helper class, move this to the package
+@dataclass(frozen=True)
+class NewLedgerObject:
+    object_type: int
+    object_name: str
+    object_rpc_name: str
+    object_format: List[Tuple[SField, SOEStyle]]
+    is_deletion_blocker: bool = False
+    visit_entry_xrp_change: Optional[Callable[[bool, STLedgerEntry, bool], int]] = None
+
+    def __post_init__(self):
+        registerLedgerObject(self.object_type, self.object_name, self.object_format)
 
 
 sfFinishAfter2 = create_new_sfield(STUInt32, "FinishAfter2", 47)
 
 STI_ACCOUNT2 = 24
+
 
 def parse_account2(field, json_name, field_name, _name, value):
     if not value.isString():
@@ -86,7 +96,7 @@ def parse_account2(field, json_name, field_name, _name, value):
     str_value = value.asString()
     try:
         account = AccountID()
-        if (account.parseHex(str_value)):
+        if account.parseHex(str_value):
             return make_stplugintype(field, account.to_buffer()), None
 
         if result := parseBase58(str_value):
@@ -102,18 +112,6 @@ sfDestination2 = constructCustomSField(STI_ACCOUNT2, "Destination2", 1)
 
 new_stypes = [(STI_ACCOUNT2, parse_account2)]
 new_sfields = [sfFinishAfter2, sfDestination2]
-
-@dataclass(frozen=True)
-class NewLedgerObject:
-    object_type: int
-    object_name: str
-    object_rpc_name: str
-    object_format: List[Tuple[SField, SOEStyle]]
-    is_deletion_blocker: bool = False
-    visit_entry_xrp_change: Optional[Callable[[bool, STLedgerEntry, bool], int]] = None
-
-    def __post_init__(self):
-        registerLedgerObject(self.object_type, self.object_name, self.object_format)
 
 
 ltNEW_ESCROW = 0x74
@@ -152,8 +150,10 @@ new_ledger_objects = [
     )
 ]
 
+
 def new_escrow_keylet(src, seq):
     return Keylet(ltNEW_ESCROW, indexHash(NEW_ESCROW_NAMESPACE, src, seq))
+
 
 tx_name = "NewEscrowCreate"
 tx_type = 47
@@ -189,7 +189,7 @@ def preflight(ctx):
         return temBAD_AMOUNT
 
     if not ctx.tx.isFieldPresent(sfCancelAfter) and \
-        not ctx.tx.isFieldPresent(sfFinishAfter2):
+            not ctx.tx.isFieldPresent(sfFinishAfter2):
         return temBAD_EXPIRATION
 
     if ctx.tx.isFieldPresent(sfCancelAfter) and \
@@ -199,33 +199,35 @@ def preflight(ctx):
 
     if ctx.rules.enabled(fix1571):
         if not ctx.tx.isFieldPresent(sfFinishAfter2) and \
-            not ctx.tx.isFieldPresent(sfCondition):
+                not ctx.tx.isFieldPresent(sfCondition):
             return temMALFORMED
 
     # TODO: figure out the conditions logic
 
     return preflight2(ctx)
 
-def preclaim(ctx):
+
+def preclaim(_ctx):
     return tesSUCCESS
 
-def doApply(ctx, _mPriorBalance, _mSourceBalance):
+
+def doApply(ctx, _m_prior_balance, _m_source_balance):
     close_time = ctx.view().info().parent_close_time
 
     if ctx.view().rules().enabled(fix1571):
         if ctx.tx.isFieldPresent(sfCancelAfter) and \
-            after(close_time, ctx.tx[sfCancelAfter]):
+                after(close_time, ctx.tx[sfCancelAfter]):
             return tecNO_PERMISSION
 
         if ctx.tx.isFieldPresent(sfFinishAfter2) and \
-            after(close_time, ctx.tx[sfFinishAfter2]):
+                after(close_time, ctx.tx[sfFinishAfter2]):
             return tecNO_PERMISSION
-    
+
     account = ctx.tx[sfAccount]
     sle = ctx.view().peek(accountKeylet(account))
     if not sle:
         return tecINTERNAL
-    
+
     balance = STAmount(sle[sfBalance]).xrp()
     reserve = ctx.view().fees().accountReserve(sle[sfOwnerCount] + 1)
     if balance < reserve:

@@ -56,7 +56,7 @@ public:
 #endif"""
 
 
-def generate_cpp(tx_name, tx_type, module_name, python_folder): 
+def generate_cpp(tx_name, tx_type, module_name, python_folder):
     return f"""#include "{tx_name}.h"
 #include <ripple/app/tx/impl/Transactor.h>
 #include <ripple/basics/Log.h>
@@ -88,7 +88,7 @@ extern "C"
 NotTEC
 preflight(PreflightContext const& ctx)
 {{
-    
+
     py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
     py::module_::import("sys").attr("path").attr("append")("{python_folder}");
     py::object preflight = py::module_::import("{module_name}").attr("preflight");
@@ -162,7 +162,7 @@ getTxName()
         py::module_::import("sys").attr("path").attr("append")("{python_folder}");
         py::object tx_name = py::module_::import("{module_name}").attr("tx_name");
         return tx_name.cast<std::string>();
-    }}(); 
+    }}();
     return txName.c_str();
 }}
 
@@ -436,7 +436,6 @@ def create_files(python_file):
     # TODO: add logic to check validity of Python transactors
     # TODO: switch to Jinja
     # TODO: add logic to only generate the methods that exist in Python
-
 
     with open(f"{tx_name}.h", "w") as f:
         f.write(generate_header(tx_name))

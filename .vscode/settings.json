@@ -122,6 +122,7 @@
         "Optionaled",
         "PAYCHAN",
         "Preclaim",
+        "pybind",
         "repr",
         "setitem",
         "sfield",
