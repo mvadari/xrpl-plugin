@@ -91,7 +91,11 @@ preflight(PreflightContext const& ctx)
 
     py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
     py::module_::import("sys").attr("path").attr("append")("{python_folder}");
-    py::object preflight = py::module_::import("{module_name}").attr("preflight");
+    py::module module = py::module_::import("{module_name}");
+    if (!hasattr(module, "preflight")) {{
+        return tesSUCCESS;
+    }}
+    py::object preflight = module.attr("preflight");
     try {{
         py::object preflightReturn = preflight(py::cast(ctx, py::return_value_policy::reference));
         try {{
@@ -113,7 +117,11 @@ preclaim(PreclaimContext const& ctx)
 {{
     py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
     py::module_::import("sys").attr("path").attr("append")("{python_folder}");
-    py::object preclaim = py::module_::import("{module_name}").attr("preclaim");
+    py::module module = py::module_::import("{module_name}");
+    if (!hasattr(module, "preclaim")) {{
+        return tesSUCCESS;
+    }}
+    py::object preclaim = module.attr("preclaim");
     try {{
         py::object preclaimReturn = preclaim(py::cast(ctx, py::return_value_policy::reference));
         return TER::fromInt(preclaimReturn.cast<int>());
@@ -131,7 +139,11 @@ doApply(ApplyContext& ctx, XRPAmount mPriorBalance, XRPAmount mSourceBalance)
 {{
     py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
     py::module_::import("sys").attr("path").attr("append")("{python_folder}");
-    py::object doApplyFn = py::module_::import("{module_name}").attr("doApply");
+    py::module module = py::module_::import("{module_name}");
+    if (!hasattr(module, "do_apply")) {{
+        return tesSUCCESS;
+    }}
+    py::object doApplyFn = module.attr("do_apply");
     try {{
         py::object doApplyReturn = doApplyFn(
             py::cast(ctx, py::return_value_policy::reference),
@@ -388,6 +400,9 @@ getLedgerObjects()
         py::module_::import("sys").attr("path").attr("append")("{python_folder}");
         py::module_ module = py::module_::import("{module_name}");
         std::vector<LedgerObjectInfoInternal> temp = {{}};
+        if (!hasattr(module, "new_ledger_objects")) {{
+            return temp;
+        }}
         auto objects = module.attr("new_ledger_objects").cast<std::vector<py::object>>();
         for (py::object object: objects)
         {{

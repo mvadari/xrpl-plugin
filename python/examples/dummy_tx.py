@@ -3,24 +3,24 @@ from plugin_transactor import (
     temINVALID_FLAG,
     preflight1,
     preflight2,
-    tfUniversalMask,
+    tf_universal_mask,
     temBAD_REGKEY,
     fixMasterKeyAsRegularKey,
-    accountKeylet,
-    signersKeylet,
+    account_keylet,
+    signers_keylet,
     lsfDisableMaster,
     tecNO_ALTERNATIVE_KEY,
-    sfRegularKey,
-    sfTicketSequence,
-    sfAccount,
+    sf_regular_key,
+    sf_ticket_sequence,
+    sf_account,
     soeOPTIONAL,
 )
 
 tx_name = "DummyTx"
 tx_type = 30
 tx_format = [
-    (sfRegularKey, soeOPTIONAL),
-    (sfTicketSequence, soeOPTIONAL)
+    (sf_regular_key, soeOPTIONAL),
+    (sf_ticket_sequence, soeOPTIONAL)
 ]
 
 
@@ -28,30 +28,27 @@ def preflight(ctx):
     if (preflight1ret := preflight1(ctx)) != tesSUCCESS:
         return preflight1ret
 
-    if ctx.tx.getFlags() & tfUniversalMask:
+    if ctx.tx.get_flags() & tf_universal_mask:
         print("Malformed transaction: Invalid flags set.")
         return temINVALID_FLAG
 
     if ctx.rules.enabled(fixMasterKeyAsRegularKey) and \
-        ctx.tx.isFieldPresent(sfRegularKey) and \
-            ctx.tx[sfRegularKey] == ctx.tx[sfAccount]:
+        ctx.tx.is_field_present(sf_regular_key) and \
+            ctx.tx[sf_regular_key] == ctx.tx[sf_account]:
         return temBAD_REGKEY
 
     return preflight2(ctx)
 
-def preclaim(ctx):
-    return tesSUCCESS
-
-def doApply(ctx, _mPriorBalance, _mSourceBalance):
-    account = ctx.tx[sfAccount]
-    sle = ctx.view().peek(accountKeylet(account))
+def do_apply(ctx, _mPriorBalance, _mSourceBalance):
+    account = ctx.tx[sf_account]
+    sle = ctx.view().peek(account_keylet(account))
     # skip weird fee stuff
-    if ctx.tx.isFieldPresent(sfRegularKey):
-        sle.setAccountID(sfRegularKey, ctx.tx[sfRegularKey])
+    if ctx.tx.is_field_present(sf_regular_key):
+        sle[sf_regular_key] = ctx.tx[sf_regular_key]
     else:
         # Account has disabled master key and no multi-signer signer list.
-        if sle.isFlag(lsfDisableMaster) and not ctx.view().peek(signersKeylet(account)):
+        if sle.is_flag(lsfDisableMaster) and not ctx.view().peek(signers_keylet(account)):
             return tecNO_ALTERNATIVE_KEY
 
-        del sle[sfRegularKey]
+        del sle[sf_regular_key]
     return tesSUCCESS
