@@ -284,11 +284,23 @@ extern "C"
 Container<TransactorExport>
 getTransactors()
 {
+    static SOElementExport format[] = {
+        {sfDestination.getCode(), soeREQUIRED},
+        {sfAmount.getCode(), soeREQUIRED},
+        {sfCondition.getCode(), soeOPTIONAL},
+        {sfCancelAfter.getCode(), soeOPTIONAL},
+        {sfFinishAfter.getCode(), soeOPTIONAL},
+        {sfDestinationTag.getCode(), soeOPTIONAL},
+        {sfTicketSequence.getCode(), soeOPTIONAL}
+    };
+    SOElementExport* formatPtr = format;
     static TransactorExport list[] = {
         {
             "NewEscrowCreate",
             30,
-            {},
+            {
+                formatPtr, 7
+            },
             Transactor::ConsequencesFactoryType::Normal,
             NULL,
             preflight,
