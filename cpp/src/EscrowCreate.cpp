@@ -29,7 +29,7 @@
 #include <ripple/beast/core/LexicalCast.h>
 #include <ripple/protocol/digest.h>
 #include <ripple/protocol/TxFlags.h>
-#include <ripple/plugin/plugin.h>
+#include <ripple/plugin/exports.h>
 
 using namespace ripple;
 

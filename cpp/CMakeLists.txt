@@ -10,7 +10,7 @@ target_link_libraries(xrpl_plugin PUBLIC soci::soci)
 
 add_library(plugin_transactor SHARED)
 target_sources(plugin_transactor PRIVATE 
-  src/EscrowCreate.cpp
+  src/TrustSet.cpp
 )
 target_link_libraries(plugin_transactor PUBLIC
   xrpl_plugin
