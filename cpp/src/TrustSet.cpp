@@ -30,138 +30,124 @@
 
 using namespace ripple;
 
-typedef SField const& (*createNewSFieldPtr)(
-    int tid,
-    int fv,
-    const char* fn);
-typedef STBase* (*constructSTypePtr)(SerialIter& sit, SField const& name);
-typedef STBase* (*constructSTypePtr2)(SField const& name);
-typedef std::optional<detail::STVar> (*parseLeafTypePtr)(
-    SField const&,
-    std::string const&,
-    std::string const&,
-    SField const*,
-    Json::Value const&,
-    Json::Value&);
-
 
 const int STI_UINT32_2 = 24;
 
-// class STUInt32_2 : public STUInt32
-// {
-// using STUInt32::STUInt32;
+class STUInt32_2 : public STUInt32
+{
+using STUInt32::STUInt32;
 
-// STUInt32_2(STUInt32 num) : STUInt32(num.value())
-// {
-// }
+STUInt32_2(STUInt32 num) : STUInt32(num.value())
+{
+}
 
-// STBase*
-// copy(std::size_t n, void* buf) const
-// {
-//     return emplace(n, buf, *this);
-// }
+STBase*
+copy(std::size_t n, void* buf) const
+{
+    return emplace(n, buf, *this);
+}
 
-// STBase*
-// move(std::size_t n, void* buf)
-// {
-//     return emplace(n, buf, std::move(*this));
-// }
+STBase*
+move(std::size_t n, void* buf)
+{
+    return emplace(n, buf, std::move(*this));
+}
 
-// int
-// getSType() const
-// {
-//     return STI_UINT32_2;
-// }
-// };
+int
+getSType() const
+{
+    return STI_UINT32_2;
+}
+};
 
-// using SF_UINT32_2 = TypedField<STUInt32_2>;
+using SF_UINT32_2 = TypedField<STUInt32_2>;
 
-// template <class T>
-// STBase*
-// constructNewSType(SerialIter& sit, SField const& name)
-// {
-//     T* stype = new T(sit, name);
-//     return stype;
-// }
+template <class T>
+STBase*
+constructNewSType(SerialIter& sit, SField const& name)
+{
+    T* stype = new T(sit, name);
+    return stype;
+}
 
-// template <class T>
-// STBase*
-// constructNewSType2(SField const& name)
-// {
-//     return new T(name);
-// }
+template <class T>
+STBase*
+constructNewSType2(SField const& name)
+{
+    return new T(name);
+}
 
-// template <class T>
-// SField const&
-// createNewSType(int tid, int fv, const char* fn)
-// {
-//     if (SField const& field = SField::getField(field_code(tid, fv)); field != sfInvalid)
-//         return field;
-//     // TODO: refactor
-//     // probably not a memory leak because the constructor adds the object to a map
-//     return *(new T(tid, fv, fn));
-// }
+template <class T>
+SField const&
+createNewSType(int tid, int fv, const char* fn)
+{
+    if (SField const& field = SField::getField(field_code(tid, fv)); field != sfInvalid)
+        return field;
+    // TODO: refactor
+    // probably not a memory leak because the constructor adds the object to a map
+    return *(new T(tid, fv, fn));
+}
 
-// std::optional<detail::STVar>
-// parseLeafTypeNew(
-//     SField const& field,
-//     std::string const& json_name,
-//     std::string const& fieldName,
-//     SField const* name,
-//     Json::Value const& value,
-//     Json::Value& error)
-// {
-//     // copied from parseLeafType<STUInt32>
-//     std::optional<detail::STVar> ret;
-//     try
-//     {
-//         if (value.isString())
-//         {
-//             ret = detail::make_stvar<STUInt32_2>(
-//                 field,
-//                 beast::lexicalCastThrow<std::uint32_t>(
-//                     value.asString()));
-//         }
-//         else if (value.isInt())
-//         {
-//             ret = detail::make_stvar<STUInt32_2>(
-//                 field, to_unsigned<std::uint32_t>(value.asInt()));
-//         }
-//         else if (value.isUInt())
-//         {
-//             ret = detail::make_stvar<STUInt32_2>(
-//                 field, safe_cast<std::uint32_t>(value.asUInt()));
-//         }
-//         else
-//         {
-//             error = bad_type(json_name, fieldName);
-//             return ret;
-//         }
-//         return ret;
-//     }
-//     catch (std::exception const&)
-//     {
-//         error = invalid_data(json_name, fieldName);
-//         return ret;
-//     }
-// }
+std::optional<detail::STVar>
+parseLeafTypeNew(
+    SField const& field,
+    std::string const& json_name,
+    std::string const& fieldName,
+    SField const* name,
+    Json::Value const& value,
+    Json::Value& error)
+{
+    // copied from parseLeafType<STUInt32>
+    std::optional<detail::STVar> ret;
+    try
+    {
+        if (value.isString())
+        {
+            ret = detail::make_stvar<STUInt32_2>(
+                field,
+                beast::lexicalCastThrow<std::uint32_t>(
+                    value.asString()));
+        }
+        else if (value.isInt())
+        {
+            ret = detail::make_stvar<STUInt32_2>(
+                field, to_unsigned<std::uint32_t>(value.asInt()));
+        }
+        else if (value.isUInt())
+        {
+            ret = detail::make_stvar<STUInt32_2>(
+                field, safe_cast<std::uint32_t>(value.asUInt()));
+        }
+        else
+        {
+            error = bad_type(json_name, fieldName);
+            return ret;
+        }
+        return ret;
+    }
+    catch (std::exception const&)
+    {
+        error = invalid_data(json_name, fieldName);
+        return ret;
+    }
+}
 
 // helper stuff that needs to be moved to rippled
 
 template <typename T>
-SerializedTypeID getSTId() { return STI_UNKNOWN; }
+int getSTId() { return STI_UNKNOWN; }
 
 template <>
-SerializedTypeID getSTId<SF_AMOUNT>() { return STI_AMOUNT; }
+int getSTId<SF_AMOUNT>() { return STI_AMOUNT; }
 
 template <> 
-SerializedTypeID getSTId<SF_ACCOUNT>() { return STI_ACCOUNT; }
+int getSTId<SF_ACCOUNT>() { return STI_ACCOUNT; }
 
 template <> 
-SerializedTypeID getSTId<SF_UINT32>() { return STI_UINT32; }
+int getSTId<SF_UINT32>() { return STI_UINT32; }
 
-// template <> 
-// int getSTId<SF_UINT32_2>() { return STI_UINT32_2; }
+template <> 
+int getSTId<SF_UINT32_2>() { return STI_UINT32_2; }
 
 
 
@@ -728,16 +714,15 @@ extern "C"
 Container<STypeExport>
 getSTypes()
 {
-    // registerSType(STI_UINT32_2, createNewSType<SF_UINT32_2>);
-    return Container<STypeExport>{
-        // {
-        //     STI_UINT32_2,
-        //     createNewSType<SF_UINT32_2>,
-        //     parseLeafTypeNew,
-        //     constructNewSType<STUInt32_2>,
-        //     constructNewSType2<STUInt32_2>
-        // },
+    registerSType(STI_UINT32_2);
+    static STypeExport exports[] = {
+        {
+            STI_UINT32_2,
+            parseLeafTypeNew,
+        },
     };
+    STypeExport* ptr = exports;
+    return {ptr, 1};
 }
 
 extern "C"
