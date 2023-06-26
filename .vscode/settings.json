@@ -109,7 +109,8 @@
         "__memory": "cpp",
         "scoped_allocator": "cpp",
         "filesystem": "cpp",
-        "format": "cpp"
+        "format": "cpp",
+        "span": "cpp"
     },
     "cSpell.words": [
         "delitem",
