@@ -65,7 +65,7 @@ indexHash(std::uint16_t space, Args const&... args)
 Keylet
 new_escrow(AccountID const& src, std::uint32_t seq) noexcept
 {
-    return {ltESCROW, indexHash('u', src, seq)};
+    return {ltNEW_ESCROW, indexHash(NEW_ESCROW_NAMESPACE, src, seq)};
 }
 
 
@@ -134,6 +134,7 @@ preflight(PreflightContext const& ctx)
             return temMALFORMED;
     }
 
+    // TODO: get conditions working
     // if (auto const cb = ctx.tx[~sfCondition])
     // {
     //     using namespace ripple::cryptoconditions;
@@ -317,98 +318,47 @@ getTransactors()
     return {ptr, 1};
 }
 
-// extern "C"
-// std::vector<FakeSOElement>
-// getTxFormat()
-// {
-//     return std::vector<FakeSOElement>{
-//         {ripple::sfDestination.getCode(), ripple::soeREQUIRED},
-//         {ripple::sfAmount.getCode(), ripple::soeREQUIRED},
-//         {ripple::sfCondition.getCode(), ripple::soeOPTIONAL},
-//         {ripple::sfCancelAfter.getCode(), ripple::soeOPTIONAL},
-//         {ripple::sfFinishAfter.getCode(), ripple::soeOPTIONAL},
-//         {ripple::sfDestinationTag.getCode(), ripple::soeOPTIONAL},
-//         {ripple::sfTicketSequence.getCode(), ripple::soeOPTIONAL},
-//     };
-// }
 
-// struct SFieldInfo {
-//     int typeId;
-//     int fieldValue;
-//     const char * txtName;
-// };
-
-extern "C"
-Container<STypeExport>
-getSTypes()
+std::int64_t visitEntryXRPChange(
+    bool isDelete,
+    std::shared_ptr<ripple::SLE const> const& entry,
+    bool isBefore)
 {
-//     // registerSType(ripple::STI_UINT32_2, ripple::createNewSType<ripple::SF_UINT32_2>);
-    return Container<STypeExport>{
-//         // {
-//         //     ripple::STI_UINT32_2,
-//         //     ripple::createNewSType<ripple::SF_UINT32_2>,
-//         //     ripple::parseLeafTypeNew,
-//         //     ripple::constructNewSType<ripple::STUInt32_2>,
-//         //     ripple::constructNewSType2<ripple::STUInt32_2>
-//         // },
-    };
+    if (isBefore) {
+        return -1 * (*entry)[ripple::sfAmount].xrp().drops();
+    }
+    if (isDelete) return 0;
+    return (*entry)[ripple::sfAmount].xrp().drops();
 }
-
-extern "C"
-Container<STypeExport>
-getSFields()
-{
-    return {};
-}
-
-
-// std::int64_t visitEntryXRPChange(
-//     bool isDelete,
-//     std::shared_ptr<ripple::SLE const> const& entry,
-//     bool isBefore)
-// {
-//     if (isBefore) {
-//         return -1 * (*entry)[ripple::sfAmount].xrp().drops();
-//     }
-//     if (isDelete) return 0;
-//     return (*entry)[ripple::sfAmount].xrp().drops();
-// }
-
-// struct LedgerObjectInfo {
-//     std::uint16_t objectType;
-//     char const* objectName; // CamelCase
-//     char const* objectRpcName; // snake_case
-//     std::vector<FakeSOElement> objectFormat;
-//     bool isDeletionBlocker;
-//     visitEntryXRPChangePtr visitEntryXRPChange;
-//     // FakeSOElement[] innerObjectFormat; // optional
-// };
 
 extern "C"
 Container<LedgerObjectExport>
 getLedgerObjects()
 {
-    return Container<LedgerObjectExport>{
-//         {
-//             ltNEW_ESCROW,
-//             "NewEscrow",
-//             "new_escrow",
-//             std::vector<FakeSOElement>{
-//                 {ripple::sfAccount.getCode(),              ripple::soeREQUIRED},
-//                 {ripple::sfDestination.getCode(),          ripple::soeREQUIRED},
-//                 {ripple::sfAmount.getCode(),               ripple::soeREQUIRED},
-//                 {ripple::sfCondition.getCode(),            ripple::soeOPTIONAL},
-//                 {ripple::sfCancelAfter.getCode(),          ripple::soeOPTIONAL},
-//                 {ripple::sfFinishAfter.getCode(),          ripple::soeOPTIONAL},
-//                 {ripple::sfSourceTag.getCode(),            ripple::soeOPTIONAL},
-//                 {ripple::sfDestinationTag.getCode(),       ripple::soeOPTIONAL},
-//                 {ripple::sfOwnerNode.getCode(),            ripple::soeREQUIRED},
-//                 {ripple::sfPreviousTxnID.getCode(),        ripple::soeREQUIRED},
-//                 {ripple::sfPreviousTxnLgrSeq.getCode(),    ripple::soeREQUIRED},
-//                 {ripple::sfDestinationNode.getCode(),      ripple::soeOPTIONAL},
-//             },
-//             false,
-//             visitEntryXRPChange
-//         }
+    static SOElementExport format[] = {
+                {ripple::sfAccount.getCode(),              ripple::soeREQUIRED},
+                {ripple::sfDestination.getCode(),          ripple::soeREQUIRED},
+                {ripple::sfAmount.getCode(),               ripple::soeREQUIRED},
+                {ripple::sfCondition.getCode(),            ripple::soeOPTIONAL},
+                {ripple::sfCancelAfter.getCode(),          ripple::soeOPTIONAL},
+                {ripple::sfFinishAfter.getCode(),          ripple::soeOPTIONAL},
+                {ripple::sfSourceTag.getCode(),            ripple::soeOPTIONAL},
+                {ripple::sfDestinationTag.getCode(),       ripple::soeOPTIONAL},
+                {ripple::sfOwnerNode.getCode(),            ripple::soeREQUIRED},
+                {ripple::sfPreviousTxnID.getCode(),        ripple::soeREQUIRED},
+                {ripple::sfPreviousTxnLgrSeq.getCode(),    ripple::soeREQUIRED},
+                {ripple::sfDestinationNode.getCode(),      ripple::soeOPTIONAL},
     };
+    static LedgerObjectExport list[] = {
+        {
+            ltNEW_ESCROW,
+            "NewEscrow",
+            "new_escrow",
+            {format, 12},
+            false,
+            visitEntryXRPChange
+        }
+    };
+    LedgerObjectExport* ptr = list;
+    return {ptr, 1};
 }
