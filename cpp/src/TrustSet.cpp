@@ -159,6 +159,8 @@ sfQualityIn2()
     return constructCustomSField(STI_UINT32_2, 1, "QualityIn2");
 }
 
+const int temINVALID_FLAG2 = -261;
+
 NotTEC
 preflight(PreflightContext const& ctx)
 {
@@ -173,7 +175,7 @@ preflight(PreflightContext const& ctx)
     if (uTxFlags & tfTrustSetMask)
     {
         JLOG(j.trace()) << "Malformed transaction: Invalid flags set.";
-        return temINVALID_FLAG;
+        return NotTEC::fromInt(temINVALID_FLAG2);
     }
 
     STAmount const saLimitAmount(tx.getFieldAmount(sfLimitAmount));
@@ -709,6 +711,17 @@ getSTypes()
             fromSerialIter,
         },
     };
+    for (int i = 0; i < sizeof(exports) / sizeof(exports[0]); i++)
+    {
+        auto const stype = exports[i];
+        registerSType(
+            {stype.typeId,
+                stype.toString,
+                stype.toJson,
+                stype.toSerializer,
+                stype.fromSerialIter});
+        registerLeafType(stype.typeId, stype.parsePtr);
+    }
     STypeExport* ptr = exports;
     return {ptr, 1};
 }
@@ -722,5 +735,17 @@ getSFields()
         {var.fieldType, var.fieldValue, var.fieldName.c_str()},
     };
     SFieldExport* ptr = sfields;
+    return {ptr, 1};
+}
+
+extern "C"
+Container<TERExport>
+getTERcodes()
+{
+    auto const& var = sfQualityIn2();
+    static TERExport sfields[] = {
+        {temINVALID_FLAG2, "temINVALID_FLAG2", "Test code"},
+    };
+    TERExport* ptr = sfields;
     return {ptr, 1};
 }
