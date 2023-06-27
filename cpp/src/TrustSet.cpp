@@ -79,7 +79,7 @@ parseLeafTypeNew(
 }
 
 std::uint32_t
-bufferToUInt32(Buffer buf)
+bufferToUInt32(Buffer const& buf)
 {
     std::uint32_t result = 0;
     int shift = 0;
@@ -94,14 +94,14 @@ bufferToUInt32(Buffer buf)
 }
 
 std::string
-toString(Buffer buf)
+toString(Buffer const& buf)
 {
     uint32_t val = bufferToUInt32(buf);
     return std::to_string(val);
 }
 
 void
-toSerializer(Buffer& buf, Serializer& s)
+toSerializer(Buffer const& buf, Serializer& s)
 {
     uint32_t val = bufferToUInt32(buf);
     s.add32(val);
