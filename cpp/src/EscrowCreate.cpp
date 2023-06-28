@@ -30,6 +30,7 @@
 #include <ripple/protocol/digest.h>
 #include <ripple/protocol/TxFlags.h>
 #include <ripple/plugin/exports.h>
+#include <map>
 
 using namespace ripple;
 
@@ -331,6 +332,94 @@ std::int64_t visitEntryXRPChange(
     return (*entry)[ripple::sfAmount].xrp().drops();
 }
 
+class NoZeroEscrow
+{
+public:
+    static std::map<void*, NoZeroEscrow&> checks;
+    static void visitEntryExport(
+        void* id,
+        bool isDelete,
+        std::shared_ptr<SLE const> const& before,
+        std::shared_ptr<SLE const> const& after)
+    {
+        if (auto it = checks.find(id);
+            it != checks.end())
+        {
+            return it->second.visitEntry(isDelete, before, after);
+        }
+        NoZeroEscrow* check = new NoZeroEscrow();
+        check->visitEntry(isDelete, before, after);
+        checks.insert({id, *check});
+    }
+
+    static bool finalizeExport(
+        void* id,
+        STTx const& tx,
+        TER const result,
+        XRPAmount const fee,
+        ReadView const& view,
+        beast::Journal const& j)
+    {
+        if (auto it = checks.find(id);
+            it != checks.end())
+        {
+            bool const finalizeResult = it->second.finalize(tx, result, fee, view, j);
+            checks.erase(id);
+            return finalizeResult;
+        }
+        JLOG(j.fatal())
+                    << "Invariant failed: could not find matching ID";
+        return false;
+    }
+
+private:
+    bool bad_ = false;
+
+    void
+    visitEntry(
+        bool isDelete,
+        std::shared_ptr<SLE const> const& before,
+        std::shared_ptr<SLE const> const& after)
+    {
+        auto isBad = [](STAmount const& amount) {
+            if (!amount.native())
+                return true;
+
+            if (amount.xrp() <= XRPAmount{0})
+                return true;
+
+            if (amount.xrp() >= INITIAL_XRP)
+                return true;
+
+            return false;
+        };
+
+        if (before && before->getType() == ltNEW_ESCROW)
+            bad_ |= isBad((*before)[sfAmount]);
+
+        if (after && after->getType() == ltNEW_ESCROW)
+            bad_ |= isBad((*after)[sfAmount]);
+    }
+
+    bool
+    finalize(
+        STTx const&,
+        TER const,
+        XRPAmount const,
+        ReadView const&,
+        beast::Journal const& j)
+    {
+        if (bad_)
+        {
+            JLOG(j.fatal()) << "Invariant failed: new escrow specifies invalid amount";
+            return false;
+        }
+
+        return true;
+    }
+};
+std::map<void*, NoZeroEscrow&> NoZeroEscrow::checks{};
+
 extern "C"
 Container<LedgerObjectExport>
 getLedgerObjects()
@@ -360,5 +449,19 @@ getLedgerObjects()
         }
     };
     LedgerObjectExport* ptr = list;
+    return {ptr, 1};
+}
+
+extern "C"
+Container<InvariantCheckExport>
+getInvariantChecks()
+{
+    static InvariantCheckExport list[] = {
+        {
+            NoZeroEscrow::visitEntryExport,
+            NoZeroEscrow::finalizeExport,
+        }
+    };
+    InvariantCheckExport* ptr = list;
     return {ptr, 1};
 }
