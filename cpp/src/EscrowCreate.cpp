@@ -70,6 +70,9 @@ new_escrow(AccountID const& src, std::uint32_t seq) noexcept
 }
 
 
+static uint256 pluginAmendment;
+
+
 /** Has the specified time passed?
 
     @param now  the current time
@@ -103,6 +106,9 @@ calculateBaseFee(ReadView const& view, STTx const& tx)
 NotTEC
 preflight(PreflightContext const& ctx)
 {
+    if (!ctx.rules.enabled(pluginAmendment))
+        return temDISABLED;
+
     if (ctx.rules.enabled(fix1543) && ctx.tx.getFlags() & tfUniversalMask)
         return temINVALID_FLAG;
 
@@ -463,5 +469,22 @@ getInvariantChecks()
         }
     };
     InvariantCheckExport* ptr = list;
+    return {ptr, 1};
+}
+
+extern "C"
+Container<AmendmentExport>
+getAmendments()
+{
+    AmendmentExport const amendment = {
+        "featurePluginTest",
+        true,
+        VoteBehavior::DefaultNo,
+    };
+    pluginAmendment = registerPluginAmendment(amendment);
+    static AmendmentExport list[] = {
+        amendment
+    };
+    AmendmentExport* ptr = list;
     return {ptr, 1};
 }

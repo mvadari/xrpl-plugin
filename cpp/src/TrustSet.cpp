@@ -159,11 +159,16 @@ sfQualityIn2()
     return constructCustomSField(STI_UINT32_2, 1, "QualityIn2");
 }
 
+static uint256 pluginAmendment;
+
 const int temINVALID_FLAG2 = -261;
 
 NotTEC
 preflight(PreflightContext const& ctx)
 {
+    if (!ctx.rules.enabled(pluginAmendment))
+        return temDISABLED;
+
     if (auto const ret = preflight1(ctx); !isTesSuccess(ret))
         return ret;
 
@@ -747,5 +752,23 @@ getTERcodes()
         {temINVALID_FLAG2, "temINVALID_FLAG2", "Test code"},
     };
     TERExport* ptr = sfields;
+    return {ptr, 1};
+}
+
+
+extern "C"
+Container<AmendmentExport>
+getAmendments()
+{
+    AmendmentExport const amendment = {
+        "featurePluginTest",
+        true,
+        VoteBehavior::DefaultNo,
+    };
+    pluginAmendment = registerPluginAmendment(amendment);
+    static AmendmentExport list[] = {
+        amendment
+    };
+    AmendmentExport* ptr = list;
     return {ptr, 1};
 }
