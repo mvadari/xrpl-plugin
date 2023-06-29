@@ -305,7 +305,7 @@ getTransactors()
     static TransactorExport list[] = {
         {
             "NewEscrowCreate",
-            30,
+            50,
             {
                 formatPtr, 7
             },

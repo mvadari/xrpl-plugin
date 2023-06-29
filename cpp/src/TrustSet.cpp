@@ -22,6 +22,7 @@
 #include <ripple/protocol/Feature.h>
 #include <ripple/protocol/Indexes.h>
 #include <ripple/protocol/Quality.h>
+#include <ripple/protocol/SField.h>
 #include <ripple/protocol/st.h>
 #include <ripple/protocol/ErrorCodes.h>
 #include <ripple/beast/core/LexicalCast.h>
@@ -329,8 +330,6 @@ doApply(ApplyContext& ctx, XRPAmount mPriorBalance, XRPAmount mSourceBalance)
                           : ctx.view().fees().accountReserve(uOwnerCount + 1));
 
     const ripple::STPluginType qualityIn = ctx.tx.getFieldPluginType(sfQualityIn2());
-    std::cout << "HIIIIIIIIIIIII" << std::endl;
-    std::cout << qualityIn.getText() << std::endl;
     std::uint32_t uQualityIn(bQualityIn ? static_cast<uint32_t>(std::stoul(qualityIn.getText())) : 0);
     std::uint32_t uQualityOut(
         bQualityOut ? ctx.tx.getFieldU32(sfQualityOut) : 0);
@@ -682,7 +681,7 @@ getTransactors()
     static TransactorExport list[] = {
         {
             "TrustSet2",
-            30,
+            50,
             {
                 formatPtr, 4
             },
