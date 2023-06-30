@@ -450,7 +450,8 @@ getLedgerObjects()
             "NewEscrow",
             "new_escrow",
             {format, 12},
-            false,
+            true,
+            NULL,
             visitEntryXRPChange
         }
     };
