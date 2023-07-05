@@ -7,7 +7,6 @@
 #include <ripple/protocol/TxFlags.h>
 #include <ripple/protocol/Feature.h>
 #include <ripple/ledger/View.h>
-#include <ripple/protocol/impl/STVar.h>
 #include <ripple/protocol/digest.h>
 #include <map>
 #include <iostream>
@@ -62,7 +61,6 @@ wrappedNewSField(const int fieldValue, std::string const fieldName)
 ripple::SField const& constructCustomSField(int tid, int fv, const char* fn) {
     if (ripple::SField const& field = ripple::SField::getField(ripple::field_code(tid, fv)); field != ripple::sfInvalid)
         return field;
-    ripple::registerSType(tid);
     return *(new ripple::TypedField<ripple::STPluginType>(tid, fv, fn));
 }
 
@@ -456,14 +454,6 @@ PYBIND11_MODULE(plugin_transactor, m) {
     * STObjects
     */
 
-    py::class_<ripple::detail::STVar> STVar(m, "STVar");
-    STVar
-        .def("get",
-            [](const ripple::detail::STVar &var) {
-                return var.get();
-            }
-        );
-
     py::class_<ripple::STBase> STBase(m, "STBase");
     STBase
         .def("get_fname",
@@ -777,7 +767,10 @@ PYBIND11_MODULE(plugin_transactor, m) {
         .def_readonly("base_fee", &ripple::ApplyContext::baseFee)
         .def_readonly("journal", &ripple::ApplyContext::journal)
         .def("deliver", &ripple::ApplyContext::deliver)
-        .def("view", &ripple::ApplyContext::view, py::return_value_policy::reference);
+        .def_property_readonly("view",
+            [](const ripple::ApplyContext &ctx) -> const ripple::ApplyView& {
+                return ctx.view();
+            }, py::return_value_policy::reference);
     
     // py::register_exception<ripple::LogicError>(m, "LogicError");
     
@@ -833,15 +826,16 @@ PYBIND11_MODULE(plugin_transactor, m) {
                 char const* objectName,
                 std::vector<py::object> objectFormat)
             {
-                std::vector<ripple::FakeSOElement> temp{};
+                std::vector<ripple::SOElementExport> temp{};
                 for (py::object variable: objectFormat)
                 {
                     py::tuple tup = variable.cast<py::tuple>();
                     auto sfield = tup[0].cast<WSF>();
                     auto varType = tup[1].cast<ripple::SOEStyle>();
-                    temp.emplace_back(ripple::FakeSOElement{static_cast<ripple::SField const&>(sfield).getCode(), varType});
+                    temp.emplace_back(ripple::SOElementExport{static_cast<ripple::SField const&>(sfield).getCode(), varType});
                 }
-                ripple::registerLedgerObject(objectType, objectName, temp);
+                ripple::Container<ripple::SOElementExport> format = {temp.data(), static_cast<int>(temp.size())};
+                ripple::registerLedgerObject(objectType, objectName, format);
             })
         .def("describe_owner_dir", &ripple::describeOwnerDir)
         .def("adjust_owner_count", &ripple::adjustOwnerCount)
@@ -877,7 +871,7 @@ PYBIND11_MODULE(plugin_transactor, m) {
         .def("non_object_in_array", &ripple::non_object_in_array)
         .def("parse_base58", py::overload_cast<std::string const&>(&ripple::parseBase58<ripple::AccountID>))
         .def("parse_base58", py::overload_cast<std::string const&>(&ripple::parseBase58<ripple::Seed>))
-        .def("parse_base58", py::overload_cast<std::string const&>(&ripple::parseBase58<ripple::PublicKey>))
+        // .def("parse_base58", py::overload_cast<std::string const&>(&ripple::parseBase58<ripple::PublicKey>))
         .def("make_stplugintype", 
             [](const WSF &wsf, ripple::Buffer& b) {
                 ripple::SField const &f = static_cast<ripple::SField const&>(wsf);

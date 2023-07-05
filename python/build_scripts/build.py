@@ -63,6 +63,7 @@ def generate_cpp(tx_name, tx_type, module_name, python_folder):
 #include <ripple/basics/XRPAmount.h>
 #include <ripple/ledger/ApplyView.h>
 #include <ripple/ledger/View.h>
+#include <ripple/plugin/exports.h>
 #include <ripple/protocol/Feature.h>
 #include <ripple/protocol/TER.h>
 #include <ripple/protocol/TxFlags.h>
@@ -159,13 +160,6 @@ doApply(ApplyContext& ctx, XRPAmount mPriorBalance, XRPAmount mSourceBalance)
 }}
 
 extern "C"
-XRPAmount
-calculateBaseFee(ReadView const& view, STTx const& tx)
-{{
-    return Transactor::calculateBaseFee(view, tx);
-}}
-
-extern "C"
 char const*
 getTxName()
 {{
@@ -196,11 +190,11 @@ getTTName()
 }}
 
 extern "C"
-std::vector<FakeSOElement>
+std::vector<SOElementExport>
 getTxFormat()
 {{
-    static std::vector<FakeSOElement> const txFormat = []{{
-        std::vector<FakeSOElement> temp = {{}};
+    static std::vector<SOElementExport> const txFormat = []{{
+        std::vector<SOElementExport> temp = {{}};
         py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
         py::module_::import("sys").attr("path").attr("append")("{python_folder}");
         auto tx_format = py::module_::import("{module_name}").attr("tx_format").cast<std::vector<py::object>>();
@@ -209,21 +203,16 @@ getTxFormat()
             py::tuple tup = variable.cast<py::tuple>();
             WSF sfield = tup[0].cast<WSF>();
             SOEStyle varType = tup[1].cast<SOEStyle>();
-            temp.emplace_back(FakeSOElement{{static_cast<SField const&>(sfield).getCode(), varType}});
+            temp.emplace_back(SOElementExport{{static_cast<SField const&>(sfield).getCode(), varType}});
         }}
         return temp;
     }}();
     return txFormat;
 }}
 
-struct STypeExport {{
-    int typeId;
-    parseLeafTypePtr parsePtr;
-}};
-
 static std::map<int, std::string> parseSTypeFunctions;
 
-std::optional<detail::STVar>
+Buffer
 parseLeafTypePython(
     SField const& field,
     std::string const& json_name,
@@ -251,11 +240,11 @@ parseLeafTypePython(
             if (!tup[1].is_none())
             {{
                 error = tup[1].cast<Json::Value>();
-                std::optional<detail::STVar> ret;
+                Buffer ret;
                 return ret;
             }}
-            auto const stVar = tup[0].cast<std::optional<detail::STVar>>();
-            return tup[0].cast<std::optional<detail::STVar>>();
+            auto const stVar = tup[0].cast<Buffer>();
+            return tup[0].cast<Buffer>();
         }} catch (py::error_already_set& e) {{
             // Print the error message
             const char* errorMessage = e.what();
@@ -264,7 +253,7 @@ parseLeafTypePython(
         }}
     }}
 
-    std::optional<detail::STVar> ret;
+    Buffer ret;
     error = unknown_type(json_name, fieldName, field.fieldType);
     return ret;
 }}
@@ -298,11 +287,11 @@ getSTypes()
 
 
 extern "C"
-std::vector<SFieldInfo>
+std::vector<SFieldExport>
 getSFields()
 {{
-    static std::vector<SFieldInfo> const sFields = []{{
-        std::vector<SFieldInfo> temp = {{}};
+    static std::vector<SFieldExport> const sFields = []{{
+        std::vector<SFieldExport> temp = {{}};
         py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
         py::module_::import("sys").attr("path").attr("append")("{python_folder}");
         py::module pluginImport = py::module_::import("{module_name}");
@@ -313,8 +302,8 @@ getSFields()
         for (py::object variable: new_sfields)
         {{
             WSF wrappedSField = variable.cast<WSF>();
-            SField sfield = static_cast<SField const&>(wrappedSField);
-            temp.emplace_back(SFieldInfo{{
+            SField const& sfield = static_cast<SField const&>(wrappedSField);
+            temp.emplace_back(SFieldExport{{
                 sfield.fieldType,
                 sfield.fieldValue,
                 sfield.jsonName}});
@@ -357,80 +346,72 @@ std::int64_t visitEntryXRPChange(
     }}
 }}
 
-struct LedgerObjectInfoInternal {{
-    std::uint16_t objectType;
-    std::string objectName; // CamelCase
-    std::string objectRpcName; // snake_case
-    std::vector<FakeSOElement> objectFormat;
+struct LedgerObjectExportInternal {{
+    std::uint16_t type;
+    std::string name; // CamelCase
+    std::string rpcName; // snake_case
+    std::vector<SOElementExport> format;
     bool isDeletionBlocker;
-    std::optional<visitEntryXRPChangePtr> visitEntryXRPChange;
-    // FakeSOElement[] innerObjectFormat; // optional
+    DeleterFuncPtr deleteFn;
+    visitEntryXRPChangePtr visitEntryXRPChange;
 }};
 
-struct LedgerObjectInfo {{
-    std::uint16_t objectType;
-    char const* objectName; // CamelCase
-    char const* objectRpcName; // snake_case
-    std::vector<FakeSOElement> objectFormat;
-    bool isDeletionBlocker;
-    std::optional<visitEntryXRPChangePtr> visitEntryXRPChange;
-    // FakeSOElement[] innerObjectFormat; // optional
-}};
-
-LedgerObjectInfo
-mutate(LedgerObjectInfoInternal const& obj)
+LedgerObjectExport
+mutate(LedgerObjectExportInternal const& obj)
 {{
-    return LedgerObjectInfo{{
-        obj.objectType,
-        obj.objectName.c_str(),
-        obj.objectRpcName.c_str(),
-        obj.objectFormat,
+    return LedgerObjectExport{{
+        obj.type,
+        obj.name.c_str(),
+        obj.rpcName.c_str(),
+        {{const_cast<SOElementExport *>(obj.format.data()), static_cast<int>(obj.format.size())}},
         obj.isDeletionBlocker,
+        obj.deleteFn,
         obj.visitEntryXRPChange,
     }};
 }}
 
 
 extern "C"
-std::vector<LedgerObjectInfo>
+std::vector<LedgerObjectExport>
 getLedgerObjects()
 {{
-    static std::vector<LedgerObjectInfoInternal> const objects = []{{
+    static std::vector<LedgerObjectExportInternal> const objects = []{{
         py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
         py::module_::import("sys").attr("path").attr("append")("{python_folder}");
         py::module_ module = py::module_::import("{module_name}");
-        std::vector<LedgerObjectInfoInternal> temp = {{}};
+        std::vector<LedgerObjectExportInternal> temp = {{}};
         if (!hasattr(module, "new_ledger_objects")) {{
             return temp;
         }}
         auto objects = module.attr("new_ledger_objects").cast<std::vector<py::object>>();
         for (py::object object: objects)
         {{
-            std::vector<FakeSOElement> objectFormat{{}};
+            std::vector<SOElementExport> objectFormat{{}};
             auto pythonObjectFormat = object.attr("object_format").cast<std::vector<py::object>>();
             for (py::object variable: pythonObjectFormat)
             {{
                 py::tuple tup = variable.cast<py::tuple>();
                 WSF sfield = tup[0].cast<WSF>();
                 SOEStyle varType = tup[1].cast<SOEStyle>();
-                objectFormat.emplace_back(FakeSOElement{{
+                objectFormat.emplace_back(SOElementExport{{
                     static_cast<SField const&>(sfield).getCode(),
                     varType}});
             }}
             auto const objectType = object.attr("object_type").cast<std::uint16_t>();
             py::function visitFn = object.attr("visit_entry_xrp_change").cast<py::function>();
             visitEntryXRPChangeFunctions.insert({{objectType, visitFn.attr("__name__").cast<std::string>()}});
-            temp.emplace_back(LedgerObjectInfoInternal{{
+            temp.emplace_back(LedgerObjectExportInternal{{
                 objectType,
                 object.attr("object_name").cast<std::string>(),
                 object.attr("object_rpc_name").cast<std::string>(),
                 std::move(objectFormat),
                 object.attr("is_deletion_blocker").cast<bool>(),
+                nullptr,  // TODO: fix
                 visitEntryXRPChange}});
         }}
         return temp;
     }}();
-    static std::vector<LedgerObjectInfo> output;
+    static std::vector<LedgerObjectExport> output;
     output.reserve(objects.size());
     std::transform(objects.begin(), objects.end(), std::back_inserter(output), mutate);
 
@@ -463,20 +444,22 @@ def create_files(python_file):
 
 def build_files(cpp_file, project_name):
     with tempfile.TemporaryDirectory() as build_temp:
-        build_temp = "./build"
+        build_temp = "./build/test"
         build_source_dir = os.path.dirname(__file__)
+        conan_source_dir = os.path.dirname(build_source_dir)
+        conan_build_dir = os.path.join(conan_source_dir, "build", "generators")
         cmake_args = []
         build_args = []
         subprocess.run([
             "conan",
             "install",
-            build_source_dir,
+            conan_source_dir,
             "--build",
             "missing",
             "--settings",
             "build_type=Debug"
         ], check=True, cwd=build_temp, stdout=subprocess.DEVNULL)
-        conan_cmake_file = os.path.join(build_temp, "generators/conan_toolchain.cmake")
+        conan_cmake_file = os.path.join(conan_build_dir, "conan_toolchain.cmake")
         cmake_args += [
             f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={os.getcwd()}{os.sep}",
             f"-DPROJECT_NAME={project_name}",
