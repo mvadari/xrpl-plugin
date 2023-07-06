@@ -1,6 +1,3 @@
-from typing import Callable, List, Optional, Tuple
-from dataclasses import dataclass
-
 from plugin_transactor import (
     tesSUCCESS,
     temINVALID_FLAG,
@@ -35,7 +32,6 @@ from plugin_transactor import (
     sf_destination_tag,
     sf_ticket_sequence,
     STUInt32,
-    STBase,
     construct_custom_sfield,
     bad_type,
     AccountID,
@@ -45,44 +41,15 @@ from plugin_transactor import (
     sf_previous_txn_id,
     sf_previous_txn_lgr_seq,
     sf_destination_node,
-    SField,
-    SOEStyle,
     index_hash,
     Keylet,
-    register_ledger_object,
-    STLedgerEntry,
-    parse_base58
+    parse_base58,
+    ConsequencesFactoryType,
+    sf_finish_after,
+    sf_destination,
 )
-import plugin_transactor
 
-
-# TODO: helper function, move this to the package
-def create_new_sfield(cls, field_name, field_value):
-    if not issubclass(cls, STBase):
-        raise Exception("SField must be of an `ST` type.")
-    fn_name = f"create_new_sfield_{cls.__name__}"
-    create_fn = getattr(plugin_transactor, fn_name, None)
-    if create_fn is None:
-        # NOTE: This should never be hit in prod
-        # It may be hit during dev work since not everything is implemented yet
-        raise Exception(
-            f"`create_new_sfield` function does not exist for {cls.__name__}"
-        )
-    return create_fn(field_value, field_name)
-
-
-# TODO: helper class, move this to the package
-@dataclass(frozen=True)
-class NewLedgerObject:
-    object_type: int
-    object_name: str
-    object_rpc_name: str
-    object_format: List[Tuple[SField, SOEStyle]]
-    is_deletion_blocker: bool = False
-    visit_entry_xrp_change: Optional[Callable[[bool, STLedgerEntry, bool], int]] = None
-
-    def __post_init__(self):
-        register_ledger_object(self.object_type, self.object_name, self.object_format)
+from utils import LedgerObject, Transactor, create_new_sfield
 
 
 sf_finish_after2 = create_new_sfield(STUInt32, "FinishAfter2", 47)
@@ -108,10 +75,10 @@ def parse_account2(field, json_name, field_name, _name, value):
         return None, invalid_data(json_name, field_name)
 
 
-sf_destination2 = construct_custom_sfield(STI_ACCOUNT2, "Destination2", 1)
+# sf_destination2 = construct_custom_sfield(STI_ACCOUNT2, "Destination2", 1)
 
-new_stypes = [(STI_ACCOUNT2, parse_account2)]
-new_sfields = [sf_finish_after2, sf_destination2]
+# new_stypes = [(STI_ACCOUNT2, parse_account2)]
+# new_sfields = [sf_finish_after2]  # , sf_destination2]
 
 
 ltNEW_ESCROW = 0x74
@@ -126,18 +93,18 @@ def visit_entry_xrp_change_escrow(is_delete, entry, is_before):
     return entry[sf_amount].xrp().drops
 
 
-new_ledger_objects = [
-    NewLedgerObject(
+ledger_objects = [
+    LedgerObject(
         ltNEW_ESCROW,
         "NewEscrow",
         "new_escrow",
         [
             (sf_account,              soeREQUIRED),
-            (sf_destination2,          soeREQUIRED),
+            (sf_destination,          soeREQUIRED),
             (sf_amount,               soeREQUIRED),
             (sf_condition,            soeOPTIONAL),
             (sf_cancel_after,          soeOPTIONAL),
-            (sf_finish_after2,          soeOPTIONAL),
+            (sf_finish_after,          soeOPTIONAL),
             (sf_source_tag,            soeOPTIONAL),
             (sf_destination_tag,       soeOPTIONAL),
             (sf_owner_node,            soeREQUIRED),
@@ -153,20 +120,6 @@ new_ledger_objects = [
 
 def new_escrow_keylet(src, seq):
     return Keylet(ltNEW_ESCROW, index_hash(NEW_ESCROW_NAMESPACE, src, seq))
-
-
-tx_name = "NewEscrowCreate"
-tx_type = 47
-
-tx_format = [
-    (sf_destination2, soeREQUIRED),
-    (sf_amount, soeREQUIRED),
-    (sf_condition, soeOPTIONAL),
-    (sf_cancel_after, soeOPTIONAL),
-    (sf_finish_after2, soeOPTIONAL),
-    (sf_destination_tag, soeOPTIONAL),
-    (sf_ticket_sequence, soeOPTIONAL)
-]
 
 
 def after(now, mark):
@@ -189,16 +142,16 @@ def preflight(ctx):
         return temBAD_AMOUNT
 
     if not ctx.tx.is_field_present(sf_cancel_after) and \
-            not ctx.tx.is_field_present(sf_finish_after2):
+            not ctx.tx.is_field_present(sf_finish_after):
         return temBAD_EXPIRATION
 
     if ctx.tx.is_field_present(sf_cancel_after) and \
-        ctx.tx.is_field_present(sf_finish_after2) and \
-            ctx.tx[sf_cancel_after] <= ctx.tx[sf_finish_after2]:
+        ctx.tx.is_field_present(sf_finish_after) and \
+            ctx.tx[sf_cancel_after] <= ctx.tx[sf_finish_after]:
         return temBAD_EXPIRATION
 
     if ctx.rules.enabled(fix1571):
-        if not ctx.tx.is_field_present(sf_finish_after2) and \
+        if not ctx.tx.is_field_present(sf_finish_after) and \
                 not ctx.tx.is_field_present(sf_condition):
             return temMALFORMED
 
@@ -215,8 +168,8 @@ def do_apply(ctx, _m_prior_balance, _m_source_balance):
                 after(close_time, ctx.tx[sf_cancel_after]):
             return tecNO_PERMISSION
 
-        if ctx.tx.is_field_present(sf_finish_after2) and \
-                after(close_time, ctx.tx[sf_finish_after2]):
+        if ctx.tx.is_field_present(sf_finish_after) and \
+                after(close_time, ctx.tx[sf_finish_after]):
             return tecNO_PERMISSION
 
     account = ctx.tx[sf_account]
@@ -232,7 +185,7 @@ def do_apply(ctx, _m_prior_balance, _m_source_balance):
     if balance < reserve + STAmount(ctx.tx[sf_amount]).xrp():
         return tecUNFUNDED
 
-    dest_acct = AccountID.from_buffer(ctx.tx[sf_destination2])
+    dest_acct = AccountID.from_buffer(ctx.tx[sf_destination])
 
     sled = ctx.view().peek(account_keylet(dest_acct))
     if not sled:
@@ -246,7 +199,7 @@ def do_apply(ctx, _m_prior_balance, _m_source_balance):
     slep[sf_account] = account
     amount = ctx.tx[sf_amount]
     slep[sf_amount] = amount
-    slep[sf_destination2] = ctx.tx[sf_destination2]
+    slep[sf_destination] = ctx.tx[sf_destination]
     ctx.view().insert(slep)
 
     page = ctx.view().dir_insert(account, keylet)
@@ -265,3 +218,23 @@ def do_apply(ctx, _m_prior_balance, _m_source_balance):
     ctx.view().update(sle)
 
     return tesSUCCESS
+
+
+transactors = [
+    Transactor(
+        name="NewEscrowCreate",
+        tx_type=47,
+        tx_format=[
+            (sf_destination, soeREQUIRED),
+            (sf_amount, soeREQUIRED),
+            (sf_condition, soeOPTIONAL),
+            (sf_cancel_after, soeOPTIONAL),
+            (sf_finish_after, soeOPTIONAL),
+            (sf_destination_tag, soeOPTIONAL),
+            (sf_ticket_sequence, soeOPTIONAL)
+        ],
+        consequences_factory_type=ConsequencesFactoryType.Normal,
+        preflight=preflight,
+        do_apply=do_apply,
+    )
+]

@@ -661,6 +661,30 @@ PYBIND11_MODULE(plugin_transactor, m) {
         .def_readonly("close_time", &ripple::LedgerInfo::closeTime)
     ;
 
+    py::enum_<ripple::Transactor::ConsequencesFactoryType>(m, "ConsequencesFactoryType")
+        .value("Normal", ripple::Transactor::ConsequencesFactoryType::Normal)
+        .value("Blocker", ripple::Transactor::ConsequencesFactoryType::Blocker)
+        .value("Custom", ripple::Transactor::ConsequencesFactoryType::Custom);
+
+    py::enum_<ripple::TxConsequences::Category>(m, "TxConsequencesCategory")
+        .value("normal", ripple::TxConsequences::Category::normal)
+        .value("blocker", ripple::TxConsequences::Category::blocker);
+
+    py::class_<ripple::TxConsequences> TxConsequences(m, "TxConsequences");
+    TxConsequences
+        .def(py::init<ripple::NotTEC>())
+        .def(py::init<ripple::STTx>())
+        .def(py::init<ripple::STTx, ripple::TxConsequences::Category>())
+        .def(py::init<ripple::STTx, ripple::XRPAmount>())
+        .def(py::init<ripple::STTx, std::uint32_t>())
+        .def("fee", &ripple::TxConsequences::fee)
+        .def("potential_spend", &ripple::TxConsequences::potentialSpend)
+        .def("seq_proxy", &ripple::TxConsequences::seqProxy)
+        .def("sequences_consumed", &ripple::TxConsequences::sequencesConsumed)
+        .def("is_blocker", &ripple::TxConsequences::isBlocker)
+        .def("following_seq", &ripple::TxConsequences::followingSeq)
+    ;
+
     py::class_<ripple::Application> Application(m, "Application");
 
     py::class_<ripple::ReadView> ReadView(m, "ReadView");
@@ -767,7 +791,7 @@ PYBIND11_MODULE(plugin_transactor, m) {
         .def_readonly("base_fee", &ripple::ApplyContext::baseFee)
         .def_readonly("journal", &ripple::ApplyContext::journal)
         .def("deliver", &ripple::ApplyContext::deliver)
-        .def_property_readonly("view",
+        .def("view",
             [](const ripple::ApplyContext &ctx) -> const ripple::ApplyView& {
                 return ctx.view();
             }, py::return_value_policy::reference);

@@ -14,14 +14,9 @@ from plugin_transactor import (
     sf_ticket_sequence,
     sf_account,
     soeOPTIONAL,
+    ConsequencesFactoryType,
 )
-
-tx_name = "DummyTx"
-tx_type = 30
-tx_format = [
-    (sf_regular_key, soeOPTIONAL),
-    (sf_ticket_sequence, soeOPTIONAL)
-]
+from utils import Transactor
 
 
 def preflight(ctx):
@@ -39,6 +34,7 @@ def preflight(ctx):
 
     return preflight2(ctx)
 
+
 def do_apply(ctx, _mPriorBalance, _mSourceBalance):
     account = ctx.tx[sf_account]
     sle = ctx.view().peek(account_keylet(account))
@@ -52,3 +48,18 @@ def do_apply(ctx, _mPriorBalance, _mSourceBalance):
 
         del sle[sf_regular_key]
     return tesSUCCESS
+
+
+transactors = [
+    Transactor(
+        name="DummyTx",
+        tx_type=50,
+        tx_format=[
+            (sf_regular_key, soeOPTIONAL),
+            (sf_ticket_sequence, soeOPTIONAL)
+        ],
+        consequences_factory_type=ConsequencesFactoryType.Normal,
+        preflight=preflight,
+        do_apply=do_apply,
+    )
+]

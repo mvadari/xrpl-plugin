@@ -135,7 +135,7 @@ setup(
     version="0.0.1",
     author="Mayukha Vadari",
     author_email="mvadari@ripple.com",
-    description="A test project using pybind11 and CMake",
+    description="XRPL Plugins",
     long_description="",
     ext_modules=[CMakeExtension("plugin_transactor")],
     cmdclass={"build_ext": CMakeBuild},
