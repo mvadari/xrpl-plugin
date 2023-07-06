@@ -65,17 +65,20 @@ class LedgerObject:
     object_type: int
     name: str
     rpc_name: str
-    format: List[Tuple[SField, SOEStyle]]
+    object_format: List[Tuple[SField, SOEStyle]]
     is_deletion_blocker: bool = False
-    deleter_function: Optional[Callable[
+    delete_object: Optional[Callable[[
         Application,
         ApplyView,
         AccountID,
         uint256,
         STLedgerEntry,
         Journal
-    ]] = None
+    ], TER]] = None
     visit_entry_xrp_change: Optional[Callable[[bool, STLedgerEntry, bool], int]] = None
 
     def __post_init__(self):
-        register_ledger_object(self.object_type, self.name, self.format)
+        if self.is_deletion_blocker and self.delete_object is not None:
+            raise Exception("Cannot have `delete_object` if `is_deletion_blocker` is True")
+        if not self.is_deletion_blocker and self.delete_object is None:
+            raise Exception("Must have `delete_object` if `is_deletion_blocker` is False")

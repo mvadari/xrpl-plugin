@@ -261,7 +261,7 @@ struct TransactorExportInternal {{
 }};
 
 TransactorExport
-mutate(TransactorExportInternal const& tx)
+mutateTransactor(TransactorExportInternal const& tx)
 {{
     return TransactorExport{{
         tx.txName.c_str(),
@@ -311,13 +311,11 @@ getTransactors()
                     varType}});
             }}
 
-            auto txName = transactor.attr("name").cast<std::string>();
-            auto consequencesFactoryType = transactor.attr("consequences_factory_type").cast<Transactor::ConsequencesFactoryType>();
             auto exportedTx = TransactorExportInternal{{
-                txName,
+                transactor.attr("name").cast<std::string>(),
                 txType,
                 format,
-                consequencesFactoryType,
+                transactor.attr("consequences_factory_type").cast<Transactor::ConsequencesFactoryType>(),
                 transactor.attr("make_tx_consequences").is_none() ? nullptr : makeTxConsequences,
                 transactor.attr("calculate_base_fee").is_none() ? nullptr : calculateBaseFee,
                 transactor.attr("preflight").is_none() ? nullptr : preflight,
@@ -335,8 +333,186 @@ getTransactors()
     }}();
     static std::vector<TransactorExport> output;
     output.reserve(transactors.size());
-    std::transform(transactors.begin(), transactors.end(), std::back_inserter(output), mutate);
+    std::transform(transactors.begin(), transactors.end(), std::back_inserter(output), mutateTransactor);
     return {{const_cast<TransactorExport *>(output.data()), static_cast<int>(output.size())}};
+}}
+
+// ----------------------------------------------------------------------------
+// Ledger Objects
+// ----------------------------------------------------------------------------
+
+static std::map<std::uint16_t, int> ledgerObjectTypeToIndexMap;
+
+struct LedgerObjectExportInternal {{
+    std::uint16_t type;
+    std::string name; // CamelCase
+    std::string rpcName; // snake_case
+    std::vector<SOElementExport> format;
+    bool isDeletionBlocker;
+    DeleterFuncPtr deleteFn;
+    visitEntryXRPChangePtr visitEntryXRPChange;
+}};
+
+LedgerObjectExport
+mutate(LedgerObjectExportInternal const& obj)
+{{
+    return LedgerObjectExport{{
+        obj.type,
+        obj.name.c_str(),
+        obj.rpcName.c_str(),
+        {{const_cast<SOElementExport *>(obj.format.data()), static_cast<int>(obj.format.size())}},
+        obj.isDeletionBlocker,
+        obj.deleteFn,
+        obj.visitEntryXRPChange,
+    }};
+}}
+
+py::object
+getLedgerObjectFromPython(std::uint16_t object)
+{{
+    py::module_::import("sys").attr("path").attr("append")("{python_folder}");
+    py::module module = py::module_::import("{module_name}");
+    if (auto it = ledgerObjectTypeToIndexMap.find(object);
+        it != ledgerObjectTypeToIndexMap.end())
+    {{
+        int index = it->second;
+        return module.attr("ledger_objects")[py::cast(index)];
+    }}
+    std::string errorMessage = "Cannot find ledger object type value " + std::to_string(object);
+    std::cout << "Python Processing Error: " << errorMessage << std::endl;
+    throw std::runtime_error(errorMessage);
+}}
+
+TER
+deleteObject(
+    Application& app,
+    ApplyView& view,
+    AccountID const& account,
+    uint256 const& delIndex,
+    std::shared_ptr<SLE> const& sleDel,
+    beast::Journal j)
+{{
+    py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+    py::object object = getLedgerObjectFromPython(sleDel->getType());
+    py::object function = object.attr("delete_object");
+    try {{
+        py::object ret = function(
+            py::cast(app, py::return_value_policy::reference),
+            py::cast(view, py::return_value_policy::reference),
+            py::cast(account, py::return_value_policy::reference),
+            delIndex,
+            py::cast(sleDel, py::return_value_policy::reference),
+            py::cast(j, py::return_value_policy::reference)
+        );
+        return TER::fromInt(ret.cast<int>());
+    }} catch (py::error_already_set& e) {{
+        // Print the error message
+        const char* errorMessage = e.what();
+        std::cout << "Python Error: " << errorMessage << std::endl;
+        throw;
+    }}
+}}
+
+std::int64_t
+visitEntryXRPChange(
+    bool isDelete,
+    std::shared_ptr<STLedgerEntry const> const& entry,
+    bool isBefore)
+{{
+    py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+    py::object object = getLedgerObjectFromPython(entry->getType());
+    py::object function = object.attr("visit_entry_xrp_change");
+    try {{
+        py::object ret = function(
+            isDelete,
+            py::cast(entry, py::return_value_policy::reference),
+            isBefore
+        );
+        return ret.cast<std::int64_t>();
+    }} catch (py::error_already_set& e) {{
+        // Print the error message
+        const char* errorMessage = e.what();
+        std::cout << "Python Error: " << errorMessage << std::endl;
+        throw;
+    }}
+}}
+
+extern "C"
+Container<LedgerObjectExport>
+getLedgerObjects()
+{{
+    static std::vector<LedgerObjectExportInternal> const objects = []{{
+        py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+        py::module_::import("sys").attr("path").attr("append")("{python_folder}");
+        py::module_ module = py::module_::import("{module_name}");
+        std::vector<LedgerObjectExportInternal> temp = {{}};
+        if (!hasattr(module, "ledger_objects")) {{
+            return temp;
+        }}
+        auto objects = module.attr("ledger_objects").cast<std::vector<py::object>>();
+        for (int i = 0; i < objects.size(); i++)
+        {{
+            py::object object = objects[i];
+            auto objectType = object.attr("object_type").cast<std::uint16_t>();
+            ledgerObjectTypeToIndexMap.insert({{objectType, i}});
+
+            std::vector<SOElementExport> objectFormat{{}};
+            auto pythonObjectFormat = object.attr("object_format").cast<std::vector<py::object>>();
+            for (py::object variable: pythonObjectFormat)
+            {{
+                py::tuple tup = variable.cast<py::tuple>();
+                WSF sfield = tup[0].cast<WSF>();
+                SOEStyle varType = tup[1].cast<SOEStyle>();
+                objectFormat.emplace_back(SOElementExport{{
+                    static_cast<SField const&>(sfield).getCode(),
+                    varType}});
+            }}
+            temp.emplace_back(LedgerObjectExportInternal{{
+                objectType,
+                object.attr("name").cast<std::string>(),
+                object.attr("rpc_name").cast<std::string>(),
+                std::move(objectFormat),
+                object.attr("is_deletion_blocker").cast<bool>(),
+                object.attr("delete_object").is_none() ? nullptr : deleteObject,
+                object.attr("visit_entry_xrp_change").is_none() ? nullptr : visitEntryXRPChange}});
+        }}
+        return temp;
+    }}();
+    static std::vector<LedgerObjectExport> output;
+    output.reserve(objects.size());
+    std::transform(objects.begin(), objects.end(), std::back_inserter(output), mutate);
+    return {{const_cast<LedgerObjectExport *>(output.data()), static_cast<int>(output.size())}};
+}}
+
+// ----------------------------------------------------------------------------
+// SFields
+// ----------------------------------------------------------------------------
+
+extern "C"
+Container<SFieldExport>
+getSFields()
+{{
+    static std::vector<SFieldExport> const sFields = []{{
+        std::vector<SFieldExport> temp = {{}};
+        py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+        py::module_::import("sys").attr("path").attr("append")("{python_folder}");
+        py::module pluginImport = py::module_::import("{module_name}");
+        if (!hasattr(pluginImport, "sfields")) {{
+            return temp;
+        }}
+        auto sfields = pluginImport.attr("sfields").cast<std::vector<py::object>>();
+        for (py::object variable: sfields)
+        {{
+            WSF wrappedSField = variable.cast<WSF>();
+            SField const& sfield = static_cast<SField const&>(wrappedSField);
+            temp.emplace_back(SFieldExport{{
+                sfield.fieldType,
+                sfield.fieldValue,
+                sfield.jsonName}});
+        }}
+        return temp;
+    }}();
+    return {{const_cast<SFieldExport *>(sFields.data()), static_cast<int>(sFields.size())}};
 }}
 
 static std::map<int, std::string> parseSTypeFunctions;
@@ -413,139 +589,6 @@ getSTypes()
     }}();
     return {{const_cast<STypeExport *>(sTypes.data()), static_cast<int>(sTypes.size())}};
 }}
-
-
-extern "C"
-Container<SFieldExport>
-getSFields()
-{{
-    static std::vector<SFieldExport> const sFields = []{{
-        std::vector<SFieldExport> temp = {{}};
-        py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
-        py::module_::import("sys").attr("path").attr("append")("{python_folder}");
-        py::module pluginImport = py::module_::import("{module_name}");
-        if (!hasattr(pluginImport, "new_sfields")) {{
-            return temp;
-        }}
-        auto new_sfields = pluginImport.attr("new_sfields").cast<std::vector<py::object>>();
-        for (py::object variable: new_sfields)
-        {{
-            WSF wrappedSField = variable.cast<WSF>();
-            SField const& sfield = static_cast<SField const&>(wrappedSField);
-            temp.emplace_back(SFieldExport{{
-                sfield.fieldType,
-                sfield.fieldValue,
-                sfield.jsonName}});
-        }}
-        return temp;
-    }}();
-    return {{const_cast<SFieldExport *>(sFields.data()), static_cast<int>(sFields.size())}};
-}}
-
-typedef std::int64_t (*visitEntryXRPChangePtr)(
-    bool isDelete,
-    std::shared_ptr<SLE const> const& entry,
-    bool isBefore);
-
-static std::map<int, std::string> visitEntryXRPChangeFunctions;
-
-std::int64_t visitEntryXRPChange(
-    bool isDelete,
-    std::shared_ptr<SLE const> const& entry,
-    bool isBefore)
-{{
-    if (auto it = visitEntryXRPChangeFunctions.find(entry->getType());
-        it != visitEntryXRPChangeFunctions.end())
-    {{
-        py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
-        try {{
-            py::module_::import("sys").attr("path").attr("append")("{python_folder}");
-            py::object visitFn = py::module_::import("{module_name}").attr(it->second.c_str());
-            py::object returnObj = visitFn(
-                isDelete,
-                py::cast(entry, py::return_value_policy::reference),
-                isBefore);
-            return returnObj.cast<std::int64_t>();
-        }} catch (py::error_already_set& e) {{
-            // Print the error message
-            const char* errorMessage = e.what();
-            std::cout << "Python Error: " << errorMessage << std::endl;
-            throw;
-        }}
-    }}
-}}
-
-struct LedgerObjectExportInternal {{
-    std::uint16_t type;
-    std::string name; // CamelCase
-    std::string rpcName; // snake_case
-    std::vector<SOElementExport> format;
-    bool isDeletionBlocker;
-    DeleterFuncPtr deleteFn;
-    visitEntryXRPChangePtr visitEntryXRPChange;
-}};
-
-LedgerObjectExport
-mutate(LedgerObjectExportInternal const& obj)
-{{
-    return LedgerObjectExport{{
-        obj.type,
-        obj.name.c_str(),
-        obj.rpcName.c_str(),
-        {{const_cast<SOElementExport *>(obj.format.data()), static_cast<int>(obj.format.size())}},
-        obj.isDeletionBlocker,
-        obj.deleteFn,
-        obj.visitEntryXRPChange,
-    }};
-}}
-
-
-// extern "C"
-// std::vector<LedgerObjectExport>
-// getLedgerObjects()
-// {{
-//     static std::vector<LedgerObjectExportInternal> const objects = []{{
-//         py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
-//         py::module_::import("sys").attr("path").attr("append")("{python_folder}");
-//         py::module_ module = py::module_::import("{module_name}");
-//         std::vector<LedgerObjectExportInternal> temp = {{}};
-//         if (!hasattr(module, "new_ledger_objects")) {{
-//             return temp;
-//         }}
-//         auto objects = module.attr("new_ledger_objects").cast<std::vector<py::object>>();
-//         for (py::object object: objects)
-//         {{
-//             std::vector<SOElementExport> objectFormat{{}};
-//             auto pythonObjectFormat = object.attr("object_format").cast<std::vector<py::object>>();
-//             for (py::object variable: pythonObjectFormat)
-//             {{
-//                 py::tuple tup = variable.cast<py::tuple>();
-//                 WSF sfield = tup[0].cast<WSF>();
-//                 SOEStyle varType = tup[1].cast<SOEStyle>();
-//                 objectFormat.emplace_back(SOElementExport{{
-//                     static_cast<SField const&>(sfield).getCode(),
-//                     varType}});
-//             }}
-//             auto const objectType = object.attr("object_type").cast<std::uint16_t>();
-//             py::function visitFn = object.attr("visit_entry_xrp_change").cast<py::function>();
-//             visitEntryXRPChangeFunctions.insert({{objectType, visitFn.attr("__name__").cast<std::string>()}});
-//             temp.emplace_back(LedgerObjectExportInternal{{
-//                 objectType,
-//                 object.attr("object_name").cast<std::string>(),
-//                 object.attr("object_rpc_name").cast<std::string>(),
-//                 std::move(objectFormat),
-//                 object.attr("is_deletion_blocker").cast<bool>(),
-//                 nullptr,  // TODO: fix
-//                 visitEntryXRPChange}});
-//         }}
-//         return temp;
-//     }}();
-//     static std::vector<LedgerObjectExport> output;
-//     output.reserve(objects.size());
-//     std::transform(objects.begin(), objects.end(), std::back_inserter(output), mutate);
-
-//     return output;
-// }}
 """
 
 
@@ -556,7 +599,7 @@ def create_files(python_file):
     last_slash = abs_python_file.rfind("/")
     module_name = abs_python_file[(last_slash+1):-3]
     # module = importlib.import_module(module_name)
-    tx_name = "DummyTx"  # module.tx_name
+    tx_name = "NewEscrowCreate"  # module.tx_name
     # TODO: add logic to check validity of Python transactors
     # TODO: switch to Jinja
     # TODO: add logic to only generate the methods that exist in Python

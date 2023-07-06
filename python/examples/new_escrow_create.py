@@ -45,7 +45,6 @@ from plugin_transactor import (
     Keylet,
     parse_base58,
     ConsequencesFactoryType,
-    sf_finish_after,
     sf_destination,
 )
 
@@ -78,7 +77,7 @@ def parse_account2(field, json_name, field_name, _name, value):
 # sf_destination2 = construct_custom_sfield(STI_ACCOUNT2, "Destination2", 1)
 
 # new_stypes = [(STI_ACCOUNT2, parse_account2)]
-# new_sfields = [sf_finish_after2]  # , sf_destination2]
+sfields = [sf_finish_after2]  # , sf_destination2]
 
 
 ltNEW_ESCROW = 0x74
@@ -95,16 +94,16 @@ def visit_entry_xrp_change_escrow(is_delete, entry, is_before):
 
 ledger_objects = [
     LedgerObject(
-        ltNEW_ESCROW,
-        "NewEscrow",
-        "new_escrow",
-        [
+        object_type=ltNEW_ESCROW,
+        name="NewEscrow",
+        rpc_name="new_escrow",
+        object_format=[
             (sf_account,              soeREQUIRED),
             (sf_destination,          soeREQUIRED),
             (sf_amount,               soeREQUIRED),
             (sf_condition,            soeOPTIONAL),
             (sf_cancel_after,          soeOPTIONAL),
-            (sf_finish_after,          soeOPTIONAL),
+            (sf_finish_after2,          soeOPTIONAL),
             (sf_source_tag,            soeOPTIONAL),
             (sf_destination_tag,       soeOPTIONAL),
             (sf_owner_node,            soeREQUIRED),
@@ -112,8 +111,8 @@ ledger_objects = [
             (sf_previous_txn_lgr_seq,    soeREQUIRED),
             (sf_destination_node,      soeOPTIONAL),
         ],
-        True,
-        visit_entry_xrp_change_escrow
+        is_deletion_blocker=True,
+        visit_entry_xrp_change=visit_entry_xrp_change_escrow
     )
 ]
 
@@ -142,16 +141,16 @@ def preflight(ctx):
         return temBAD_AMOUNT
 
     if not ctx.tx.is_field_present(sf_cancel_after) and \
-            not ctx.tx.is_field_present(sf_finish_after):
+            not ctx.tx.is_field_present(sf_finish_after2):
         return temBAD_EXPIRATION
 
     if ctx.tx.is_field_present(sf_cancel_after) and \
-        ctx.tx.is_field_present(sf_finish_after) and \
-            ctx.tx[sf_cancel_after] <= ctx.tx[sf_finish_after]:
+        ctx.tx.is_field_present(sf_finish_after2) and \
+            ctx.tx[sf_cancel_after] <= ctx.tx[sf_finish_after2]:
         return temBAD_EXPIRATION
 
     if ctx.rules.enabled(fix1571):
-        if not ctx.tx.is_field_present(sf_finish_after) and \
+        if not ctx.tx.is_field_present(sf_finish_after2) and \
                 not ctx.tx.is_field_present(sf_condition):
             return temMALFORMED
 
@@ -168,8 +167,8 @@ def do_apply(ctx, _m_prior_balance, _m_source_balance):
                 after(close_time, ctx.tx[sf_cancel_after]):
             return tecNO_PERMISSION
 
-        if ctx.tx.is_field_present(sf_finish_after) and \
-                after(close_time, ctx.tx[sf_finish_after]):
+        if ctx.tx.is_field_present(sf_finish_after2) and \
+                after(close_time, ctx.tx[sf_finish_after2]):
             return tecNO_PERMISSION
 
     account = ctx.tx[sf_account]
@@ -185,7 +184,7 @@ def do_apply(ctx, _m_prior_balance, _m_source_balance):
     if balance < reserve + STAmount(ctx.tx[sf_amount]).xrp():
         return tecUNFUNDED
 
-    dest_acct = AccountID.from_buffer(ctx.tx[sf_destination])
+    dest_acct = ctx.tx[sf_destination] # AccountID.from_buffer(ctx.tx[sf_destination])
 
     sled = ctx.view().peek(account_keylet(dest_acct))
     if not sled:
@@ -229,7 +228,7 @@ transactors = [
             (sf_amount, soeREQUIRED),
             (sf_condition, soeOPTIONAL),
             (sf_cancel_after, soeOPTIONAL),
-            (sf_finish_after, soeOPTIONAL),
+            (sf_finish_after2, soeOPTIONAL),
             (sf_destination_tag, soeOPTIONAL),
             (sf_ticket_sequence, soeOPTIONAL)
         ],
