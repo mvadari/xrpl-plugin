@@ -59,19 +59,15 @@ STI_ACCOUNT2 = 24
 
 
 def parse_account2(field, json_name, field_name, _name, value):
-    print(field, json_name, field_name, _name, value)
     if not value.is_string():
-        print("value isn't string")
         return bad_type(json_name, field_name)
     str_value = value.as_string()
     try:
         account = AccountID()
         if account.parse_hex(str_value):
-            print("value is hex")
             return account.to_buffer()
 
         if result := parse_base58(str_value):
-            print("value is base58")
             return result.to_buffer()
         return invalid_data(json_name, field_name)
     except Exception as err:
@@ -155,7 +151,6 @@ def after(now, mark):
 
 
 def preflight(ctx):
-    print(amendment, ctx.rules.enabled(amendment))
     if not ctx.rules.enabled(amendment):
         return temDISABLED
 
