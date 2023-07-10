@@ -8,11 +8,11 @@ find_package(SOCI REQUIRED)
 add_subdirectory(../../external/rippled subproject/rippled EXCLUDE_FROM_ALL)
 target_link_libraries(xrpl_plugin PUBLIC soci::soci)
 
-add_executable(helper)
-target_sources(helper PRIVATE 
-  Test.cpp
+add_executable(stype_debugger)
+target_sources(stype_debugger PRIVATE 
+  DebugSTypes.cpp
 )
-target_link_libraries(helper PUBLIC
+target_link_libraries(stype_debugger PUBLIC
   xrpl_plugin
 )
-install(TARGETS helper)
+install(TARGETS stype_debugger)
