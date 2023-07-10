@@ -1,6 +1,7 @@
 from plugin_transactor import (
     tesSUCCESS,
     temINVALID_FLAG,
+    temDISABLED,
     preflight1,
     preflight2,
     tf_universal_mask,
@@ -46,9 +47,10 @@ from plugin_transactor import (
     parse_base58,
     ConsequencesFactoryType,
     Slice,
+    VoteBehavior,
 )
 
-from utils import LedgerObject, SType, Transactor, create_new_sfield
+from utils import Amendment, LedgerObject, SType, Transactor, create_new_sfield
 
 
 sf_finish_after2 = create_new_sfield(STUInt32, "FinishAfter2", 47)
@@ -83,6 +85,7 @@ def to_string(buf):
 
 def to_serializer(buf, serializer):
     serializer.add_vl(Slice.from_buffer(buf))
+
 
 def from_serial_iter(sit):
     return sit.get_vl_buffer()
@@ -138,6 +141,10 @@ ledger_objects = [
     )
 ]
 
+amendment = Amendment("featurePluginTest", True, VoteBehavior.DEFAULT_NO)
+
+amendments = [amendment]
+
 
 def new_escrow_keylet(src, seq):
     return Keylet(ltNEW_ESCROW, index_hash(NEW_ESCROW_NAMESPACE, src, seq))
@@ -148,6 +155,10 @@ def after(now, mark):
 
 
 def preflight(ctx):
+    print(amendment, ctx.rules.enabled(amendment))
+    if not ctx.rules.enabled(amendment):
+        return temDISABLED
+
     if ctx.rules.enabled(fix1543) and ctx.tx.get_flags() & tf_universal_mask:
         print("Malformed transaction: Invalid flags set.")
         return temINVALID_FLAG

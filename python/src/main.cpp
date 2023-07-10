@@ -455,6 +455,11 @@ PYBIND11_MODULE(plugin_transactor, m) {
         .def("is_string", &Json::Value::isString)
         .def("as_string", &Json::Value::asString)
         .def("__repr__", &Json::Value::asCString);
+    
+    py::enum_<ripple::VoteBehavior>(m, "VoteBehavior")
+        .value("OBSOLETE", ripple::VoteBehavior::Obsolete)
+        .value("DEFAULT_NO", ripple::VoteBehavior::DefaultNo)
+        .value("DEFAULT_YES", ripple::VoteBehavior::DefaultYes);
 
     /*
     * STObjects
@@ -602,7 +607,13 @@ PYBIND11_MODULE(plugin_transactor, m) {
 
     py::class_<ripple::Rules> Rules(m, "Rules");
     Rules
-        .def("enabled", &ripple::Rules::enabled);
+        .def("enabled", &ripple::Rules::enabled)
+        .def("enabled",
+            [](const ripple::Rules &rules, py::object amendment) {
+                auto const name = amendment.attr("name").cast<std::string>();
+                return rules.enabled(ripple::sha512Half(ripple::Slice(name.data(), name.size())));
+            }
+        );
     
     py::class_<ripple::Keylet> Keylet(m, "Keylet");
     Keylet
@@ -880,22 +891,6 @@ PYBIND11_MODULE(plugin_transactor, m) {
             },
             py::return_value_policy::move
         )
-        .def("register_ledger_object",
-            [](std::uint16_t objectType,
-                char const* objectName,
-                std::vector<py::object> objectFormat)
-            {
-                std::vector<ripple::SOElementExport> temp{};
-                for (py::object variable: objectFormat)
-                {
-                    py::tuple tup = variable.cast<py::tuple>();
-                    auto sfield = tup[0].cast<WSF>();
-                    auto varType = tup[1].cast<ripple::SOEStyle>();
-                    temp.emplace_back(ripple::SOElementExport{static_cast<ripple::SField const&>(sfield).getCode(), varType});
-                }
-                ripple::Container<ripple::SOElementExport> format = {temp.data(), static_cast<int>(temp.size())};
-                ripple::registerLedgerObject(objectType, objectName, format);
-            })
         .def("describe_owner_dir", &ripple::describeOwnerDir)
         .def("adjust_owner_count", &ripple::adjustOwnerCount)
         .def("create_new_sfield_STAccount", &wrappedNewSField<ripple::STAccount>)

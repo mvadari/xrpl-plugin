@@ -674,6 +674,54 @@ getSTypes()
     }}();
     return {{const_cast<STypeExport *>(types.data()), static_cast<int>(types.size())}};
 }}
+
+// ----------------------------------------------------------------------------
+// Amendments
+// ----------------------------------------------------------------------------
+
+struct AmendmentExportInternal {{
+    std::string name;
+    bool supported;
+    VoteBehavior vote;
+}};
+
+AmendmentExport
+mutateAmendment(AmendmentExportInternal const& amendment)
+{{
+    return AmendmentExport{{
+        amendment.name.c_str(),
+        amendment.supported,
+        amendment.vote,
+    }};
+}}
+
+extern "C"
+Container<AmendmentExport>
+getAmendments()
+{{
+    static std::vector<AmendmentExportInternal> const amendments = []{{
+        py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+        std::vector<AmendmentExportInternal> temp = {{}};
+        py::module_::import("sys").attr("path").attr("append")("{python_folder}");
+        py::module pluginImport = py::module_::import("{module_name}");
+        if (!hasattr(pluginImport, "amendments")) {{
+            return temp;
+        }}
+        auto amendments = pluginImport.attr("amendments").cast<std::vector<py::object>>();
+        for (py::object variable: amendments)
+        {{
+            temp.emplace_back(AmendmentExportInternal{{
+                variable.attr("name").cast<std::string>(),
+                variable.attr("supported").cast<bool>(),
+                variable.attr("vote").cast<VoteBehavior>()}});
+        }}
+        return temp;
+    }}();
+    static std::vector<AmendmentExport> output;
+    output.reserve(amendments.size());
+    std::transform(amendments.begin(), amendments.end(), std::back_inserter(output), mutateAmendment);
+    return {{const_cast<AmendmentExport *>(output.data()), static_cast<int>(output.size())}};
+}}
 """
 
 

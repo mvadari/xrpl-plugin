@@ -17,7 +17,6 @@ from plugin_transactor import (
     Journal,
     STBase,
     STLedgerEntry,
-    register_ledger_object,
     Application,
     ApplyView,
     AccountID,
@@ -26,6 +25,7 @@ from plugin_transactor import (
     Buffer,
     Serializer,
     SerialIter,
+    VoteBehavior,
 )
 import plugin_transactor
 
@@ -74,6 +74,13 @@ class SType:
     to_serializer: Callable[[Buffer, Serializer], None]
     from_serial_iter: Callable[[SerialIter], Buffer]
     to_json: Optional[Callable[[Buffer], JsonValue]] = None
+
+
+@dataclass(frozen=True)
+class Amendment:
+    name: str
+    supported: bool
+    vote: VoteBehavior
 
 
 @dataclass(frozen=True)
