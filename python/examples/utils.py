@@ -82,6 +82,12 @@ class Amendment:
     supported: bool
     vote: VoteBehavior
 
+@dataclass(frozen=True)
+class TERCode:
+    code: int
+    code_str: str
+    description: str
+
 
 @dataclass(frozen=True)
 class LedgerObject:

@@ -722,6 +722,54 @@ getAmendments()
     std::transform(amendments.begin(), amendments.end(), std::back_inserter(output), mutateAmendment);
     return {{const_cast<AmendmentExport *>(output.data()), static_cast<int>(output.size())}};
 }}
+
+// ----------------------------------------------------------------------------
+// TER codes
+// ----------------------------------------------------------------------------
+
+struct TERExportInternal {{
+    int code;
+    std::string codeStr;
+    std::string description;
+}};
+
+TERExport
+mutateTERcodes(TERExportInternal const& TERcode)
+{{
+    return TERExport{{
+        TERcode.code,
+        TERcode.codeStr.c_str(),
+        TERcode.description.c_str(),
+    }};
+}}
+
+extern "C"
+Container<TERExport>
+getTERcodes()
+{{
+    static std::vector<TERExportInternal> const codes = []{{
+        py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+        std::vector<TERExportInternal> temp = {{}};
+        py::module_::import("sys").attr("path").attr("append")("{python_folder}");
+        py::module pluginImport = py::module_::import("{module_name}");
+        if (!hasattr(pluginImport, "ter_codes")) {{
+            return temp;
+        }}
+        auto codes = pluginImport.attr("ter_codes").cast<std::vector<py::object>>();
+        for (py::object variable: codes)
+        {{
+            temp.emplace_back(TERExportInternal{{
+                variable.attr("code").cast<int>(),
+                variable.attr("code_str").cast<std::string>(),
+                variable.attr("description").cast<std::string>()}});
+        }}
+        return temp;
+    }}();
+    static std::vector<TERExport> output;
+    output.reserve(codes.size());
+    std::transform(codes.begin(), codes.end(), std::back_inserter(output), mutateTERcodes);
+    return {{const_cast<TERExport *>(output.data()), static_cast<int>(output.size())}};
+}}
 """
 
 

@@ -50,7 +50,7 @@ from plugin_transactor import (
     VoteBehavior,
 )
 
-from utils import Amendment, LedgerObject, SType, Transactor, create_new_sfield
+from utils import Amendment, LedgerObject, SType, Transactor, create_new_sfield, TERCode
 
 
 sf_finish_after2 = create_new_sfield(STUInt32, "FinishAfter2", 47)
@@ -150,13 +150,17 @@ def after(now, mark):
     return now.time_since_epoch() > mark
 
 
+temINVALID_FLAG2 = -261
+ter_codes = [TERCode(temINVALID_FLAG2, "temINVALID_FLAG2", "Test code")]
+
+
 def preflight(ctx):
     if not ctx.rules.enabled(amendment):
         return temDISABLED
 
     if ctx.rules.enabled(fix1543) and ctx.tx.get_flags() & tf_universal_mask:
         print("Malformed transaction: Invalid flags set.")
-        return temINVALID_FLAG
+        return temINVALID_FLAG2
 
     if (preflight1ret := preflight1(ctx)) != tesSUCCESS:
         return preflight1ret
