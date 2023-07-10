@@ -22,6 +22,10 @@ from plugin_transactor import (
     ApplyView,
     AccountID,
     uint256,
+    JsonValue,
+    Buffer,
+    Serializer,
+    SerialIter,
 )
 import plugin_transactor
 
@@ -59,7 +63,19 @@ def create_new_sfield(cls, field_name, field_value):
     return create_fn(field_value, field_name)
 
 
-# TODO: helper class, move this to the package
+@dataclass(frozen=True)
+class SType:
+    type_id: int
+    parse_value: Callable[
+        [SField, str, str, SField, JsonValue],
+        Buffer | JsonValue
+    ]
+    to_string: Callable[[Buffer], str]
+    to_serializer: Callable[[Buffer, Serializer], None]
+    from_serial_iter: Callable[[SerialIter], Buffer]
+    to_json: Optional[Callable[[Buffer], JsonValue]] = None
+
+
 @dataclass(frozen=True)
 class LedgerObject:
     object_type: int
@@ -75,7 +91,9 @@ class LedgerObject:
         STLedgerEntry,
         Journal
     ], TER]] = None
-    visit_entry_xrp_change: Optional[Callable[[bool, STLedgerEntry, bool], int]] = None
+    visit_entry_xrp_change: Optional[
+        Callable[[bool, STLedgerEntry, bool], int]
+    ] = None
 
     def __post_init__(self):
         if self.is_deletion_blocker and self.delete_object is not None:

@@ -515,10 +515,30 @@ getSFields()
     return {{const_cast<SFieldExport *>(sFields.data()), static_cast<int>(sFields.size())}};
 }}
 
-static std::map<int, std::string> parseSTypeFunctions;
+// ----------------------------------------------------------------------------
+// Serialized Types
+// ----------------------------------------------------------------------------
+
+static std::map<int, int> sTypeToIndexMap;
+
+py::object
+getSTypeFromPython(std::uint16_t object)
+{{
+    py::module_::import("sys").attr("path").attr("append")("{python_folder}");
+    py::module module = py::module_::import("{module_name}");
+    if (auto it = sTypeToIndexMap.find(object);
+        it != sTypeToIndexMap.end())
+    {{
+        int index = it->second;
+        return module.attr("stypes")[py::cast(index)];
+    }}
+    std::string errorMessage = "Cannot find stype value " + std::to_string(object);
+    std::cout << "Python Processing Error: " << errorMessage << std::endl;
+    throw std::runtime_error(errorMessage);
+}}
 
 Buffer
-parseLeafTypePython(
+parseValue(
     SField const& field,
     std::string const& json_name,
     std::string const& fieldName,
@@ -526,68 +546,133 @@ parseLeafTypePython(
     Json::Value const& value,
     Json::Value& error)
 {{
-    if (auto it = parseSTypeFunctions.find(field.fieldType);
-        it != parseSTypeFunctions.end())
-    {{
+    py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+    py::object object = getSTypeFromPython(field.fieldType);
+    py::object function = object.attr("parse_value");
+    try {{
         WSF wrappedField = WSF{{(void *)&field}};
         WSF wrappedName = WSF{{(void *)name}};
-        py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+        py::object returnObj = function(
+            py::cast(wrappedField, py::return_value_policy::reference),
+            json_name,
+            fieldName,
+            wrappedName,
+            value);
         try {{
-            py::module_::import("sys").attr("path").attr("append")("{python_folder}");
-            py::object parseFn = py::module_::import("{module_name}").attr(it->second.c_str());
-            py::object returnObj = parseFn(
-                py::cast(wrappedField, py::return_value_policy::reference),
-                json_name,
-                fieldName,
-                wrappedName,
-                value);
-            py::tuple tup = returnObj.cast<py::tuple>();
-            if (!tup[1].is_none())
-            {{
-                error = tup[1].cast<Json::Value>();
-                Buffer ret;
-                return ret;
-            }}
-            auto const stVar = tup[0].cast<Buffer>();
-            return tup[0].cast<Buffer>();
-        }} catch (py::error_already_set& e) {{
-            // Print the error message
-            const char* errorMessage = e.what();
-            std::cout << "Python Error: " << errorMessage << std::endl;
-            throw;
+            return returnObj.cast<Buffer>();
+        }} catch (const py::cast_error &) {{ // TODO: figure out the exact error that is thrown
+            error = returnObj.cast<Json::Value>();
+            return Buffer();
         }}
+    }} catch (py::error_already_set& e) {{
+        // Print the error message
+        const char* errorMessage = e.what();
+        std::cout << "Python Error: " << errorMessage << std::endl;
+        throw;
     }}
-
-    Buffer ret;
-    error = unknown_type(json_name, fieldName, field.fieldType);
-    return ret;
 }}
 
+std::string
+toString(int typeId, Buffer const& buf)
+{{
+    py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+    py::object object = getSTypeFromPython(typeId);
+    py::object function = object.attr("to_string");
+    try {{
+        py::object ret = function(py::cast(buf, py::return_value_policy::reference));
+        return ret.cast<std::string>();
+    }} catch (py::error_already_set& e) {{
+        // Print the error message
+        const char* errorMessage = e.what();
+        std::cout << "Python Error: " << errorMessage << std::endl;
+        throw;
+    }}
+}}
+
+Json::Value
+toJson(int typeId, Buffer const& buf)
+{{
+    py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+    py::object object = getSTypeFromPython(typeId);
+    py::object function = object.attr("to_json");
+    try {{
+        py::object ret = function(py::cast(buf, py::return_value_policy::reference));
+        return ret.cast<Json::Value>();
+    }} catch (py::error_already_set& e) {{
+        // Print the error message
+        const char* errorMessage = e.what();
+        std::cout << "Python Error: " << errorMessage << std::endl;
+        throw;
+    }}
+}}
+
+void
+toSerializer(int typeId, Buffer const& buf, Serializer& s)
+{{
+    py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+    py::object object = getSTypeFromPython(typeId);
+    py::object function = object.attr("to_serializer");
+    try {{
+        function(
+            py::cast(buf, py::return_value_policy::reference),
+            py::cast(s, py::return_value_policy::reference)
+        );
+        return;
+    }} catch (py::error_already_set& e) {{
+        // Print the error message
+        const char* errorMessage = e.what();
+        std::cout << "Python Error: " << errorMessage << std::endl;
+        throw;
+    }}
+}}
+
+Buffer
+fromSerialIter(int typeId, SerialIter& st)
+{{
+    py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+    py::object object = getSTypeFromPython(typeId);
+    py::object function = object.attr("from_serial_iter");
+    try {{
+        py::object ret = function(py::cast(st, py::return_value_policy::reference));
+        return ret.cast<Buffer>();
+    }} catch (py::error_already_set& e) {{
+        // Print the error message
+        const char* errorMessage = e.what();
+        std::cout << "Python Error: " << errorMessage << std::endl;
+        throw;
+    }}
+}}
 
 extern "C"
 Container<STypeExport>
 getSTypes()
 {{
-    static std::vector<STypeExport> const sTypes = []{{
-        std::vector<STypeExport> temp = {{}};
+    static std::vector<STypeExport> const types = []{{
         py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
         py::module_::import("sys").attr("path").attr("append")("{python_folder}");
-        py::module pluginImport = py::module_::import("{module_name}");
-        if (!hasattr(pluginImport, "new_stypes")) {{
+        py::module_ module = py::module_::import("{module_name}");
+        std::vector<STypeExport> temp = {{}};
+        if (!hasattr(module, "stypes")) {{
             return temp;
         }}
-        auto new_stypes = pluginImport.attr("new_stypes").cast<std::vector<py::object>>();
-        for (py::object variable: new_stypes)
+        auto types = module.attr("stypes").cast<std::vector<py::object>>();
+        for (int i = 0; i < types.size(); i++)
         {{
-            py::tuple tup = variable.cast<py::tuple>();
-            int typeId = tup[0].cast<int>();
-            py::function parseFn = tup[1].cast<py::function>();
-            parseSTypeFunctions.insert({{typeId, parseFn.attr("__name__").cast<std::string>()}});
-            temp.emplace_back(STypeExport{{typeId, parseLeafTypePython}});
+            py::object stype = types[i];
+            auto typeId = stype.attr("type_id").cast<int>();
+            sTypeToIndexMap.insert({{typeId, i}});
+
+            temp.emplace_back(STypeExport{{
+                typeId,
+                parseValue,
+                toString,
+                stype.attr("to_json").is_none() ? nullptr : toJson,
+                toSerializer,
+                fromSerialIter}});
         }}
         return temp;
     }}();
-    return {{const_cast<STypeExport *>(sTypes.data()), static_cast<int>(sTypes.size())}};
+    return {{const_cast<STypeExport *>(types.data()), static_cast<int>(types.size())}};
 }}
 """
 

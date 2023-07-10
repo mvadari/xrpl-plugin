@@ -45,10 +45,10 @@ from plugin_transactor import (
     Keylet,
     parse_base58,
     ConsequencesFactoryType,
-    sf_destination,
+    Slice,
 )
 
-from utils import LedgerObject, Transactor, create_new_sfield
+from utils import LedgerObject, SType, Transactor, create_new_sfield
 
 
 sf_finish_after2 = create_new_sfield(STUInt32, "FinishAfter2", 47)
@@ -57,27 +57,49 @@ STI_ACCOUNT2 = 24
 
 
 def parse_account2(field, json_name, field_name, _name, value):
+    print(field, json_name, field_name, _name, value)
     if not value.is_string():
-        return None, bad_type(json_name, field_name)
+        print("value isn't string")
+        return bad_type(json_name, field_name)
     str_value = value.as_string()
     try:
         account = AccountID()
         if account.parse_hex(str_value):
-            return make_stplugintype(field, account.to_buffer()), None
+            print("value is hex")
+            return account.to_buffer()
 
         if result := parse_base58(str_value):
-            ret = make_stplugintype(field, result.to_buffer())
-            return ret, None
-        return None, invalid_data(json_name, field_name)
+            print("value is base58")
+            return result.to_buffer()
+        return invalid_data(json_name, field_name)
     except Exception as err:
         print("Error in parsing Account2:", err)
-        return None, invalid_data(json_name, field_name)
+        return invalid_data(json_name, field_name)
 
 
-# sf_destination2 = construct_custom_sfield(STI_ACCOUNT2, "Destination2", 1)
+def to_string(buf):
+    return AccountID.from_buffer(buf).to_base58()
 
-# new_stypes = [(STI_ACCOUNT2, parse_account2)]
-sfields = [sf_finish_after2]  # , sf_destination2]
+
+def to_serializer(buf, serializer):
+    serializer.add_vl(Slice.from_buffer(buf))
+
+def from_serial_iter(sit):
+    return sit.get_vl_buffer()
+
+
+sf_destination2 = construct_custom_sfield(STI_ACCOUNT2, "Destination2", 1)
+
+stypes = [
+    SType(
+        type_id=STI_ACCOUNT2,
+        parse_value=parse_account2,
+        to_string=to_string,
+        to_serializer=to_serializer,
+        from_serial_iter=from_serial_iter,
+        )
+]
+sfields = [sf_finish_after2, sf_destination2]
 
 
 ltNEW_ESCROW = 0x74
@@ -99,7 +121,7 @@ ledger_objects = [
         rpc_name="new_escrow",
         object_format=[
             (sf_account,              soeREQUIRED),
-            (sf_destination,          soeREQUIRED),
+            (sf_destination2,          soeREQUIRED),
             (sf_amount,               soeREQUIRED),
             (sf_condition,            soeOPTIONAL),
             (sf_cancel_after,          soeOPTIONAL),
@@ -184,7 +206,7 @@ def do_apply(ctx, _m_prior_balance, _m_source_balance):
     if balance < reserve + STAmount(ctx.tx[sf_amount]).xrp():
         return tecUNFUNDED
 
-    dest_acct = ctx.tx[sf_destination] # AccountID.from_buffer(ctx.tx[sf_destination])
+    dest_acct = AccountID.from_buffer(ctx.tx[sf_destination2])
 
     sled = ctx.view().peek(account_keylet(dest_acct))
     if not sled:
@@ -198,7 +220,7 @@ def do_apply(ctx, _m_prior_balance, _m_source_balance):
     slep[sf_account] = account
     amount = ctx.tx[sf_amount]
     slep[sf_amount] = amount
-    slep[sf_destination] = ctx.tx[sf_destination]
+    slep[sf_destination2] = ctx.tx[sf_destination2]
     ctx.view().insert(slep)
 
     page = ctx.view().dir_insert(account, keylet)
@@ -224,7 +246,7 @@ transactors = [
         name="NewEscrowCreate",
         tx_type=47,
         tx_format=[
-            (sf_destination, soeREQUIRED),
+            (sf_destination2, soeREQUIRED),
             (sf_amount, soeREQUIRED),
             (sf_condition, soeOPTIONAL),
             (sf_cancel_after, soeOPTIONAL),

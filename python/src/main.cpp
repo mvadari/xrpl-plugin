@@ -3,6 +3,7 @@
 #include <pybind11/operators.h>
 
 #include <ripple/app/tx/impl/Transactor.h>
+#include <ripple/protocol/Serializer.h>
 #include <ripple/protocol/st.h>
 #include <ripple/protocol/TxFlags.h>
 #include <ripple/protocol/Feature.h>
@@ -421,6 +422,11 @@ PYBIND11_MODULE(plugin_transactor, m) {
             },
             py::return_value_policy::move
         )
+        .def("from_buffer",
+            [](const ripple::Buffer &buf) {
+                return ripple::Slice(std::move(buf.data()), buf.size());
+            }
+        )
         .def("__repr__",
             [](const ripple::Slice &slice) {
                 return strHex(slice);
@@ -683,6 +689,35 @@ PYBIND11_MODULE(plugin_transactor, m) {
         .def("sequences_consumed", &ripple::TxConsequences::sequencesConsumed)
         .def("is_blocker", &ripple::TxConsequences::isBlocker)
         .def("following_seq", &ripple::TxConsequences::followingSeq)
+    ;
+
+    py::class_<ripple::Serializer> Serializer(m, "Serializer");
+    Serializer
+        .def("add8", &ripple::Serializer::add8)
+        .def("add16", &ripple::Serializer::add16)
+        .def("add32", py::overload_cast<std::uint32_t>(&ripple::Serializer::add32))
+        .def("add64", &ripple::Serializer::add64)
+        .def("add_raw", py::overload_cast<ripple::Blob const&>(&ripple::Serializer::addRaw))
+        .def("add_raw", py::overload_cast<ripple::Slice>(&ripple::Serializer::addRaw))
+        .def("add_raw", py::overload_cast<const ripple::Serializer&>(&ripple::Serializer::addRaw))
+        .def("add_vl", [](ripple::Serializer& self, const ripple::Blob& vector) {
+            return self.addVL(vector);
+        })
+        .def("add_vl", [](ripple::Serializer& self, const ripple::Slice& slice) {
+            return self.addVL(slice);
+        })
+    ;
+
+    py::class_<ripple::SerialIter> SerialIter(m, "SerialIter");
+    SerialIter
+        .def("get8", &ripple::SerialIter::get8)
+        .def("get16", &ripple::SerialIter::get16)
+        .def("get32", &ripple::SerialIter::get32)
+        .def("get64", &ripple::SerialIter::get64)
+        .def("get128", &ripple::SerialIter::get128)
+        .def("get160", &ripple::SerialIter::get160)
+        .def("get256", &ripple::SerialIter::get256)
+        .def("get_vl_buffer", &ripple::SerialIter::getVLBuffer)
     ;
 
     py::class_<ripple::Application> Application(m, "Application");
