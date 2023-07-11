@@ -95,21 +95,21 @@ bufferToUInt32(Buffer const& buf)
 }
 
 std::string
-toString(Buffer const& buf)
+toString(int typeId, Buffer const& buf)
 {
     uint32_t val = bufferToUInt32(buf);
     return std::to_string(val);
 }
 
 void
-toSerializer(Buffer const& buf, Serializer& s)
+toSerializer(int typeId, Buffer const& buf, Serializer& s)
 {
     uint32_t val = bufferToUInt32(buf);
     s.add32(val);
 }
 
 Buffer
-fromSerialIter(SerialIter& st)
+fromSerialIter(int typeId, SerialIter& st)
 {
     uint32_t val = st.get32();
     return Buffer(&val, sizeof val);
@@ -687,9 +687,9 @@ getTransactors()
             },
             Transactor::ConsequencesFactoryType::Normal,
             NULL,
+            NULL,
             preflight,
             preclaim,
-            NULL,
             doApply,
             NULL,
             NULL,

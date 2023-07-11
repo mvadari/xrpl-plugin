@@ -305,15 +305,15 @@ getTransactors()
     static TransactorExport list[] = {
         {
             "NewEscrowCreate",
-            50,
+            49,
             {
                 formatPtr, 7
             },
             Transactor::ConsequencesFactoryType::Normal,
             NULL,
+            calculateBaseFee,
             preflight,
             preclaim,
-            calculateBaseFee,
             doApply,
             NULL,
             NULL,
@@ -478,7 +478,7 @@ Container<AmendmentExport>
 getAmendments()
 {
     AmendmentExport const amendment = {
-        "featurePluginTest",
+        "featurePluginTest2",
         true,
         VoteBehavior::DefaultNo,
     };
