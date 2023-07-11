@@ -113,12 +113,20 @@
         "span": "cpp"
     },
     "cSpell.words": [
+        "cout",
+        "cryptoconditions",
+        "DBUILD",
+        "DCMAKE",
         "delitem",
+        "DPROJECT",
+        "DSOURCE",
+        "endl",
         "getitem",
         "hasattr",
         "INSUF",
         "JLOG",
         "keylet",
+        "multisignature",
         "nftoffer",
         "NFTOKEN",
         "nftokens",
@@ -131,7 +139,9 @@
         "setitem",
         "sfield",
         "sfields",
+        "slep",
         "stvar",
+        "stype",
         "stypes",
         "trustlines"
     ]

@@ -1,36 +1,36 @@
+import json
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Any, Callable, Dict, List, Optional, Tuple, Type
-import json
+from typing import Callable, List, Optional, Tuple
 
+import plugin_transactor
 from plugin_transactor import (
+    TER,
+    AccountID,
+    Application,
+    ApplyContext,
+    ApplyView,
+    Buffer,
+    ConsequencesFactoryType,
+    Journal,
+    JsonValue,
+    NotTEC,
+    PreclaimContext,
+    PreflightContext,
+    ReadView,
+    SerialIter,
+    Serializer,
     SField,
     SOEStyle,
-    PreflightContext,
-    TxConsequences,
-    ConsequencesFactoryType,
-    ReadView,
-    STTx,
-    NotTEC,
-    TER,
-    PreclaimContext,
-    XRPAmount,
-    ApplyContext,
-    Journal,
     STBase,
     STLedgerEntry,
     STPluginType,
-    Application,
-    ApplyView,
-    AccountID,
-    uint256,
-    JsonValue,
-    Buffer,
-    Serializer,
-    SerialIter,
+    STTx,
+    TxConsequences,
     VoteBehavior,
+    XRPAmount,
+    uint256,
 )
-import plugin_transactor
 
 # TODO: move this file into the package
 

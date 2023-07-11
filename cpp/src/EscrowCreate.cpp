@@ -238,7 +238,7 @@ doApply(ApplyContext& ctx, XRPAmount mPriorBalance, XRPAmount mSourceBalance)
             !ctx.tx[~sfDestinationTag])
             return tecDST_TAG_NEEDED;
 
-        // Obeying the lsfDissalowXRP flag was a bug.  Piggyback on
+        // Obeying the lsfDisallowXRP flag was a bug.  Piggyback on
         // featureDepositAuth to remove the bug.
         if (!ctx.view().rules().enabled(featureDepositAuth) &&
             ((*sled)[sfFlags] & lsfDisallowXRP))

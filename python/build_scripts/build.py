@@ -811,8 +811,6 @@ visitEntryExport(
         py::function checkType = checks[i];
         py::object check = checkType();
 
-        py::print("ASDFJKLASDFJKLASDFJKLASDFJKL");
-        py::print(check);
         py::object function = check.attr("visit_entry_actual");
         try {{
             py::object ret = function(
@@ -821,7 +819,6 @@ visitEntryExport(
                 py::cast(before, py::return_value_policy::reference),
                 py::cast(after, py::return_value_policy::reference)
             );
-            py::print(ret);
             storedCheckData[i] = ret.cast<std::string>();
         }} catch (py::error_already_set& e) {{
             // Print the error message
@@ -915,7 +912,7 @@ def create_files(python_file):
     python_folder = os.path.dirname(abs_python_file)
     sys.path.append(python_folder)
     last_slash = abs_python_file.rfind("/")
-    module_name = abs_python_file[(last_slash+1):-3]
+    module_name = abs_python_file[(last_slash + 1): -3]
     # module = importlib.import_module(module_name)
     tx_name = "NewEscrowCreate"  # module.tx_name
     # TODO: add logic to check validity of Python transactors
@@ -924,7 +921,7 @@ def create_files(python_file):
 
     with open(f"{tx_name}.cpp", "w") as f:
         f.write(generate_cpp(tx_name, module_name, python_folder))
-    
+
     return os.path.abspath(f"{tx_name}.cpp"), module_name
 
 
@@ -937,15 +934,20 @@ def build_files(cpp_file, project_name):
         cmake_args = []
         build_args = []
         if not os.path.exists(conan_build_dir):
-            subprocess.run([
-                "conan",
-                "install",
-                conan_source_dir,
-                "--build",
-                "missing",
-                "--settings",
-                "build_type=Debug"
-            ], check=True, cwd=build_temp, stdout=subprocess.DEVNULL)
+            subprocess.run(
+                [
+                    "conan",
+                    "install",
+                    conan_source_dir,
+                    "--build",
+                    "missing",
+                    "--settings",
+                    "build_type=Debug",
+                ],
+                check=True,
+                cwd=build_temp,
+                stdout=subprocess.DEVNULL,
+            )
         conan_cmake_file = os.path.join(conan_build_dir, "conan_toolchain.cmake")
         cmake_args += [
             f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={os.getcwd()}{os.sep}",
@@ -956,10 +958,16 @@ def build_files(cpp_file, project_name):
             "-DBUILD_SHARED_LIBS=ON",
         ]
         subprocess.run(
-            ["cmake", build_source_dir] + cmake_args, cwd=build_temp, check=True, stdout=subprocess.DEVNULL
+            ["cmake", build_source_dir] + cmake_args,
+            cwd=build_temp,
+            check=True,
+            stdout=subprocess.DEVNULL,
         )
         subprocess.run(
-            ["cmake", "--build", "."] + build_args, cwd=build_temp, check=True, stdout=subprocess.DEVNULL
+            ["cmake", "--build", "."] + build_args,
+            cwd=build_temp,
+            check=True,
+            stdout=subprocess.DEVNULL,
         )
 
 

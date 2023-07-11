@@ -5,12 +5,10 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "~/.conan/data",
-                "~/.conan/data/boost/1.77.0/_/_/package/4487565cef5463d0b192b189b027a6f0186fbca7/include"
+                "~/.conan/data/boost/1.77.0/_/_/source/src",
+                "~/.conan/data/date/3.0.1/_/_/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/include"
             ],
             "defines": [],
-            "macFrameworkPath": [
-                "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks"
-            ],
             "compilerPath": "/usr/bin/clang",
             "cStandard": "c17",
             "cppStandard": "c++17",
