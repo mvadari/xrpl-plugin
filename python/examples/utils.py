@@ -1,5 +1,7 @@
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Callable, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple, Type
+import json
 
 from plugin_transactor import (
     SField,
@@ -82,11 +84,39 @@ class Amendment:
     supported: bool
     vote: VoteBehavior
 
+
 @dataclass(frozen=True)
 class TERCode:
     code: int
     code_str: str
     description: str
+
+
+class InvariantCheck(ABC):
+    def process_data(self, data):
+        if data is None:
+            return
+        data_dict = json.loads(data)
+        self.__dict__.update(**data_dict)
+
+    def visit_entry_actual(self, data, is_delete, before, after):
+        self.process_data(data)
+
+        self.visit_entry(is_delete, before, after)
+
+        return json.dumps(self.__dict__)
+
+    def finalize_actual(self, data, tx, result, fee, view, j):
+        self.process_data(data)
+        return self.finalize(tx, result, fee, view, j)
+
+    @abstractmethod
+    def visit_entry(self, is_delete, before, after):
+        pass
+
+    @abstractmethod
+    def finalize(self, tx, result, fee, view, j):
+        pass
 
 
 @dataclass(frozen=True)

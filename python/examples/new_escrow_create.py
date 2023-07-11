@@ -1,3 +1,4 @@
+import json
 from plugin_transactor import (
     tesSUCCESS,
     temINVALID_FLAG,
@@ -48,9 +49,10 @@ from plugin_transactor import (
     ConsequencesFactoryType,
     Slice,
     VoteBehavior,
+    XRPAmount,
 )
 
-from utils import Amendment, LedgerObject, SType, Transactor, create_new_sfield, TERCode
+from utils import Amendment, InvariantCheck, LedgerObject, SType, Transactor, create_new_sfield, TERCode
 
 
 sf_finish_after2 = create_new_sfield(STUInt32, "FinishAfter2", 47)
@@ -113,6 +115,34 @@ def visit_entry_xrp_change_escrow(is_delete, entry, is_before):
     return entry[sf_amount].xrp().drops
 
 
+class NoZeroEscrow(InvariantCheck):
+    def __init__(self):
+        self.bad = False
+
+    def visit_entry(self, is_delete, before, after):
+        def is_bad(amount):
+            if not amount.native():
+                return True
+            if amount.xrp() <= XRPAmount(0):
+                return True
+            if amount.xrp() > XRPAmount(100_000_000_000 * 1_000_000):
+                return True
+            return False
+
+        if before is not None and before.get_type() == ltNEW_ESCROW:
+            self.bad |= is_bad(before[sf_amount])
+        
+        if after is not None and after.get_type() == ltNEW_ESCROW:
+            self.bad |= is_bad(after[sf_amount])
+
+    def finalize(self, tx, result, fee, view, j):
+        if self.bad:
+            print("Invariant failed: new escrow specifies invalid amount")
+            return False
+
+        return True
+
+
 ledger_objects = [
     LedgerObject(
         object_type=ltNEW_ESCROW,
@@ -136,6 +166,8 @@ ledger_objects = [
         visit_entry_xrp_change=visit_entry_xrp_change_escrow
     )
 ]
+
+invariant_checks = [NoZeroEscrow]
 
 amendment = Amendment("featurePluginTest", True, VoteBehavior.DEFAULT_NO)
 
@@ -169,6 +201,8 @@ def preflight(ctx):
     if not amount.is_xrp():
         return temBAD_AMOUNT
 
+    # NOTE: uncomment this if block to test out the invariant checker
+    # You shouldn't be able to create a 0-amount escrow
     if amount <= zero_amount:
         return temBAD_AMOUNT
 

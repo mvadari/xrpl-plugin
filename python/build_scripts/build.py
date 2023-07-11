@@ -16,6 +16,7 @@ def generate_cpp(tx_name, module_name, python_folder):
 #include <ripple/protocol/TxFlags.h>
 #include <ripple/protocol/st.h>
 #include <map>
+#include <vector>
 
 #include <pybind11/embed.h> // everything needed for embedding
 #include <pybind11/stl.h>
@@ -769,6 +770,142 @@ getTERcodes()
     output.reserve(codes.size());
     std::transform(codes.begin(), codes.end(), std::back_inserter(output), mutateTERcodes);
     return {{const_cast<TERExport *>(output.data()), static_cast<int>(output.size())}};
+}}
+
+// ----------------------------------------------------------------------------
+// Invariant Checks
+// ----------------------------------------------------------------------------
+
+static std::map<void*, std::vector<std::string>> checkData;
+
+void
+visitEntryExport(
+    void* id,
+    bool isDelete,
+    std::shared_ptr<SLE const> const& before,
+    std::shared_ptr<SLE const> const& after)
+{{
+    py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+    py::module_::import("sys").attr("path").attr("append")("{python_folder}");
+    py::module pluginImport = py::module_::import("{module_name}");
+    if (!hasattr(pluginImport, "invariant_checks")) {{
+        throw std::runtime_error("Expected `invariant_checks` variable");
+    }}
+    auto checks = pluginImport.attr("invariant_checks").cast<std::vector<py::object>>();
+    std::vector<std::string> storedCheckData;
+    if (auto it = checkData.find(id); it != checkData.end())
+    {{
+        storedCheckData = it->second;
+    }} else
+    {{
+        for (int i = 0; i < checks.size(); i++)
+        {{
+            storedCheckData.push_back("");
+        }}
+        checkData.insert({{id, storedCheckData}});
+    }}
+
+    for (int i = 0; i < checks.size(); i++)
+    {{
+        std::string data = storedCheckData[i];
+        py::function checkType = checks[i];
+        py::object check = checkType();
+
+        py::print("ASDFJKLASDFJKLASDFJKLASDFJKL");
+        py::print(check);
+        py::object function = check.attr("visit_entry_actual");
+        try {{
+            py::object ret = function(
+                data.length() == 0 ? py::none() : py::cast(data),
+                isDelete,
+                py::cast(before, py::return_value_policy::reference),
+                py::cast(after, py::return_value_policy::reference)
+            );
+            py::print(ret);
+            storedCheckData[i] = ret.cast<std::string>();
+        }} catch (py::error_already_set& e) {{
+            // Print the error message
+            const char* errorMessage = e.what();
+            std::cout << "Python Error: " << errorMessage << std::endl;
+            throw;
+        }}
+    }}
+    checkData[id] = storedCheckData;
+}}
+
+bool
+finalizeExport(
+    void* id,
+    STTx const& tx,
+    TER const result,
+    XRPAmount const fee,
+    ReadView const& view,
+    beast::Journal const& j)
+{{
+    bool finalizeResult = true;
+
+    py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+    py::module_::import("sys").attr("path").attr("append")("{python_folder}");
+    py::module pluginImport = py::module_::import("{module_name}");
+    if (!hasattr(pluginImport, "invariant_checks")) {{
+        throw std::runtime_error("Expected `invariant_checks` variable");
+    }}
+    auto checks = pluginImport.attr("invariant_checks").cast<std::vector<py::object>>();
+    std::vector<std::string> storedCheckData;
+    if (auto it = checkData.find(id); it != checkData.end())
+    {{
+        storedCheckData = it->second;
+    }} else
+    {{
+        JLOG(j.fatal()) << "Invariant failed: could not find matching ID";
+        return false;
+    }}
+    for (int i = 0; i < checks.size(); i++)
+    {{
+        std::string data = storedCheckData[i];
+        py::function checkType = checks[i];
+        py::object check = checkType();
+
+        py::object function = check.attr("finalize_actual");
+        try {{
+            py::object ret = function(
+                data,
+                py::cast(tx, py::return_value_policy::reference),
+                py::cast(result, py::return_value_policy::reference),
+                py::cast(fee, py::return_value_policy::reference),
+                py::cast(view, py::return_value_policy::reference),
+                py::cast(j, py::return_value_policy::reference)
+            );
+            finalizeResult &= ret.cast<bool>();
+        }} catch (py::error_already_set& e) {{
+            // Print the error message
+            const char* errorMessage = e.what();
+            std::cout << "Python Error: " << errorMessage << std::endl;
+            throw;
+        }}
+    }}
+    checkData.erase(id);
+    return finalizeResult;
+}}
+
+extern "C"
+Container<InvariantCheckExport>
+getInvariantChecks()
+{{
+    static std::vector<InvariantCheckExport> const checks = []{{
+        py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+        py::module_::import("sys").attr("path").attr("append")("{python_folder}");
+        py::module_ module = py::module_::import("{module_name}");
+        std::vector<InvariantCheckExport> temp = {{}};
+        if (!hasattr(module, "invariant_checks")) {{
+            return temp;
+        }}
+        temp.emplace_back(InvariantCheckExport{{
+            visitEntryExport,
+            finalizeExport}});
+        return temp;
+    }}();
+    return {{const_cast<InvariantCheckExport *>(checks.data()), static_cast<int>(checks.size())}};
 }}
 """
 

@@ -79,6 +79,84 @@ indexHash(std::uint16_t space, Args const&... args)
     return ripple::sha512Half(space, args...);
 }
 
+// class InvariantCheck
+// {
+// public:
+//     static std::map<void*, InvariantCheck&> checks;
+//     static void visitEntryExport(
+//         void* id,
+//         bool isDelete,
+//         std::shared_ptr<ripple::SLE const> const& before,
+//         std::shared_ptr<ripple::SLE const> const& after)
+//     {
+//         if (auto it = checks.find(id);
+//             it != checks.end())
+//         {
+//             return it->second.visitEntry(isDelete, before, after);
+//         }
+//         InvariantCheck* check = new InvariantCheck();
+//         check->visitEntry(isDelete, before, after);
+//         checks.insert({id, *check});
+//     }
+
+//     static bool finalizeExport(
+//         void* id,
+//         ripple::STTx const& tx,
+//         ripple::TER const result,
+//         ripple::XRPAmount const fee,
+//         ripple::ReadView const& view,
+//         beast::Journal const& j)
+//     {
+//         if (auto it = checks.find(id);
+//             it != checks.end())
+//         {
+//             bool const finalizeResult = it->second.finalize(tx, result, fee, view, j);
+//             checks.erase(id);
+//             return finalizeResult;
+//         }
+//         JLOG(j.fatal())
+//                     << "Invariant failed: could not find matching ID";
+//         return false;
+//     }
+
+//     virtual void
+//     visitEntry(
+//         bool isDelete,
+//         std::shared_ptr<ripple::SLE const> const& before,
+//         std::shared_ptr<ripple::SLE const> const& after);
+
+//     virtual bool
+//     finalize(
+//         ripple::STTx const&,
+//         ripple::TER const,
+//         ripple::XRPAmount const,
+//         ripple::ReadView const&,
+//         beast::Journal const& j);
+// };
+// std::map<void*, InvariantCheck&> InvariantCheck::checks{};
+
+// class PyInvariantCheck : public InvariantCheck {
+//     void
+//     visitEntry(
+//         bool isDelete,
+//         std::shared_ptr<ripple::SLE const> const& before,
+//         std::shared_ptr<ripple::SLE const> const& after) override
+//     {
+//         PYBIND11_OVERRIDE_PURE(void, InvariantCheck, visitEntry, isDelete, before, after);
+//     }
+
+//     bool
+//     finalize(
+//         ripple::STTx const& tx,
+//         ripple::TER const result,
+//         ripple::XRPAmount const fee,
+//         ripple::ReadView const& view,
+//         beast::Journal const& j) override
+//     {
+//         PYBIND11_OVERRIDE_PURE(bool, InvariantCheck, finalize, tx, result, fee, view, j);
+//     }
+// };
+
 namespace py = pybind11;
 
 PYBIND11_MODULE(plugin_transactor, m) {
@@ -401,7 +479,12 @@ PYBIND11_MODULE(plugin_transactor, m) {
         .def(py::self >= py::self)
         .def(py::self == int())
         .def(py::self != int())
-        .def(-py::self);
+        .def(-py::self)
+        .def("__repr__",
+            [](const ripple::XRPAmount &xrp) {
+                return ripple::to_string(xrp);
+            }
+        );
     
     py::class_<ripple::Issue> Issue(m, "Issue");
     py::class_<ripple::Currency> Currency(m, "Currency");
@@ -490,6 +573,7 @@ PYBIND11_MODULE(plugin_transactor, m) {
             }
         )
         .def("xrp", &ripple::STAmount::xrp)
+        .def("native", &ripple::STAmount::native)
         .def(py::self += py::self)
         .def(py::self -= py::self)
         .def(py::self + py::self)
@@ -600,6 +684,9 @@ PYBIND11_MODULE(plugin_transactor, m) {
     ;
 
     py::class_<ripple::STLedgerEntry, ripple::STObject, std::shared_ptr<ripple::STLedgerEntry>> STLedgerEntry(m, "STLedgerEntry");
+    STLedgerEntry
+        .def("get_type", &ripple::STLedgerEntry::getType)
+    ;
 
     /*
     * Contexts and classes that the contexts depend on
@@ -659,7 +746,7 @@ PYBIND11_MODULE(plugin_transactor, m) {
             [](const ripple::NetClock::time_point &tp) {
                 return ripple::to_string(tp);
             }
-        );
+        )
     ;
     
     py::class_<ripple::LedgerInfo> LedgerInfo(m, "LedgerInfo");
