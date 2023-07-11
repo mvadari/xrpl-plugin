@@ -19,6 +19,7 @@ from plugin_transactor import (
     Journal,
     STBase,
     STLedgerEntry,
+    STPluginType,
     Application,
     ApplyView,
     AccountID,
@@ -54,6 +55,8 @@ class Transactor:
 def create_new_sfield(cls, field_name, field_value):
     if not issubclass(cls, STBase):
         raise Exception("SField must be of an `ST` type.")
+    if cls == STPluginType:
+        raise Exception("Must use `construct_custom_sfield` for custom STypes.")
     fn_name = f"create_new_sfield_{cls.__name__}"
     create_fn = getattr(plugin_transactor, fn_name, None)
     if create_fn is None:
