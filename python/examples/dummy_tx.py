@@ -27,9 +27,11 @@ def preflight(ctx):
         print("Malformed transaction: Invalid flags set.")
         return temINVALID_FLAG
 
-    if ctx.rules.enabled(fixMasterKeyAsRegularKey) and \
-        ctx.tx.is_field_present(sf_regular_key) and \
-            ctx.tx[sf_regular_key] == ctx.tx[sf_account]:
+    if (
+        ctx.rules.enabled(fixMasterKeyAsRegularKey)
+        and ctx.tx.is_field_present(sf_regular_key)
+        and ctx.tx[sf_regular_key] == ctx.tx[sf_account]
+    ):
         return temBAD_REGKEY
 
     return preflight2(ctx)
@@ -43,7 +45,9 @@ def do_apply(ctx, _mPriorBalance, _mSourceBalance):
         sle[sf_regular_key] = ctx.tx[sf_regular_key]
     else:
         # Account has disabled master key and no multi-signer signer list.
-        if sle.is_flag(lsfDisableMaster) and not ctx.view().peek(signers_keylet(account)):
+        if sle.is_flag(lsfDisableMaster) and not ctx.view().peek(
+            signers_keylet(account)
+        ):
             return tecNO_ALTERNATIVE_KEY
 
         del sle[sf_regular_key]
@@ -54,10 +58,7 @@ transactors = [
     Transactor(
         name="DummyTx",
         tx_type=50,
-        tx_format=[
-            (sf_regular_key, soeOPTIONAL),
-            (sf_ticket_sequence, soeOPTIONAL)
-        ],
+        tx_format=[(sf_regular_key, soeOPTIONAL), (sf_ticket_sequence, soeOPTIONAL)],
         consequences_factory_type=ConsequencesFactoryType.Normal,
         preflight=preflight,
         do_apply=do_apply,

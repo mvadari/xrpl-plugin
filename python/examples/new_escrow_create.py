@@ -52,7 +52,15 @@ from plugin_transactor import (
     XRPAmount,
 )
 
-from utils import Amendment, InvariantCheck, LedgerObject, SType, Transactor, create_new_sfield, TERCode
+from utils import (
+    Amendment,
+    InvariantCheck,
+    LedgerObject,
+    SType,
+    Transactor,
+    create_new_sfield,
+    TERCode,
+)
 
 
 sf_finish_after2 = create_new_sfield(STUInt32, "FinishAfter2", 47)
@@ -98,13 +106,13 @@ stypes = [
         to_string=to_string,
         to_serializer=to_serializer,
         from_serial_iter=from_serial_iter,
-        )
+    )
 ]
 sfields = [sf_finish_after2, sf_destination2]
 
 
 ltNEW_ESCROW = 0x74
-NEW_ESCROW_NAMESPACE = ord('t')
+NEW_ESCROW_NAMESPACE = ord("t")
 
 
 def visit_entry_xrp_change_escrow(is_delete, entry, is_before):
@@ -131,7 +139,7 @@ class NoZeroEscrow(InvariantCheck):
 
         if before is not None and before.get_type() == ltNEW_ESCROW:
             self.bad |= is_bad(before[sf_amount])
-        
+
         if after is not None and after.get_type() == ltNEW_ESCROW:
             self.bad |= is_bad(after[sf_amount])
 
@@ -150,20 +158,20 @@ ledger_objects = [
         rpc_name="new_escrow",
         object_format=[
             (sf_account,              soeREQUIRED),
-            (sf_destination2,          soeREQUIRED),
+            (sf_destination2,         soeREQUIRED),
             (sf_amount,               soeREQUIRED),
             (sf_condition,            soeOPTIONAL),
-            (sf_cancel_after,          soeOPTIONAL),
-            (sf_finish_after2,          soeOPTIONAL),
-            (sf_source_tag,            soeOPTIONAL),
-            (sf_destination_tag,       soeOPTIONAL),
-            (sf_owner_node,            soeREQUIRED),
-            (sf_previous_txn_id,        soeREQUIRED),
-            (sf_previous_txn_lgr_seq,    soeREQUIRED),
-            (sf_destination_node,      soeOPTIONAL),
+            (sf_cancel_after,         soeOPTIONAL),
+            (sf_finish_after2,        soeOPTIONAL),
+            (sf_source_tag,           soeOPTIONAL),
+            (sf_destination_tag,      soeOPTIONAL),
+            (sf_owner_node,           soeREQUIRED),
+            (sf_previous_txn_id,      soeREQUIRED),
+            (sf_previous_txn_lgr_seq, soeREQUIRED),
+            (sf_destination_node,     soeOPTIONAL),
         ],
         is_deletion_blocker=True,
-        visit_entry_xrp_change=visit_entry_xrp_change_escrow
+        visit_entry_xrp_change=visit_entry_xrp_change_escrow,
     )
 ]
 
@@ -206,18 +214,22 @@ def preflight(ctx):
     if amount <= zero_amount:
         return temBAD_AMOUNT
 
-    if not ctx.tx.is_field_present(sf_cancel_after) and \
-            not ctx.tx.is_field_present(sf_finish_after2):
+    if not ctx.tx.is_field_present(sf_cancel_after) and not ctx.tx.is_field_present(
+        sf_finish_after2
+    ):
         return temBAD_EXPIRATION
 
-    if ctx.tx.is_field_present(sf_cancel_after) and \
-        ctx.tx.is_field_present(sf_finish_after2) and \
-            ctx.tx[sf_cancel_after] <= ctx.tx[sf_finish_after2]:
+    if (
+        ctx.tx.is_field_present(sf_cancel_after)
+        and ctx.tx.is_field_present(sf_finish_after2)
+        and ctx.tx[sf_cancel_after] <= ctx.tx[sf_finish_after2]
+    ):
         return temBAD_EXPIRATION
 
     if ctx.rules.enabled(fix1571):
-        if not ctx.tx.is_field_present(sf_finish_after2) and \
-                not ctx.tx.is_field_present(sf_condition):
+        if not ctx.tx.is_field_present(
+            sf_finish_after2
+        ) and not ctx.tx.is_field_present(sf_condition):
             return temMALFORMED
 
     # TODO: figure out the conditions logic
@@ -229,12 +241,14 @@ def do_apply(ctx, _m_prior_balance, _m_source_balance):
     close_time = ctx.view().info().parent_close_time
 
     if ctx.view().rules().enabled(fix1571):
-        if ctx.tx.is_field_present(sf_cancel_after) and \
-                after(close_time, ctx.tx[sf_cancel_after]):
+        if ctx.tx.is_field_present(sf_cancel_after) and after(
+            close_time, ctx.tx[sf_cancel_after]
+        ):
             return tecNO_PERMISSION
 
-        if ctx.tx.is_field_present(sf_finish_after2) and \
-                after(close_time, ctx.tx[sf_finish_after2]):
+        if ctx.tx.is_field_present(sf_finish_after2) and after(
+            close_time, ctx.tx[sf_finish_after2]
+        ):
             return tecNO_PERMISSION
 
     account = ctx.tx[sf_account]
@@ -290,13 +304,13 @@ transactors = [
         name="NewEscrowCreate",
         tx_type=47,
         tx_format=[
-            (sf_destination2, soeREQUIRED),
-            (sf_amount, soeREQUIRED),
-            (sf_condition, soeOPTIONAL),
-            (sf_cancel_after, soeOPTIONAL),
-            (sf_finish_after2, soeOPTIONAL),
-            (sf_destination_tag, soeOPTIONAL),
-            (sf_ticket_sequence, soeOPTIONAL)
+            (sf_destination2,     soeREQUIRED),
+            (sf_amount,           soeREQUIRED),
+            (sf_condition,        soeOPTIONAL),
+            (sf_cancel_after,     soeOPTIONAL),
+            (sf_finish_after2,    soeOPTIONAL),
+            (sf_destination_tag,  soeOPTIONAL),
+            (sf_ticket_sequence,  soeOPTIONAL),
         ],
         consequences_factory_type=ConsequencesFactoryType.Normal,
         preflight=preflight,

@@ -71,10 +71,7 @@ def create_new_sfield(cls, field_name, field_value):
 @dataclass(frozen=True)
 class SType:
     type_id: int
-    parse_value: Callable[
-        [SField, str, str, SField, JsonValue],
-        Buffer | JsonValue
-    ]
+    parse_value: Callable[[SField, str, str, SField, JsonValue], Buffer | JsonValue]
     to_string: Callable[[Buffer], str]
     to_serializer: Callable[[Buffer, Serializer], None]
     from_serial_iter: Callable[[SerialIter], Buffer]
@@ -129,20 +126,19 @@ class LedgerObject:
     rpc_name: str
     object_format: List[Tuple[SField, SOEStyle]]
     is_deletion_blocker: bool = False
-    delete_object: Optional[Callable[[
-        Application,
-        ApplyView,
-        AccountID,
-        uint256,
-        STLedgerEntry,
-        Journal
-    ], TER]] = None
-    visit_entry_xrp_change: Optional[
-        Callable[[bool, STLedgerEntry, bool], int]
+    delete_object: Optional[
+        Callable[
+            [Application, ApplyView, AccountID, uint256, STLedgerEntry, Journal], TER
+        ]
     ] = None
+    visit_entry_xrp_change: Optional[Callable[[bool, STLedgerEntry, bool], int]] = None
 
     def __post_init__(self):
         if self.is_deletion_blocker and self.delete_object is not None:
-            raise Exception("Cannot have `delete_object` if `is_deletion_blocker` is True")
+            raise Exception(
+                "Cannot have `delete_object` if `is_deletion_blocker` is True"
+            )
         if not self.is_deletion_blocker and self.delete_object is None:
-            raise Exception("Must have `delete_object` if `is_deletion_blocker` is False")
+            raise Exception(
+                "Must have `delete_object` if `is_deletion_blocker` is False"
+            )
