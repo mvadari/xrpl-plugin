@@ -6,7 +6,8 @@
                 "${workspaceFolder}/**",
                 "~/.conan/data",
                 "~/.conan/data/boost/1.77.0/_/_/source/src",
-                "~/.conan/data/date/3.0.1/_/_/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/include"
+                "~/.conan/data/date/3.0.1/_/_/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/include",
+                "~/.conan/data/pybind11/2.10.1/_/_/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/include"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/clang",
