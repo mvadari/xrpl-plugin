@@ -58,9 +58,9 @@ from utils import (
     create_new_sfield,
 )
 
-sf_finish_after2 = create_new_sfield(STUInt32, "FinishAfter2", 47)
+sf_finish_after2 = create_new_sfield(STUInt32, "FinishAfter2", 53)
 
-STI_ACCOUNT2 = 24
+STI_ACCOUNT2 = 28
 
 
 def parse_account2(field, json_name, field_name, _name, value):
@@ -185,7 +185,7 @@ def after(now, mark):
     return now.time_since_epoch() > mark
 
 
-temINVALID_FLAG2 = -261
+temINVALID_FLAG2 = -256
 ter_codes = [TERCode(temINVALID_FLAG2, "temINVALID_FLAG2", "Test code")]
 
 
@@ -275,6 +275,7 @@ def do_apply(ctx, _m_prior_balance, _m_source_balance):
     amount = ctx.tx[sf_amount]
     slep[sf_amount] = amount
     slep[sf_destination2] = ctx.tx[sf_destination2]
+    slep[sf_finish_after2] = ctx.tx[sf_finish_after2]
     ctx.view().insert(slep)
 
     page = ctx.view().dir_insert(account, keylet)

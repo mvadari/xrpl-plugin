@@ -927,7 +927,6 @@ def create_files(python_file):
 
 def build_files(cpp_file, project_name):
     with tempfile.TemporaryDirectory() as build_temp:
-        build_temp = "./build/test"
         build_source_dir = os.path.dirname(__file__)
         conan_source_dir = os.path.dirname(build_source_dir)
         conan_build_dir = os.path.join(conan_source_dir, "build", "generators")
