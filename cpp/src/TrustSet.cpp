@@ -33,7 +33,7 @@
 using namespace ripple;
 
 
-const int STI_UINT32_2 = 24;
+const int STI_UINT32_2 = 28;
 
 Buffer
 parseLeafTypeNew(
@@ -129,13 +129,25 @@ int getSTId<SF_ACCOUNT>() { return STI_ACCOUNT; }
 template <> 
 int getSTId<SF_UINT32>() { return STI_UINT32; }
 
+template <> 
+int getSTId<STArray>() { return STI_ARRAY; }
+
+template <> 
+int getSTId<STObject>() { return STI_OBJECT; }
+
 template <class T>
 T const&
 newSField(const int fieldValue, char const* fieldName)
 {
+    int const typeId = getSTId<T>();
+    if (typeId == STI_ARRAY || typeId == STI_OBJECT)
+    {
+        // TODO: merge `newSField` and `newUntypedSField` for a seamless experience
+        throw std::runtime_error("Must use `newUntypedSField` for arrays and objects");
+    }
     if (SField const& field = SField::getField(fieldName); field != sfInvalid)
         return static_cast<T const&>(field);
-    T const* newSField = new T(getSTId<T>(), fieldValue, fieldName);
+    T const* newSField = new T(typeId, fieldValue, fieldName);
     return *newSField;
 }
 
@@ -146,6 +158,16 @@ newSField(const int fieldValue, std::string const fieldName)
     return newSField<T>(fieldValue, fieldName.c_str());
 }
 
+template <class T>
+SField const&
+newUntypedSField(const int fieldValue, char const* fieldName)
+{
+    if (SField const& field = SField::getField(fieldName); field != sfInvalid)
+        return field;
+    SField const* newSField = new SField(getSTId<T>(), fieldValue, fieldName);
+    return *newSField;
+}
+
 SF_PLUGINTYPE const& constructCustomSField(int tid, int fv, const char* fn) {
     if (SField const& field = SField::getField(field_code(tid, fv)); field != sfInvalid)
         return reinterpret_cast<SF_PLUGINTYPE const&>(field);
@@ -153,6 +175,18 @@ SF_PLUGINTYPE const& constructCustomSField(int tid, int fv, const char* fn) {
 }
 
 // end of helper stuff
+
+SField const&
+sfFakeArray()
+{
+    return newUntypedSField<STArray>(13, "FakeArray");
+}
+
+SField const&
+sfFakeElement()
+{
+    return newUntypedSField<STObject>(17, "FakeElement");
+}
 
 SF_PLUGINTYPE const&
 sfQualityIn2()
@@ -162,7 +196,7 @@ sfQualityIn2()
 
 static uint256 pluginAmendment;
 
-const int temINVALID_FLAG2 = -261;
+const int temINVALID_FLAG2 = -256;
 
 NotTEC
 preflight(PreflightContext const& ctx)
@@ -676,6 +710,7 @@ getTransactors()
         {sfQualityIn2().getCode(), soeOPTIONAL},
         {sfQualityOut.getCode(), soeOPTIONAL},
         {sfTicketSequence.getCode(), soeOPTIONAL},
+        {sfFakeArray().getCode(), soeREQUIRED},
     };
     SOElementExport* formatPtr = format;
     static TransactorExport list[] = {
@@ -683,7 +718,7 @@ getTransactors()
             "TrustSet2",
             50,
             {
-                formatPtr, 4
+                formatPtr, 5
             },
             Transactor::ConsequencesFactoryType::Normal,
             NULL,
@@ -734,11 +769,37 @@ extern "C"
 Container<SFieldExport>
 getSFields()
 {
-    auto const& var = sfQualityIn2();
+    auto const& qualityIn = sfQualityIn2();
+    auto const& fakeArray = sfFakeArray();
+    auto const& fakeElement = sfFakeElement();
     static SFieldExport sfields[] = {
-        {var.fieldType, var.fieldValue, var.fieldName.c_str()},
+        {qualityIn.fieldType, qualityIn.fieldValue, qualityIn.fieldName.c_str()},
+        {fakeArray.fieldType, fakeArray.fieldValue, fakeArray.fieldName.c_str()},
+        {fakeElement.fieldType, fakeElement.fieldValue, fakeElement.fieldName.c_str()},
     };
     SFieldExport* ptr = sfields;
+    return {ptr, 3};
+}
+
+extern "C"
+Container<InnerObjectExport>
+getInnerObjectFormats()
+{
+    static SOElementExport format[] = {
+        {sfAccount.getCode(), soeREQUIRED},
+    };
+    auto const& fakeElement = sfFakeElement();
+    SOElementExport* formatPtr = format;
+    static InnerObjectExport list[] = {
+        {
+            fakeElement.getCode(),
+            fakeElement.jsonName.c_str(),
+            {
+                formatPtr, 1
+            },
+        }
+    };
+    InnerObjectExport* ptr = list;
     return {ptr, 1};
 }
 
