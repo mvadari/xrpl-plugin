@@ -904,6 +904,74 @@ getInvariantChecks()
     }}();
     return {{const_cast<InvariantCheckExport *>(checks.data()), static_cast<int>(checks.size())}};
 }}
+
+// ----------------------------------------------------------------------------
+// Inner Object Formats
+// ----------------------------------------------------------------------------
+
+struct InnerObjectExportInternal {{
+    int code;
+    std::string name;
+    std::vector<SOElementExport> format;
+}};
+
+InnerObjectExport
+mutateInnerObject(InnerObjectExportInternal const& innerObject)
+{{
+    return InnerObjectExport{{
+        innerObject.code,
+        innerObject.name.c_str(),
+        {{const_cast<SOElementExport *>(innerObject.format.data()), static_cast<int>(innerObject.format.size())}},
+    }};
+}}
+
+extern "C"
+Container<InnerObjectExport>
+getInnerObjectFormats()
+{{
+    static std::vector<InnerObjectExportInternal> const innerObjects = []{{
+        std::vector<InnerObjectExportInternal> temp = {{}};
+        py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+        py::module_::import("sys").attr("path").attr("append")("{python_folder}");
+        py::module pluginImport = py::module_::import("{module_name}");
+        if (!hasattr(pluginImport, "inner_objects")) {{
+            return temp;
+        }}
+        auto innerObjects = pluginImport.attr("inner_objects").cast<std::vector<py::object>>();
+        for (int i = 0; i < innerObjects.size(); i++)
+        {{
+            py::object innerObject = innerObjects[i];
+
+            std::vector<SOElementExport> format{{}};
+            auto pythonFormat = innerObject.attr("format").cast<std::vector<py::object>>();
+            for (py::object innerObject: pythonFormat)
+            {{
+                py::tuple tup = innerObject.cast<py::tuple>();
+                WSF sfield = tup[0].cast<WSF>();
+                SOEStyle varType = tup[1].cast<SOEStyle>();
+                format.emplace_back(SOElementExport{{
+                    static_cast<SField const&>(sfield).getCode(),
+                    varType}});
+            }}
+
+            WSF wrappedField = innerObject.attr("field").cast<WSF>();
+            SField const& field = static_cast<SField const&>(wrappedField);
+
+            auto exportedTx = InnerObjectExportInternal{{
+                field.getCode(),
+                std::string(field.jsonName.c_str()),
+                format,
+            }};
+
+            temp.emplace_back(exportedTx);
+        }}
+        return temp;
+    }}();
+    static std::vector<InnerObjectExport> output;
+    output.reserve(innerObjects.size());
+    std::transform(innerObjects.begin(), innerObjects.end(), std::back_inserter(output), mutateInnerObject);
+    return {{const_cast<InnerObjectExport *>(output.data()), static_cast<int>(output.size())}};
+}}
 """
 
 

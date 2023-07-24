@@ -33,13 +33,58 @@ template <typename T>
 int getSTId() { return 0; }
 
 template <>
+int getSTId<ripple::SF_UINT8>() { return ripple::STI_UINT8; }
+
+template <>
+int getSTId<ripple::SF_UINT16>() { return ripple::STI_UINT16; }
+
+template <>
+int getSTId<ripple::SF_UINT32>() { return ripple::STI_UINT32; }
+
+template <>
+int getSTId<ripple::SF_UINT64>() { return ripple::STI_UINT64; }
+
+template <>
+int getSTId<ripple::SF_UINT128>() { return ripple::STI_UINT128; }
+
+template <>
+int getSTId<ripple::SF_UINT256>() { return ripple::STI_UINT256; }
+
+template <>
+int getSTId<ripple::SF_UINT160>() { return ripple::STI_UINT160; }
+
+template <>
 int getSTId<ripple::SF_AMOUNT>() { return ripple::STI_AMOUNT; }
+
+template <>
+int getSTId<ripple::SF_VL>() { return ripple::STI_VL; }
 
 template <> 
 int getSTId<ripple::SF_ACCOUNT>() { return ripple::STI_ACCOUNT; }
 
 template <> 
-int getSTId<ripple::SF_UINT32>() { return ripple::STI_UINT32; }
+int getSTId<ripple::STObject>() { return ripple::STI_OBJECT; }
+
+template <> 
+int getSTId<ripple::STArray>() { return ripple::STI_ARRAY; }
+
+template <>
+int getSTId<ripple::SF_VECTOR256>() { return ripple::STI_VECTOR256; }
+
+template <>
+int getSTId<ripple::SF_UINT96>() { return ripple::STI_UINT96; }
+
+template <>
+int getSTId<ripple::SF_UINT192>() { return ripple::STI_UINT192; }
+
+template <>
+int getSTId<ripple::SF_UINT384>() { return ripple::STI_UINT384; }
+
+template <>
+int getSTId<ripple::SF_UINT512>() { return ripple::STI_UINT512; }
+
+template <>
+int getSTId<ripple::SF_ISSUE>() { return ripple::STI_ISSUE; }
 
 template <class T>
 T const&
@@ -52,11 +97,29 @@ newSField(const int fieldValue, char const* fieldName)
 }
 
 template <class T>
+ripple::SField const&
+newUntypedSField(const int fieldValue, char const* fieldName)
+{
+    if (ripple::SField const& field = ripple::SField::getField(fieldName); field != ripple::sfInvalid)
+        return field;
+    ripple::SField const* newSField = new ripple::SField(getSTId<T>(), fieldValue, fieldName);
+    return *newSField;
+}
+
+template <class T>
 TWSF<T>
 wrappedNewSField(const int fieldValue, std::string const fieldName)
 {
     ripple::TypedField<T> const& sfield = newSField<ripple::TypedField<T>>(fieldValue, fieldName.c_str());
     return TWSF<T>{(void *)&sfield};
+}
+
+template <class T>
+WSF
+wrappedNewUntypedSField(const int fieldValue, std::string const fieldName)
+{
+    ripple::SField const& sfield = newUntypedSField<T>(fieldValue, fieldName.c_str());
+    return WSF{(void *)&sfield};
 }
 
 ripple::SField const& constructCustomSField(int tid, int fv, const char* fn) {
@@ -915,6 +978,8 @@ PYBIND11_MODULE(plugin_transactor, m) {
         .def("create_new_sfield_STPluginType", &wrappedNewSField<ripple::STPluginType>)
         .def("create_new_sfield_STVector256", &wrappedNewSField<ripple::STVector256>)
         .def("create_new_sfield_STPluginType", &wrappedNewSField<ripple::STPluginType>)
+        .def("create_new_sfield_STArray", &wrappedNewUntypedSField<ripple::STArray>)
+        .def("create_new_sfield_STObject", &wrappedNewUntypedSField<ripple::STObject>)
         .def("construct_custom_sfield", &constructCustomWrappedSField)
         .def("make_name", &ripple::make_name)
         .def("not_an_object", py::overload_cast<std::string const&>(&ripple::not_an_object))

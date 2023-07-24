@@ -3,8 +3,11 @@ from plugin_transactor import (
     ConsequencesFactoryType,
     Keylet,
     Slice,
+    STAccount,
     STAmount,
     STUInt32,
+    STArray,
+    STObject,
     VoteBehavior,
     XRPAmount,
     account_keylet,
@@ -56,9 +59,12 @@ from utils import (
     TERCode,
     Transactor,
     create_new_sfield,
+    InnerObject,
 )
 
 sf_finish_after2 = create_new_sfield(STUInt32, "FinishAfter2", 53)
+# sf_fake_array = create_new_sfield(STArray, "FakeArray", 13)
+# sf_fake_element = create_new_sfield(STObject, "FakeElement", 17)
 
 STI_ACCOUNT2 = 28
 
@@ -93,6 +99,7 @@ def from_serial_iter(sit):
 
 
 sf_destination2 = construct_custom_sfield(STI_ACCOUNT2, "Destination2", 1)
+# sf_destination2 = create_new_sfield(STAccount, "Destination2", 18)
 
 stypes = [
     SType(
@@ -103,7 +110,7 @@ stypes = [
         from_serial_iter=from_serial_iter,
     )
 ]
-sfields = [sf_finish_after2, sf_destination2]
+sfields = [sf_finish_after2, sf_destination2]  #, sf_fake_array, sf_fake_element]
 
 
 ltNEW_ESCROW = 0x74
@@ -308,9 +315,14 @@ transactors = [
             (sf_finish_after2,    soeOPTIONAL),
             (sf_destination_tag,  soeOPTIONAL),
             (sf_ticket_sequence,  soeOPTIONAL),
+            # (sf_fake_array,       soeOPTIONAL),
         ],
         consequences_factory_type=ConsequencesFactoryType.Normal,
         preflight=preflight,
         do_apply=do_apply,
     )
 ]
+
+# inner_objects = [
+#     InnerObject(sf_fake_element, [(sf_account, soeOPTIONAL)])
+# ]

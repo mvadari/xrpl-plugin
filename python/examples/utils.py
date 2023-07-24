@@ -22,8 +22,10 @@ from plugin_transactor import (
     Serializer,
     SField,
     SOEStyle,
+    STArray,
     STBase,
     STLedgerEntry,
+    STObject,
     STPluginType,
     STTx,
     TxConsequences,
@@ -53,7 +55,8 @@ class Transactor:
 
 
 def create_new_sfield(cls, field_name, field_value):
-    if not issubclass(cls, STBase):
+    if not issubclass(cls, STBase) and cls != STObject:
+        # TODO: fix inheritance
         raise Exception("SField must be of an `ST` type.")
     if cls == STPluginType:
         raise Exception("Must use `construct_custom_sfield` for custom STypes.")
@@ -142,3 +145,8 @@ class LedgerObject:
             raise Exception(
                 "Must have `delete_object` if `is_deletion_blocker` is False"
             )
+
+@dataclass(frozen=True)
+class InnerObject:
+    field: SField
+    format: List[Tuple[SField, SOEStyle]]
