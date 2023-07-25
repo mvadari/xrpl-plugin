@@ -168,7 +168,8 @@ newUntypedSField(const int fieldValue, char const* fieldName)
     return *newSField;
 }
 
-SF_PLUGINTYPE const& constructCustomSField(int tid, int fv, const char* fn) {
+SF_PLUGINTYPE const&
+constructCustomSField(int tid, int fv, const char* fn) {
     if (SField const& field = SField::getField(field_code(tid, fv)); field != sfInvalid)
         return reinterpret_cast<SF_PLUGINTYPE const&>(field);
     return *(new SF_PLUGINTYPE(tid, fv, fn));

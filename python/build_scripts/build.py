@@ -489,6 +489,14 @@ getLedgerObjects()
 // SFields
 // ----------------------------------------------------------------------------
 
+static struct
+{{
+    bool operator()(py::object a, py::object b) const {{ 
+        return a.attr("fieldNum").cast<int>() < b.attr("fieldNum").cast<int>();
+    }}
+}}
+sFieldSorter;
+
 extern "C"
 Container<SFieldExport>
 getSFields()
@@ -502,7 +510,8 @@ getSFields()
             return temp;
         }}
         auto sfields = pluginImport.attr("sfields").cast<std::vector<py::object>>();
-        for (py::object variable: sfields)
+        std::sort(sfields.begin(), sfields.end(), sFieldSorter);
+        for (py::object& variable: sfields)
         {{
             WSF wrappedSField = variable.cast<WSF>();
             SField const& sfield = static_cast<SField const&>(wrappedSField);

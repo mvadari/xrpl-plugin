@@ -90,9 +90,15 @@ template <class T>
 T const&
 newSField(const int fieldValue, char const* fieldName)
 {
+    int const typeId = getSTId<T>();
+    if (typeId == ripple::STI_ARRAY || typeId == ripple::STI_OBJECT)
+    {
+        // TODO: merge `newSField` and `newUntypedSField` for a seamless experience
+        throw std::runtime_error("Must use `newUntypedSField` for arrays and objects");
+    }
     if (ripple::SField const& field = ripple::SField::getField(fieldName); field != ripple::sfInvalid)
         return static_cast<T const&>(field);
-    T const* newSField = new T(getSTId<T>(), fieldValue, fieldName);
+    T const* newSField = new T(typeId, fieldValue, fieldName);
     return *newSField;
 }
 
@@ -122,16 +128,17 @@ wrappedNewUntypedSField(const int fieldValue, std::string const fieldName)
     return WSF{(void *)&sfield};
 }
 
-ripple::SField const& constructCustomSField(int tid, int fv, const char* fn) {
+ripple::SF_PLUGINTYPE const&
+constructCustomSField(int tid, int fv, const char* fn) {
     if (ripple::SField const& field = ripple::SField::getField(ripple::field_code(tid, fv)); field != ripple::sfInvalid)
-        return field;
-    return *(new ripple::TypedField<ripple::STPluginType>(tid, fv, fn));
+        return reinterpret_cast<ripple::SF_PLUGINTYPE const&>(field);
+    return *(new ripple::SF_PLUGINTYPE(tid, fv, fn));
 }
 
 TWSF<ripple::STPluginType>
 constructCustomWrappedSField(int tid, const char* fn, int fv)
 {
-    ripple::SField const& sfield = constructCustomSField(tid, fv, fn);
+    ripple::SF_PLUGINTYPE const& sfield = constructCustomSField(tid, fv, fn);
     return TWSF<ripple::STPluginType>{(void *)&sfield};
 }
 
@@ -387,6 +394,21 @@ PYBIND11_MODULE(xrpl_plugin_py, m) {
         .def_property_readonly("fieldCode",
             [](const WSF &wsf) {
                 return static_cast<ripple::SField const&>(wsf).fieldCode;
+            }
+        )
+        .def_property_readonly("fieldNum",
+            [](const WSF &wsf) {
+                return static_cast<ripple::SField const&>(wsf).fieldNum;
+            }
+        )
+        .def_property_readonly("fieldName",
+            [](const WSF &wsf) {
+                return static_cast<ripple::SField const&>(wsf).fieldName;
+            }
+        )
+        .def_property_readonly("fieldType",
+            [](const WSF &wsf) {
+                return static_cast<ripple::SField const&>(wsf).fieldType;
             }
         )
         .def("__repr__",
@@ -659,7 +681,12 @@ PYBIND11_MODULE(xrpl_plugin_py, m) {
             }
         )
         .def(py::self == py::self)
-        .def(py::self != py::self);
+        .def(py::self != py::self)
+        .def("__repr__",
+            [](const ripple::STObject &obj) {
+                return obj.getFullText();
+            }
+        );
 
     py::class_<ripple::STTx, ripple::STObject, std::shared_ptr<ripple::STTx>> STTx(m, "STTx");
     STTx

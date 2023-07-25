@@ -61,8 +61,8 @@ from xrpl_plugin import (
 )
 
 sf_finish_after2 = create_new_sfield(STUInt32, "FinishAfter2", 53)
-# sf_fake_array = create_new_sfield(STArray, "FakeArray", 13)
-# sf_fake_element = create_new_sfield(STObject, "FakeElement", 17)
+sf_fake_array = create_new_sfield(STArray, "FakeArray", 13)
+sf_fake_element = create_new_sfield(STObject, "FakeElement", 17)
 
 STI_ACCOUNT2 = 28
 
@@ -107,7 +107,7 @@ stypes = [
         from_serial_iter=from_serial_iter,
     )
 ]
-sfields = [sf_finish_after2, sf_destination2]  #, sf_fake_array, sf_fake_element]
+sfields = [sf_finish_after2, sf_destination2, sf_fake_array, sf_fake_element]
 
 
 ltNEW_ESCROW = 0x74
@@ -311,7 +311,7 @@ transactors = [
             (sf_finish_after2, soeOPTIONAL),
             (sf_destination_tag, soeOPTIONAL),
             (sf_ticket_sequence, soeOPTIONAL),
-            # (sf_fake_array,       soeOPTIONAL),
+            (sf_fake_array,       soeOPTIONAL),
         ],
         consequences_factory_type=ConsequencesFactoryType.Normal,
         preflight=preflight,
@@ -319,6 +319,6 @@ transactors = [
     )
 ]
 
-# inner_objects = [
-#     InnerObject(sf_fake_element, [(sf_account, soeOPTIONAL)])
-# ]
+inner_objects = [
+    InnerObject(sf_fake_element, [(sf_account, soeOPTIONAL)])
+]

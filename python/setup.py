@@ -32,7 +32,8 @@ class CMakeBuild(build_ext):
         # Using this requires trailing slash for auto-detection & inclusion of
         # auxiliary "native" libs
 
-        debug = int(os.environ.get("DEBUG", 0)) if self.debug is None else self.debug
+        # debug = int(os.environ.get("DEBUG", 0)) if self.debug is None else self.debug
+        debug = True
         cfg = "Debug" if debug else "Release"
 
         # CMake lets you override the generator - we need to check this.
@@ -141,7 +142,7 @@ class CMakeBuild(build_ext):
 # The information here can also be placed in setup.cfg - better separation of
 # logic and declaration, and simpler if you include description/version in a file.
 setup(
-    name="xrpl_plugin",
+    name="xrpl-plugin",
     version="0.0.1",
     author="Mayukha Vadari",
     author_email="mvadari@ripple.com",
