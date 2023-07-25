@@ -3,8 +3,8 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Callable, List, Optional, Tuple
 
-import plugin_transactor
-from plugin_transactor import (
+from . import xrpl_plugin_py
+from .xrpl_plugin_py import (
     TER,
     AccountID,
     Application,
@@ -61,7 +61,7 @@ def create_new_sfield(cls, field_name, field_value):
     if cls == STPluginType:
         raise Exception("Must use `construct_custom_sfield` for custom STypes.")
     fn_name = f"create_new_sfield_{cls.__name__}"
-    create_fn = getattr(plugin_transactor, fn_name, None)
+    create_fn = getattr(xrpl_plugin_py, fn_name, None)
     if create_fn is None:
         # NOTE: This should never be hit in prod
         # It may be hit during dev work since not everything is implemented yet
@@ -145,6 +145,7 @@ class LedgerObject:
             raise Exception(
                 "Must have `delete_object` if `is_deletion_blocker` is False"
             )
+
 
 @dataclass(frozen=True)
 class InnerObject:

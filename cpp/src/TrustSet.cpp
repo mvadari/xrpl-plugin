@@ -807,7 +807,6 @@ extern "C"
 Container<TERExport>
 getTERcodes()
 {
-    auto const& var = sfQualityIn2();
     static TERExport sfields[] = {
         {temINVALID_FLAG2, "temINVALID_FLAG2", "Test code"},
     };

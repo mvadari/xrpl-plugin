@@ -144,7 +144,7 @@ indexHash(std::uint16_t space, Args const&... args)
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(plugin_transactor, m) {
+PYBIND11_MODULE(xrpl_plugin_py, m) {
 
     /*
     * Enums

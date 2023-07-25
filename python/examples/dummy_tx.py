@@ -1,5 +1,6 @@
-from plugin_transactor import (
+from xrpl_plugin import (
     ConsequencesFactoryType,
+    Transactor,
     account_keylet,
     fixMasterKeyAsRegularKey,
     lsfDisableMaster,
@@ -16,10 +17,10 @@ from plugin_transactor import (
     tesSUCCESS,
     tf_universal_mask,
 )
-from utils import Transactor
 
 
 def preflight(ctx):
+    print("This is a Python plugin")
     if (preflight1ret := preflight1(ctx)) != tesSUCCESS:
         return preflight1ret
 

@@ -1,7 +1,5 @@
 import os
-import re
 import subprocess
-import sys
 from pathlib import Path
 
 from setuptools import Extension, setup
@@ -118,7 +116,19 @@ class CMakeBuild(build_ext):
 
         conan_cmake = "build/generators/conan_toolchain.cmake"
         if not os.path.exists(os.path.join(os.getcwd(), conan_cmake)):
-            subprocess.run(["conan", "install", ext.sourcedir, "--build", "missing", "--settings", f"build_type={cfg}"], cwd=build_temp, check=True)
+            subprocess.run(
+                [
+                    "conan",
+                    "install",
+                    ext.sourcedir,
+                    "--build",
+                    "missing",
+                    "--settings",
+                    f"build_type={cfg}",
+                ],
+                cwd=build_temp,
+                check=True,
+            )
         cmake_args += [f"-DCMAKE_TOOLCHAIN_FILE:FILEPATH={conan_cmake}"]
         subprocess.run(
             ["cmake", ext.sourcedir] + cmake_args, cwd=build_temp, check=True
@@ -131,13 +141,14 @@ class CMakeBuild(build_ext):
 # The information here can also be placed in setup.cfg - better separation of
 # logic and declaration, and simpler if you include description/version in a file.
 setup(
-    name="plugin_transactor",
+    name="xrpl_plugin",
     version="0.0.1",
     author="Mayukha Vadari",
     author_email="mvadari@ripple.com",
     description="XRPL Plugins",
     long_description="",
-    ext_modules=[CMakeExtension("plugin_transactor")],
+    packages=["xrpl_plugin"],
+    ext_modules=[CMakeExtension("xrpl_plugin.xrpl_plugin_py")],
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
     extras_require={"test": ["pytest>=6.0"]},

@@ -1,19 +1,27 @@
-from plugin_transactor import (
+from xrpl_plugin import (
     AccountID,
+    Amendment,
     ConsequencesFactoryType,
+    InnerObject,
+    InvariantCheck,
     Keylet,
+    LedgerObject,
     Slice,
     STAccount,
     STAmount,
-    STUInt32,
     STArray,
     STObject,
+    STUInt32,
+    SType,
+    TERCode,
+    Transactor,
     VoteBehavior,
     XRPAmount,
     account_keylet,
     adjust_owner_count,
     bad_type,
     construct_custom_sfield,
+    create_new_sfield,
     fix1543,
     fix1571,
     index_hash,
@@ -50,16 +58,6 @@ from plugin_transactor import (
     tesSUCCESS,
     tf_universal_mask,
     zero_amount,
-)
-from utils import (
-    Amendment,
-    InvariantCheck,
-    LedgerObject,
-    SType,
-    TERCode,
-    Transactor,
-    create_new_sfield,
-    InnerObject,
 )
 
 sf_finish_after2 = create_new_sfield(STUInt32, "FinishAfter2", 53)
@@ -99,7 +97,6 @@ def from_serial_iter(sit):
 
 
 sf_destination2 = construct_custom_sfield(STI_ACCOUNT2, "Destination2", 1)
-# sf_destination2 = create_new_sfield(STAccount, "Destination2", 18)
 
 stypes = [
     SType(
@@ -159,18 +156,18 @@ ledger_objects = [
         name="NewEscrow",
         rpc_name="new_escrow",
         object_format=[
-            (sf_account,              soeREQUIRED),
-            (sf_destination2,         soeREQUIRED),
-            (sf_amount,               soeREQUIRED),
-            (sf_condition,            soeOPTIONAL),
-            (sf_cancel_after,         soeOPTIONAL),
-            (sf_finish_after2,        soeOPTIONAL),
-            (sf_source_tag,           soeOPTIONAL),
-            (sf_destination_tag,      soeOPTIONAL),
-            (sf_owner_node,           soeREQUIRED),
-            (sf_previous_txn_id,      soeREQUIRED),
+            (sf_account, soeREQUIRED),
+            (sf_destination2, soeREQUIRED),
+            (sf_amount, soeREQUIRED),
+            (sf_condition, soeOPTIONAL),
+            (sf_cancel_after, soeOPTIONAL),
+            (sf_finish_after2, soeOPTIONAL),
+            (sf_source_tag, soeOPTIONAL),
+            (sf_destination_tag, soeOPTIONAL),
+            (sf_owner_node, soeREQUIRED),
+            (sf_previous_txn_id, soeREQUIRED),
             (sf_previous_txn_lgr_seq, soeREQUIRED),
-            (sf_destination_node,     soeOPTIONAL),
+            (sf_destination_node, soeOPTIONAL),
         ],
         is_deletion_blocker=True,
         visit_entry_xrp_change=visit_entry_xrp_change_escrow,
@@ -216,9 +213,8 @@ def preflight(ctx):
     if amount <= zero_amount:
         return temBAD_AMOUNT
 
-    if (
-        not ctx.tx.is_field_present(sf_cancel_after)
-        and not ctx.tx.is_field_present(sf_finish_after2)
+    if not ctx.tx.is_field_present(sf_cancel_after) and not ctx.tx.is_field_present(
+        sf_finish_after2
     ):
         return temBAD_EXPIRATION
 
@@ -308,13 +304,13 @@ transactors = [
         name="NewEscrowCreate",
         tx_type=47,
         tx_format=[
-            (sf_destination2,     soeREQUIRED),
-            (sf_amount,           soeREQUIRED),
-            (sf_condition,        soeOPTIONAL),
-            (sf_cancel_after,     soeOPTIONAL),
-            (sf_finish_after2,    soeOPTIONAL),
-            (sf_destination_tag,  soeOPTIONAL),
-            (sf_ticket_sequence,  soeOPTIONAL),
+            (sf_destination2, soeREQUIRED),
+            (sf_amount, soeREQUIRED),
+            (sf_condition, soeOPTIONAL),
+            (sf_cancel_after, soeOPTIONAL),
+            (sf_finish_after2, soeOPTIONAL),
+            (sf_destination_tag, soeOPTIONAL),
+            (sf_ticket_sequence, soeOPTIONAL),
             # (sf_fake_array,       soeOPTIONAL),
         ],
         consequences_factory_type=ConsequencesFactoryType.Normal,
