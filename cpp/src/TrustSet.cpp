@@ -17,99 +17,25 @@
 */
 //==============================================================================
 
-#include "TrustSet.h"
 #include <ripple/basics/Log.h>
 #include <ripple/ledger/View.h>
 #include <ripple/protocol/Feature.h>
 #include <ripple/protocol/Indexes.h>
 #include <ripple/protocol/Quality.h>
+#include <ripple/protocol/SField.h>
 #include <ripple/protocol/st.h>
 #include <ripple/protocol/ErrorCodes.h>
 #include <ripple/beast/core/LexicalCast.h>
+#include <ripple/protocol/TxFlags.h>
+#include <ripple/plugin/exports.h>
+#include <string>
+
+using namespace ripple;
 
 
-typedef ripple::SField const& (*createNewSFieldPtr)(
-    int tid,
-    int fv,
-    const char* fn);
-typedef ripple::STBase* (*constructSTypePtr)(ripple::SerialIter& sit, ripple::SField const& name);
-typedef ripple::STBase* (*constructSTypePtr2)(ripple::SField const& name);
-typedef std::optional<ripple::detail::STVar> (*parseLeafTypePtr)(
-    ripple::SField const&,
-    std::string const&,
-    std::string const&,
-    ripple::SField const*,
-    Json::Value const&,
-    Json::Value&);
+const int STI_UINT32_2 = 28;
 
-struct STypeExport {
-    int typeId;
-    createNewSFieldPtr createPtr;
-    parseLeafTypePtr parsePtr;
-    constructSTypePtr constructPtr;
-    constructSTypePtr2 constructPtr2;
-};
-
-namespace ripple {
-
-const int STI_UINT32_2 = 24;
-
-class STUInt32_2 : public STUInt32
-{
-using STUInt32::STUInt32;
-
-STUInt32_2(STUInt32 num) : STUInt32(num.value())
-{
-}
-
-STBase*
-copy(std::size_t n, void* buf) const
-{
-    return emplace(n, buf, *this);
-}
-
-STBase*
-move(std::size_t n, void* buf)
-{
-    return emplace(n, buf, std::move(*this));
-}
-
-int
-getSType() const
-{
-    return STI_UINT32_2;
-}
-};
-
-using SF_UINT32_2 = TypedField<STUInt32_2>;
-
-template <class T>
-STBase*
-constructNewSType(SerialIter& sit, SField const& name)
-{
-    T* stype = new T(sit, name);
-    return stype;
-}
-
-template <class T>
-STBase*
-constructNewSType2(SField const& name)
-{
-    return new T(name);
-}
-
-template <class T>
-SField const&
-createNewSType(int tid, int fv, const char* fn)
-{
-    if (SField const& field = SField::getField(field_code(tid, fv)); field != sfInvalid)
-        return field;
-    // TODO: refactor
-    // probably not a memory leak because the constructor adds the object to a map
-    return *(new T(tid, fv, fn));
-}
-
-std::optional<detail::STVar>
+Buffer
 parseLeafTypeNew(
     SField const& field,
     std::string const& json_name,
@@ -119,44 +45,80 @@ parseLeafTypeNew(
     Json::Value& error)
 {
     // copied from parseLeafType<STUInt32>
-    std::optional<detail::STVar> ret;
+    std::optional<uint32_t> ret;
     try
     {
         if (value.isString())
         {
-            ret = detail::make_stvar<STUInt32_2>(
-                field,
-                beast::lexicalCastThrow<std::uint32_t>(
-                    value.asString()));
+            ret = beast::lexicalCastThrow<std::uint32_t>(
+                    value.asString());
         }
         else if (value.isInt())
         {
-            ret = detail::make_stvar<STUInt32_2>(
-                field, to_unsigned<std::uint32_t>(value.asInt()));
+            ret = to_unsigned<std::uint32_t>(value.asInt());
         }
         else if (value.isUInt())
         {
-            ret = detail::make_stvar<STUInt32_2>(
-                field, safe_cast<std::uint32_t>(value.asUInt()));
+            ret = safe_cast<std::uint32_t>(value.asUInt());
         }
         else
         {
             error = bad_type(json_name, fieldName);
-            return ret;
         }
-        return ret;
+        if (ret.has_value())
+        {
+            auto const val = ret.value();
+            return Buffer(&val, sizeof val);
+        }
+        return Buffer();
     }
     catch (std::exception const&)
     {
         error = invalid_data(json_name, fieldName);
-        return ret;
+        return Buffer();
     }
+}
+
+std::uint32_t
+bufferToUInt32(Buffer const& buf)
+{
+    std::uint32_t result = 0;
+    int shift = 0;
+    for (int i = 0; i < buf.size(); i++)
+    {
+        auto const byte = *(buf.data() + i);
+        result |= static_cast<std::uint32_t>(byte) << shift;
+        shift += 8;
+    }
+
+    return result;
+}
+
+std::string
+toString(int typeId, Buffer const& buf)
+{
+    uint32_t val = bufferToUInt32(buf);
+    return std::to_string(val);
+}
+
+void
+toSerializer(int typeId, Buffer const& buf, Serializer& s)
+{
+    uint32_t val = bufferToUInt32(buf);
+    s.add32(val);
+}
+
+Buffer
+fromSerialIter(int typeId, SerialIter& st)
+{
+    uint32_t val = st.get32();
+    return Buffer(&val, sizeof val);
 }
 
 // helper stuff that needs to be moved to rippled
 
 template <typename T>
-int getSTId() { return 0; }
+int getSTId() { return STI_UNKNOWN; }
 
 template <>
 int getSTId<SF_AMOUNT>() { return STI_AMOUNT; }
@@ -168,17 +130,24 @@ template <>
 int getSTId<SF_UINT32>() { return STI_UINT32; }
 
 template <> 
-int getSTId<SF_UINT32_2>() { return STI_UINT32_2; }
+int getSTId<STArray>() { return STI_ARRAY; }
 
-
+template <> 
+int getSTId<STObject>() { return STI_OBJECT; }
 
 template <class T>
 T const&
 newSField(const int fieldValue, char const* fieldName)
 {
+    int const typeId = getSTId<T>();
+    if (typeId == STI_ARRAY || typeId == STI_OBJECT)
+    {
+        // TODO: merge `newSField` and `newUntypedSField` for a seamless experience
+        throw std::runtime_error("Must use `newUntypedSField` for arrays and objects");
+    }
     if (SField const& field = SField::getField(fieldName); field != sfInvalid)
         return static_cast<T const&>(field);
-    T const* newSField = new T(getSTId<T>(), fieldValue, fieldName);
+    T const* newSField = new T(typeId, fieldValue, fieldName);
     return *newSField;
 }
 
@@ -189,17 +158,52 @@ newSField(const int fieldValue, std::string const fieldName)
     return newSField<T>(fieldValue, fieldName.c_str());
 }
 
+template <class T>
+SField const&
+newUntypedSField(const int fieldValue, char const* fieldName)
+{
+    if (SField const& field = SField::getField(fieldName); field != sfInvalid)
+        return field;
+    SField const* newSField = new SField(getSTId<T>(), fieldValue, fieldName);
+    return *newSField;
+}
+
+SF_PLUGINTYPE const& constructCustomSField(int tid, int fv, const char* fn) {
+    if (SField const& field = SField::getField(field_code(tid, fv)); field != sfInvalid)
+        return reinterpret_cast<SF_PLUGINTYPE const&>(field);
+    return *(new SF_PLUGINTYPE(tid, fv, fn));
+}
+
 // end of helper stuff
 
-SF_UINT32_2 const&
+SField const&
+sfFakeArray()
+{
+    return newUntypedSField<STArray>(13, "FakeArray");
+}
+
+SField const&
+sfFakeElement()
+{
+    return newUntypedSField<STObject>(17, "FakeElement");
+}
+
+SF_PLUGINTYPE const&
 sfQualityIn2()
 {
-    return newSField<SF_UINT32_2>(47, "QualityIn2");
+    return constructCustomSField(STI_UINT32_2, 1, "QualityIn2");
 }
+
+static uint256 pluginAmendment;
+
+const int temINVALID_FLAG2 = -256;
 
 NotTEC
 preflight(PreflightContext const& ctx)
 {
+    if (!ctx.rules.enabled(pluginAmendment))
+        return temDISABLED;
+
     if (auto const ret = preflight1(ctx); !isTesSuccess(ret))
         return ret;
 
@@ -211,7 +215,7 @@ preflight(PreflightContext const& ctx)
     if (uTxFlags & tfTrustSetMask)
     {
         JLOG(j.trace()) << "Malformed transaction: Invalid flags set.";
-        return temINVALID_FLAG;
+        return NotTEC::fromInt(temINVALID_FLAG2);
     }
 
     STAmount const saLimitAmount(tx.getFieldAmount(sfLimitAmount));
@@ -359,7 +363,8 @@ doApply(ApplyContext& ctx, XRPAmount mPriorBalance, XRPAmount mSourceBalance)
         (uOwnerCount < 2) ? XRPAmount(beast::zero)
                           : ctx.view().fees().accountReserve(uOwnerCount + 1));
 
-    std::uint32_t uQualityIn(bQualityIn ? ctx.tx.getFieldU32(sfQualityIn2()) : 0);
+    const ripple::STPluginType qualityIn = ctx.tx.getFieldPluginType(sfQualityIn2());
+    std::uint32_t uQualityIn(bQualityIn ? static_cast<uint32_t>(std::stoul(qualityIn.getText())) : 0);
     std::uint32_t uQualityOut(
         bQualityOut ? ctx.tx.getFieldU32(sfQualityOut) : 0);
 
@@ -696,107 +701,134 @@ doApply(ApplyContext& ctx, XRPAmount mPriorBalance, XRPAmount mSourceBalance)
     return terResult;
 }
 
-}  // namespace ripple
-
-
-
 extern "C"
-ripple::NotTEC
-preflight(ripple::PreflightContext const& ctx)
+Container<TransactorExport>
+getTransactors()
 {
-    return ripple::preflight(ctx);
-}
-
-extern "C"
-ripple::TER
-preclaim(ripple::PreclaimContext const& ctx)
-{
-    return ripple::preclaim(ctx);
-}
-
-extern "C"
-ripple::XRPAmount
-calculateBaseFee(ripple::ReadView const& view, ripple::STTx const& tx)
-{
-    return ripple::Transactor::calculateBaseFee(view, tx);
-}
-
-extern "C"
-ripple::TER
-doApply(
-    ripple::ApplyContext& ctx,
-    ripple::XRPAmount mPriorBalance,
-    ripple::XRPAmount mSourceBalance)
-{
-    return ripple::doApply(ctx, mPriorBalance, mSourceBalance);
-}
-
-extern "C"
-char const*
-getTxName()
-{
-    return "TrustSet2";
-}
-
-struct FakeSOElement {
-    int fieldCode;
-    ripple::SOEStyle style;
-};
-
-extern "C"
-std::vector<FakeSOElement>
-getTxFormat()
-{
-    return std::vector<FakeSOElement>{
-        {ripple::sfLimitAmount.getCode(), ripple::soeOPTIONAL},
-        {ripple::sfQualityIn2().getCode(), ripple::soeOPTIONAL},
-        {ripple::sfQualityOut.getCode(), ripple::soeOPTIONAL},
-        {ripple::sfTicketSequence.getCode(), ripple::soeOPTIONAL},
+    static SOElementExport format[] = {
+        {sfLimitAmount.getCode(), soeOPTIONAL},
+        {sfQualityIn2().getCode(), soeOPTIONAL},
+        {sfQualityOut.getCode(), soeOPTIONAL},
+        {sfTicketSequence.getCode(), soeOPTIONAL},
+        {sfFakeArray().getCode(), soeREQUIRED},
     };
+    SOElementExport* formatPtr = format;
+    static TransactorExport list[] = {
+        {
+            "TrustSet2",
+            50,
+            {
+                formatPtr, 5
+            },
+            Transactor::ConsequencesFactoryType::Normal,
+            NULL,
+            NULL,
+            preflight,
+            preclaim,
+            doApply,
+            NULL,
+            NULL,
+            NULL,
+            NULL
+        }
+    };
+    TransactorExport* ptr = list;
+    return {ptr, 1};
 }
 
-struct SFieldInfo {
-    int typeId;
-    int fieldValue;
-    const char * txtName;
-};
-
 extern "C"
-std::vector<STypeExport>
+Container<STypeExport>
 getSTypes()
 {
-    registerSType(ripple::STI_UINT32_2, ripple::createNewSType<ripple::SF_UINT32_2>);
-    return std::vector<STypeExport>{
+    static STypeExport exports[] = {
         {
-            ripple::STI_UINT32_2,
-            ripple::createNewSType<ripple::SF_UINT32_2>,
-            ripple::parseLeafTypeNew,
-            ripple::constructNewSType<ripple::STUInt32_2>,
-            ripple::constructNewSType2<ripple::STUInt32_2>
+            STI_UINT32_2,
+            parseLeafTypeNew,
+            toString,
+            NULL,
+            toSerializer,
+            fromSerialIter,
         },
     };
+    for (int i = 0; i < sizeof(exports) / sizeof(exports[0]); i++)
+    {
+        auto const stype = exports[i];
+        registerSType(
+            {stype.typeId,
+                stype.toString,
+                stype.toJson,
+                stype.toSerializer,
+                stype.fromSerialIter});
+        registerLeafType(stype.typeId, stype.parsePtr);
+    }
+    STypeExport* ptr = exports;
+    return {ptr, 1};
 }
 
 extern "C"
-std::vector<SFieldInfo>
+Container<SFieldExport>
 getSFields()
 {
-    auto const& sfQualityIn2 = ripple::sfQualityIn2();
-    return std::vector<SFieldInfo>{
-        {sfQualityIn2.fieldType, sfQualityIn2.fieldValue, sfQualityIn2.fieldName.c_str()},
+    auto const& qualityIn = sfQualityIn2();
+    auto const& fakeArray = sfFakeArray();
+    auto const& fakeElement = sfFakeElement();
+    static SFieldExport sfields[] = {
+        {qualityIn.fieldType, qualityIn.fieldValue, qualityIn.fieldName.c_str()},
+        {fakeArray.fieldType, fakeArray.fieldValue, fakeArray.fieldName.c_str()},
+        {fakeElement.fieldType, fakeElement.fieldValue, fakeElement.fieldName.c_str()},
     };
+    SFieldExport* ptr = sfields;
+    return {ptr, 3};
 }
 
 extern "C"
-std::uint16_t
-getTxType()
+Container<InnerObjectExport>
+getInnerObjectFormats()
 {
-    return 20;
+    static SOElementExport format[] = {
+        {sfAccount.getCode(), soeREQUIRED},
+    };
+    auto const& fakeElement = sfFakeElement();
+    SOElementExport* formatPtr = format;
+    static InnerObjectExport list[] = {
+        {
+            fakeElement.getCode(),
+            fakeElement.jsonName.c_str(),
+            {
+                formatPtr, 1
+            },
+        }
+    };
+    InnerObjectExport* ptr = list;
+    return {ptr, 1};
 }
 
 extern "C"
-std::string
-getTTName()
+Container<TERExport>
+getTERcodes()
 {
-    return "ttTRUST_SET";
+    auto const& var = sfQualityIn2();
+    static TERExport sfields[] = {
+        {temINVALID_FLAG2, "temINVALID_FLAG2", "Test code"},
+    };
+    TERExport* ptr = sfields;
+    return {ptr, 1};
+}
+
+
+extern "C"
+Container<AmendmentExport>
+getAmendments()
+{
+    AmendmentExport const amendment = {
+        "featurePluginTest",
+        true,
+        VoteBehavior::DefaultNo,
+    };
+    pluginAmendment = registerPluginAmendment(amendment);
+    static AmendmentExport list[] = {
+        amendment
+    };
+    AmendmentExport* ptr = list;
+    return {ptr, 1};
 }

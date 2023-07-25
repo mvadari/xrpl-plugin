@@ -3,11 +3,11 @@
 #include <pybind11/operators.h>
 
 #include <ripple/app/tx/impl/Transactor.h>
+#include <ripple/protocol/Serializer.h>
 #include <ripple/protocol/st.h>
 #include <ripple/protocol/TxFlags.h>
 #include <ripple/protocol/Feature.h>
 #include <ripple/ledger/View.h>
-#include <ripple/protocol/impl/STVar.h>
 #include <ripple/protocol/digest.h>
 #include <map>
 #include <iostream>
@@ -33,13 +33,58 @@ template <typename T>
 int getSTId() { return 0; }
 
 template <>
+int getSTId<ripple::SF_UINT8>() { return ripple::STI_UINT8; }
+
+template <>
+int getSTId<ripple::SF_UINT16>() { return ripple::STI_UINT16; }
+
+template <>
+int getSTId<ripple::SF_UINT32>() { return ripple::STI_UINT32; }
+
+template <>
+int getSTId<ripple::SF_UINT64>() { return ripple::STI_UINT64; }
+
+template <>
+int getSTId<ripple::SF_UINT128>() { return ripple::STI_UINT128; }
+
+template <>
+int getSTId<ripple::SF_UINT256>() { return ripple::STI_UINT256; }
+
+template <>
+int getSTId<ripple::SF_UINT160>() { return ripple::STI_UINT160; }
+
+template <>
 int getSTId<ripple::SF_AMOUNT>() { return ripple::STI_AMOUNT; }
+
+template <>
+int getSTId<ripple::SF_VL>() { return ripple::STI_VL; }
 
 template <> 
 int getSTId<ripple::SF_ACCOUNT>() { return ripple::STI_ACCOUNT; }
 
 template <> 
-int getSTId<ripple::SF_UINT32>() { return ripple::STI_UINT32; }
+int getSTId<ripple::STObject>() { return ripple::STI_OBJECT; }
+
+template <> 
+int getSTId<ripple::STArray>() { return ripple::STI_ARRAY; }
+
+template <>
+int getSTId<ripple::SF_VECTOR256>() { return ripple::STI_VECTOR256; }
+
+template <>
+int getSTId<ripple::SF_UINT96>() { return ripple::STI_UINT96; }
+
+template <>
+int getSTId<ripple::SF_UINT192>() { return ripple::STI_UINT192; }
+
+template <>
+int getSTId<ripple::SF_UINT384>() { return ripple::STI_UINT384; }
+
+template <>
+int getSTId<ripple::SF_UINT512>() { return ripple::STI_UINT512; }
+
+template <>
+int getSTId<ripple::SF_ISSUE>() { return ripple::STI_ISSUE; }
 
 template <class T>
 T const&
@@ -52,6 +97,16 @@ newSField(const int fieldValue, char const* fieldName)
 }
 
 template <class T>
+ripple::SField const&
+newUntypedSField(const int fieldValue, char const* fieldName)
+{
+    if (ripple::SField const& field = ripple::SField::getField(fieldName); field != ripple::sfInvalid)
+        return field;
+    ripple::SField const* newSField = new ripple::SField(getSTId<T>(), fieldValue, fieldName);
+    return *newSField;
+}
+
+template <class T>
 TWSF<T>
 wrappedNewSField(const int fieldValue, std::string const fieldName)
 {
@@ -59,10 +114,17 @@ wrappedNewSField(const int fieldValue, std::string const fieldName)
     return TWSF<T>{(void *)&sfield};
 }
 
+template <class T>
+WSF
+wrappedNewUntypedSField(const int fieldValue, std::string const fieldName)
+{
+    ripple::SField const& sfield = newUntypedSField<T>(fieldValue, fieldName.c_str());
+    return WSF{(void *)&sfield};
+}
+
 ripple::SField const& constructCustomSField(int tid, int fv, const char* fn) {
     if (ripple::SField const& field = ripple::SField::getField(ripple::field_code(tid, fv)); field != ripple::sfInvalid)
         return field;
-    ripple::registerSType(tid);
     return *(new ripple::TypedField<ripple::STPluginType>(tid, fv, fn));
 }
 
@@ -402,7 +464,12 @@ PYBIND11_MODULE(plugin_transactor, m) {
         .def(py::self >= py::self)
         .def(py::self == int())
         .def(py::self != int())
-        .def(-py::self);
+        .def(-py::self)
+        .def("__repr__",
+            [](const ripple::XRPAmount &xrp) {
+                return ripple::to_string(xrp);
+            }
+        );
     
     py::class_<ripple::Issue> Issue(m, "Issue");
     py::class_<ripple::Currency> Currency(m, "Currency");
@@ -422,6 +489,11 @@ PYBIND11_MODULE(plugin_transactor, m) {
                 return ripple::Buffer(slice.data(), slice.size());
             },
             py::return_value_policy::move
+        )
+        .def("from_buffer",
+            [](const ripple::Buffer &buf) {
+                return ripple::Slice(std::move(buf.data()), buf.size());
+            }
         )
         .def("__repr__",
             [](const ripple::Slice &slice) {
@@ -451,18 +523,15 @@ PYBIND11_MODULE(plugin_transactor, m) {
         .def("is_string", &Json::Value::isString)
         .def("as_string", &Json::Value::asString)
         .def("__repr__", &Json::Value::asCString);
+    
+    py::enum_<ripple::VoteBehavior>(m, "VoteBehavior")
+        .value("OBSOLETE", ripple::VoteBehavior::Obsolete)
+        .value("DEFAULT_NO", ripple::VoteBehavior::DefaultNo)
+        .value("DEFAULT_YES", ripple::VoteBehavior::DefaultYes);
 
     /*
     * STObjects
     */
-
-    py::class_<ripple::detail::STVar> STVar(m, "STVar");
-    STVar
-        .def("get",
-            [](const ripple::detail::STVar &var) {
-                return var.get();
-            }
-        );
 
     py::class_<ripple::STBase> STBase(m, "STBase");
     STBase
@@ -489,6 +558,7 @@ PYBIND11_MODULE(plugin_transactor, m) {
             }
         )
         .def("xrp", &ripple::STAmount::xrp)
+        .def("native", &ripple::STAmount::native)
         .def(py::self += py::self)
         .def(py::self -= py::self)
         .def(py::self + py::self)
@@ -599,6 +669,9 @@ PYBIND11_MODULE(plugin_transactor, m) {
     ;
 
     py::class_<ripple::STLedgerEntry, ripple::STObject, std::shared_ptr<ripple::STLedgerEntry>> STLedgerEntry(m, "STLedgerEntry");
+    STLedgerEntry
+        .def("get_type", &ripple::STLedgerEntry::getType)
+    ;
 
     /*
     * Contexts and classes that the contexts depend on
@@ -606,7 +679,13 @@ PYBIND11_MODULE(plugin_transactor, m) {
 
     py::class_<ripple::Rules> Rules(m, "Rules");
     Rules
-        .def("enabled", &ripple::Rules::enabled);
+        .def("enabled", &ripple::Rules::enabled)
+        .def("enabled",
+            [](const ripple::Rules &rules, py::object amendment) {
+                auto const name = amendment.attr("name").cast<std::string>();
+                return rules.enabled(ripple::sha512Half(ripple::Slice(name.data(), name.size())));
+            }
+        );
     
     py::class_<ripple::Keylet> Keylet(m, "Keylet");
     Keylet
@@ -652,7 +731,7 @@ PYBIND11_MODULE(plugin_transactor, m) {
             [](const ripple::NetClock::time_point &tp) {
                 return ripple::to_string(tp);
             }
-        );
+        )
     ;
     
     py::class_<ripple::LedgerInfo> LedgerInfo(m, "LedgerInfo");
@@ -669,6 +748,59 @@ PYBIND11_MODULE(plugin_transactor, m) {
         .def_readonly("close_flags", &ripple::LedgerInfo::closeFlags)
         .def_readonly("close_time_resolution", &ripple::LedgerInfo::closeTimeResolution)
         .def_readonly("close_time", &ripple::LedgerInfo::closeTime)
+    ;
+
+    py::enum_<ripple::Transactor::ConsequencesFactoryType>(m, "ConsequencesFactoryType")
+        .value("Normal", ripple::Transactor::ConsequencesFactoryType::Normal)
+        .value("Blocker", ripple::Transactor::ConsequencesFactoryType::Blocker)
+        .value("Custom", ripple::Transactor::ConsequencesFactoryType::Custom);
+
+    py::enum_<ripple::TxConsequences::Category>(m, "TxConsequencesCategory")
+        .value("normal", ripple::TxConsequences::Category::normal)
+        .value("blocker", ripple::TxConsequences::Category::blocker);
+
+    py::class_<ripple::TxConsequences> TxConsequences(m, "TxConsequences");
+    TxConsequences
+        .def(py::init<ripple::NotTEC>())
+        .def(py::init<ripple::STTx>())
+        .def(py::init<ripple::STTx, ripple::TxConsequences::Category>())
+        .def(py::init<ripple::STTx, ripple::XRPAmount>())
+        .def(py::init<ripple::STTx, std::uint32_t>())
+        .def("fee", &ripple::TxConsequences::fee)
+        .def("potential_spend", &ripple::TxConsequences::potentialSpend)
+        .def("seq_proxy", &ripple::TxConsequences::seqProxy)
+        .def("sequences_consumed", &ripple::TxConsequences::sequencesConsumed)
+        .def("is_blocker", &ripple::TxConsequences::isBlocker)
+        .def("following_seq", &ripple::TxConsequences::followingSeq)
+    ;
+
+    py::class_<ripple::Serializer> Serializer(m, "Serializer");
+    Serializer
+        .def("add8", &ripple::Serializer::add8)
+        .def("add16", &ripple::Serializer::add16)
+        .def("add32", py::overload_cast<std::uint32_t>(&ripple::Serializer::add32))
+        .def("add64", &ripple::Serializer::add64)
+        .def("add_raw", py::overload_cast<ripple::Blob const&>(&ripple::Serializer::addRaw))
+        .def("add_raw", py::overload_cast<ripple::Slice>(&ripple::Serializer::addRaw))
+        .def("add_raw", py::overload_cast<const ripple::Serializer&>(&ripple::Serializer::addRaw))
+        .def("add_vl", [](ripple::Serializer& self, const ripple::Blob& vector) {
+            return self.addVL(vector);
+        })
+        .def("add_vl", [](ripple::Serializer& self, const ripple::Slice& slice) {
+            return self.addVL(slice);
+        })
+    ;
+
+    py::class_<ripple::SerialIter> SerialIter(m, "SerialIter");
+    SerialIter
+        .def("get8", &ripple::SerialIter::get8)
+        .def("get16", &ripple::SerialIter::get16)
+        .def("get32", &ripple::SerialIter::get32)
+        .def("get64", &ripple::SerialIter::get64)
+        .def("get128", &ripple::SerialIter::get128)
+        .def("get160", &ripple::SerialIter::get160)
+        .def("get256", &ripple::SerialIter::get256)
+        .def("get_vl_buffer", &ripple::SerialIter::getVLBuffer)
     ;
 
     py::class_<ripple::Application> Application(m, "Application");
@@ -777,7 +909,10 @@ PYBIND11_MODULE(plugin_transactor, m) {
         .def_readonly("base_fee", &ripple::ApplyContext::baseFee)
         .def_readonly("journal", &ripple::ApplyContext::journal)
         .def("deliver", &ripple::ApplyContext::deliver)
-        .def("view", &ripple::ApplyContext::view, py::return_value_policy::reference);
+        .def("view",
+            [](const ripple::ApplyContext &ctx) -> const ripple::ApplyView& {
+                return ctx.view();
+            }, py::return_value_policy::reference);
     
     // py::register_exception<ripple::LogicError>(m, "LogicError");
     
@@ -828,21 +963,6 @@ PYBIND11_MODULE(plugin_transactor, m) {
             },
             py::return_value_policy::move
         )
-        .def("register_ledger_object",
-            [](std::uint16_t objectType,
-                char const* objectName,
-                std::vector<py::object> objectFormat)
-            {
-                std::vector<ripple::FakeSOElement> temp{};
-                for (py::object variable: objectFormat)
-                {
-                    py::tuple tup = variable.cast<py::tuple>();
-                    auto sfield = tup[0].cast<WSF>();
-                    auto varType = tup[1].cast<ripple::SOEStyle>();
-                    temp.emplace_back(ripple::FakeSOElement{static_cast<ripple::SField const&>(sfield).getCode(), varType});
-                }
-                ripple::registerLedgerObject(objectType, objectName, temp);
-            })
         .def("describe_owner_dir", &ripple::describeOwnerDir)
         .def("adjust_owner_count", &ripple::adjustOwnerCount)
         .def("create_new_sfield_STAccount", &wrappedNewSField<ripple::STAccount>)
@@ -858,6 +978,8 @@ PYBIND11_MODULE(plugin_transactor, m) {
         .def("create_new_sfield_STPluginType", &wrappedNewSField<ripple::STPluginType>)
         .def("create_new_sfield_STVector256", &wrappedNewSField<ripple::STVector256>)
         .def("create_new_sfield_STPluginType", &wrappedNewSField<ripple::STPluginType>)
+        .def("create_new_sfield_STArray", &wrappedNewUntypedSField<ripple::STArray>)
+        .def("create_new_sfield_STObject", &wrappedNewUntypedSField<ripple::STObject>)
         .def("construct_custom_sfield", &constructCustomWrappedSField)
         .def("make_name", &ripple::make_name)
         .def("not_an_object", py::overload_cast<std::string const&>(&ripple::not_an_object))
@@ -877,7 +999,7 @@ PYBIND11_MODULE(plugin_transactor, m) {
         .def("non_object_in_array", &ripple::non_object_in_array)
         .def("parse_base58", py::overload_cast<std::string const&>(&ripple::parseBase58<ripple::AccountID>))
         .def("parse_base58", py::overload_cast<std::string const&>(&ripple::parseBase58<ripple::Seed>))
-        .def("parse_base58", py::overload_cast<std::string const&>(&ripple::parseBase58<ripple::PublicKey>))
+        // .def("parse_base58", py::overload_cast<std::string const&>(&ripple::parseBase58<ripple::PublicKey>))
         .def("make_stplugintype", 
             [](const WSF &wsf, ripple::Buffer& b) {
                 ripple::SField const &f = static_cast<ripple::SField const&>(wsf);

@@ -174,3 +174,5 @@ conaninfo.txt
 graph_info.json
 .build
 .cupcake.toml
+
+.DS_Store

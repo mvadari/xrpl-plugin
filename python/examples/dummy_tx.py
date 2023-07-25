@@ -1,27 +1,22 @@
 from plugin_transactor import (
-    tesSUCCESS,
-    temINVALID_FLAG,
+    ConsequencesFactoryType,
+    account_keylet,
+    fixMasterKeyAsRegularKey,
+    lsfDisableMaster,
     preflight1,
     preflight2,
-    tf_universal_mask,
-    temBAD_REGKEY,
-    fixMasterKeyAsRegularKey,
-    account_keylet,
-    signers_keylet,
-    lsfDisableMaster,
-    tecNO_ALTERNATIVE_KEY,
+    sf_account,
     sf_regular_key,
     sf_ticket_sequence,
-    sf_account,
+    signers_keylet,
     soeOPTIONAL,
+    tecNO_ALTERNATIVE_KEY,
+    temBAD_REGKEY,
+    temINVALID_FLAG,
+    tesSUCCESS,
+    tf_universal_mask,
 )
-
-tx_name = "DummyTx"
-tx_type = 30
-tx_format = [
-    (sf_regular_key, soeOPTIONAL),
-    (sf_ticket_sequence, soeOPTIONAL)
-]
+from utils import Transactor
 
 
 def preflight(ctx):
@@ -32,12 +27,15 @@ def preflight(ctx):
         print("Malformed transaction: Invalid flags set.")
         return temINVALID_FLAG
 
-    if ctx.rules.enabled(fixMasterKeyAsRegularKey) and \
-        ctx.tx.is_field_present(sf_regular_key) and \
-            ctx.tx[sf_regular_key] == ctx.tx[sf_account]:
+    if (
+        ctx.rules.enabled(fixMasterKeyAsRegularKey)
+        and ctx.tx.is_field_present(sf_regular_key)
+        and ctx.tx[sf_regular_key] == ctx.tx[sf_account]
+    ):
         return temBAD_REGKEY
 
     return preflight2(ctx)
+
 
 def do_apply(ctx, _mPriorBalance, _mSourceBalance):
     account = ctx.tx[sf_account]
@@ -47,8 +45,22 @@ def do_apply(ctx, _mPriorBalance, _mSourceBalance):
         sle[sf_regular_key] = ctx.tx[sf_regular_key]
     else:
         # Account has disabled master key and no multi-signer signer list.
-        if sle.is_flag(lsfDisableMaster) and not ctx.view().peek(signers_keylet(account)):
+        if sle.is_flag(lsfDisableMaster) and not ctx.view().peek(
+            signers_keylet(account)
+        ):
             return tecNO_ALTERNATIVE_KEY
 
         del sle[sf_regular_key]
     return tesSUCCESS
+
+
+transactors = [
+    Transactor(
+        name="DummyTx",
+        tx_type=50,
+        tx_format=[(sf_regular_key, soeOPTIONAL), (sf_ticket_sequence, soeOPTIONAL)],
+        consequences_factory_type=ConsequencesFactoryType.Normal,
+        preflight=preflight,
+        do_apply=do_apply,
+    )
+]

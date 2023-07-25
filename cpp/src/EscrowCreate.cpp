@@ -17,7 +17,6 @@
 */
 //==============================================================================
 
-#include "EscrowCreate.h"
 #include <ripple/conditions/Condition.h>
 #include <ripple/conditions/Fulfillment.h>
 #include <ripple/basics/Log.h>
@@ -30,7 +29,10 @@
 #include <ripple/beast/core/LexicalCast.h>
 #include <ripple/protocol/digest.h>
 #include <ripple/protocol/TxFlags.h>
+#include <ripple/plugin/exports.h>
+#include <map>
 
+using namespace ripple;
 
 typedef ripple::SField const& (*createNewSFieldPtr)(
     int tid,
@@ -51,19 +53,8 @@ typedef std::int64_t (*visitEntryXRPChangePtr)(
     std::shared_ptr<ripple::SLE const> const& entry,
     bool isBefore);
 
-struct STypeExport {
-    int typeId;
-    createNewSFieldPtr createPtr;
-    parseLeafTypePtr parsePtr;
-    constructSTypePtr constructPtr;
-    constructSTypePtr2 constructPtr2;
-};
-
 static const std::uint16_t ltNEW_ESCROW = 0x0074;
 static const std::uint16_t NEW_ESCROW_NAMESPACE = 't';
-
-
-namespace ripple {
 
 template <class... Args>
 static uint256
@@ -78,150 +69,9 @@ new_escrow(AccountID const& src, std::uint32_t seq) noexcept
     return {ltNEW_ESCROW, indexHash(NEW_ESCROW_NAMESPACE, src, seq)};
 }
 
-const int STI_UINT32_2 = 24;
 
-class STUInt32_2 : public STUInt32
-{
-using STUInt32::STUInt32;
+static uint256 pluginAmendment;
 
-STUInt32_2(STUInt32 num) : STUInt32(num.value())
-{
-}
-
-STBase*
-copy(std::size_t n, void* buf) const
-{
-    return emplace(n, buf, *this);
-}
-
-STBase*
-move(std::size_t n, void* buf)
-{
-    return emplace(n, buf, std::move(*this));
-}
-
-int
-getSType() const
-{
-    return STI_UINT32_2;
-}
-};
-
-using SF_UINT32_2 = TypedField<STUInt32_2>;
-
-template <class T>
-STBase*
-constructNewSType(SerialIter& sit, SField const& name)
-{
-    T* stype = new T(sit, name);
-    return stype;
-}
-
-template <class T>
-STBase*
-constructNewSType2(SField const& name)
-{
-    return new T(name);
-}
-
-template <class T>
-SField const&
-createNewSType(int tid, int fv, const char* fn)
-{
-    if (SField const& field = SField::getField(field_code(tid, fv)); field != sfInvalid)
-        return field;
-    // TODO: refactor
-    // probably not a memory leak because the constructor adds the object to a map
-    return *(new T(tid, fv, fn));
-}
-
-std::optional<detail::STVar>
-parseLeafTypeNew(
-    SField const& field,
-    std::string const& json_name,
-    std::string const& fieldName,
-    SField const* name,
-    Json::Value const& value,
-    Json::Value& error)
-{
-    // copied from parseLeafType<STUInt32>
-    std::optional<detail::STVar> ret;
-    try
-    {
-        if (value.isString())
-        {
-            ret = detail::make_stvar<STUInt32_2>(
-                field,
-                beast::lexicalCastThrow<std::uint32_t>(
-                    value.asString()));
-        }
-        else if (value.isInt())
-        {
-            ret = detail::make_stvar<STUInt32_2>(
-                field, to_unsigned<std::uint32_t>(value.asInt()));
-        }
-        else if (value.isUInt())
-        {
-            ret = detail::make_stvar<STUInt32_2>(
-                field, safe_cast<std::uint32_t>(value.asUInt()));
-        }
-        else
-        {
-            error = bad_type(json_name, fieldName);
-            return ret;
-        }
-        return ret;
-    }
-    catch (std::exception const&)
-    {
-        error = invalid_data(json_name, fieldName);
-        return ret;
-    }
-}
-
-// helper stuff that needs to be moved to rippled
-
-template <typename T>
-int getSTId() { return 0; }
-
-template <>
-int getSTId<SF_AMOUNT>() { return STI_AMOUNT; }
-
-template <> 
-int getSTId<SF_ACCOUNT>() { return STI_ACCOUNT; }
-
-template <> 
-int getSTId<SF_UINT32>() { return STI_UINT32; }
-
-template <> 
-int getSTId<SF_UINT32_2>() { return STI_UINT32_2; }
-
-
-
-template <class T>
-T const&
-newSField(const int fieldValue, char const* fieldName)
-{
-    if (SField const& field = SField::getField(fieldName); field != sfInvalid)
-        return static_cast<T const&>(field);
-    T const* newSField = new T(getSTId<T>(), fieldValue, fieldName);
-    return *newSField;
-}
-
-template <class T>
-T const&
-newSField(const int fieldValue, std::string const fieldName)
-{
-    return newSField<T>(fieldValue, fieldName.c_str());
-}
-
-// end of helper stuff
-
-SF_UINT32_2 const&
-sfQualityIn2()
-{
-    return newSField<SF_UINT32_2>(47, "QualityIn2");
-}
 
 /** Has the specified time passed?
 
@@ -235,9 +85,30 @@ after(NetClock::time_point now, std::uint32_t mark)
     return now.time_since_epoch().count() > mark;
 }
 
+XRPAmount
+calculateBaseFee(ReadView const& view, STTx const& tx)
+{
+    // Returns the fee in fee units.
+
+    // The computation has two parts:
+    //  * The base fee, which is the same for most transactions.
+    //  * The additional cost of each multisignature on the transaction.
+    XRPAmount const baseFee = view.fees().base;
+
+    // Each signer adds one more baseFee to the minimum required fee
+    // for the transaction.
+    std::size_t const signerCount =
+        tx.isFieldPresent(sfSigners) ? tx.getFieldArray(sfSigners).size() : 0;
+
+    return baseFee + (signerCount * baseFee);
+}
+
 NotTEC
 preflight(PreflightContext const& ctx)
 {
+    if (!ctx.rules.enabled(pluginAmendment))
+        return temDISABLED;
+
     if (ctx.rules.enabled(fix1543) && ctx.tx.getFlags() & tfUniversalMask)
         return temINVALID_FLAG;
 
@@ -270,27 +141,28 @@ preflight(PreflightContext const& ctx)
             return temMALFORMED;
     }
 
-    if (auto const cb = ctx.tx[~sfCondition])
-    {
-        using namespace ripple::cryptoconditions;
+    // TODO: get conditions working
+    // if (auto const cb = ctx.tx[~sfCondition])
+    // {
+    //     using namespace ripple::cryptoconditions;
 
-        std::error_code ec;
+    //     std::error_code ec;
 
-        auto condition = Condition::deserialize(*cb, ec);
-        if (!condition)
-        {
-            JLOG(ctx.j.debug())
-                << "Malformed condition during escrow creation: "
-                << ec.message();
-            return temMALFORMED;
-        }
+    //     auto condition = Condition::deserialize(*cb, ec);
+    //     if (!condition)
+    //     {
+    //         JLOG(ctx.j.debug())
+    //             << "Malformed condition during escrow creation: "
+    //             << ec.message();
+    //         return temMALFORMED;
+    //     }
 
-        // Conditions other than PrefixSha256 require the
-        // "CryptoConditionsSuite" amendment:
-        if (condition->type != Type::preimageSha256 &&
-            !ctx.rules.enabled(featureCryptoConditionsSuite))
-            return temDISABLED;
-    }
+    //     // Conditions other than PrefixSha256 require the
+    //     // "CryptoConditionsSuite" amendment:
+    //     if (condition->type != Type::preimageSha256 &&
+    //         !ctx.rules.enabled(featureCryptoConditionsSuite))
+    //         return temDISABLED;
+    // }
 
     return preflight2(ctx);
 }
@@ -366,7 +238,7 @@ doApply(ApplyContext& ctx, XRPAmount mPriorBalance, XRPAmount mSourceBalance)
             !ctx.tx[~sfDestinationTag])
             return tecDST_TAG_NEEDED;
 
-        // Obeying the lsfDissalowXRP flag was a bug.  Piggyback on
+        // Obeying the lsfDisallowXRP flag was a bug.  Piggyback on
         // featureDepositAuth to remove the bug.
         if (!ctx.view().rules().enabled(featureDepositAuth) &&
             ((*sled)[sfFlags] & lsfDisallowXRP))
@@ -416,113 +288,43 @@ doApply(ApplyContext& ctx, XRPAmount mPriorBalance, XRPAmount mSourceBalance)
     return tesSUCCESS;
 }
 
-}  // namespace ripple
-
-
-
 extern "C"
-ripple::NotTEC
-preflight(ripple::PreflightContext const& ctx)
+Container<TransactorExport>
+getTransactors()
 {
-    return ripple::preflight(ctx);
-}
-
-extern "C"
-ripple::TER
-preclaim(ripple::PreclaimContext const& ctx)
-{
-    return ripple::preclaim(ctx);
-}
-
-extern "C"
-ripple::XRPAmount
-calculateBaseFee(ripple::ReadView const& view, ripple::STTx const& tx)
-{
-    return ripple::Transactor::calculateBaseFee(view, tx);
-}
-
-extern "C"
-ripple::TER
-doApply(
-    ripple::ApplyContext& ctx,
-    ripple::XRPAmount mPriorBalance,
-    ripple::XRPAmount mSourceBalance)
-{
-    return ripple::doApply(ctx, mPriorBalance, mSourceBalance);
-}
-
-extern "C"
-char const*
-getTxName()
-{
-    return "NewEscrowCreate";
-}
-
-struct FakeSOElement {
-    int fieldCode;
-    ripple::SOEStyle style;
-};
-
-extern "C"
-std::vector<FakeSOElement>
-getTxFormat()
-{
-    return std::vector<FakeSOElement>{
-        {ripple::sfDestination.getCode(), ripple::soeREQUIRED},
-        {ripple::sfAmount.getCode(), ripple::soeREQUIRED},
-        {ripple::sfCondition.getCode(), ripple::soeOPTIONAL},
-        {ripple::sfCancelAfter.getCode(), ripple::soeOPTIONAL},
-        {ripple::sfFinishAfter.getCode(), ripple::soeOPTIONAL},
-        {ripple::sfDestinationTag.getCode(), ripple::soeOPTIONAL},
-        {ripple::sfTicketSequence.getCode(), ripple::soeOPTIONAL},
+    static SOElementExport format[] = {
+        {sfDestination.getCode(), soeREQUIRED},
+        {sfAmount.getCode(), soeREQUIRED},
+        {sfCondition.getCode(), soeOPTIONAL},
+        {sfCancelAfter.getCode(), soeOPTIONAL},
+        {sfFinishAfter.getCode(), soeOPTIONAL},
+        {sfDestinationTag.getCode(), soeOPTIONAL},
+        {sfTicketSequence.getCode(), soeOPTIONAL}
     };
-}
-
-struct SFieldInfo {
-    int typeId;
-    int fieldValue;
-    const char * txtName;
-};
-
-extern "C"
-std::vector<STypeExport>
-getSTypes()
-{
-    // registerSType(ripple::STI_UINT32_2, ripple::createNewSType<ripple::SF_UINT32_2>);
-    return std::vector<STypeExport>{
-        // {
-        //     ripple::STI_UINT32_2,
-        //     ripple::createNewSType<ripple::SF_UINT32_2>,
-        //     ripple::parseLeafTypeNew,
-        //     ripple::constructNewSType<ripple::STUInt32_2>,
-        //     ripple::constructNewSType2<ripple::STUInt32_2>
-        // },
+    SOElementExport* formatPtr = format;
+    static TransactorExport list[] = {
+        {
+            "NewEscrowCreate",
+            49,
+            {
+                formatPtr, 7
+            },
+            Transactor::ConsequencesFactoryType::Normal,
+            NULL,
+            calculateBaseFee,
+            preflight,
+            preclaim,
+            doApply,
+            NULL,
+            NULL,
+            NULL,
+            NULL
+        }
     };
+    TransactorExport* ptr = list;
+    return {ptr, 1};
 }
 
-extern "C"
-std::vector<SFieldInfo>
-getSFields()
-{
-    // auto const& sfQualityIn2 = ripple::sfQualityIn2();
-    return std::vector<SFieldInfo>{
-        // {sfQualityIn2.fieldType, sfQualityIn2.fieldValue, sfQualityIn2.fieldName.c_str()},
-    };
-}
-
-extern "C"
-std::uint16_t
-getTxType()
-{
-    return 30;
-}
-
-extern "C"
-std::string
-getTTName()
-{
-    return "ttESCROW_CREATE2";
-}
 
 std::int64_t visitEntryXRPChange(
     bool isDelete,
@@ -536,26 +338,99 @@ std::int64_t visitEntryXRPChange(
     return (*entry)[ripple::sfAmount].xrp().drops();
 }
 
-struct LedgerObjectInfo {
-    std::uint16_t objectType;
-    char const* objectName; // CamelCase
-    char const* objectRpcName; // snake_case
-    std::vector<FakeSOElement> objectFormat;
-    bool isDeletionBlocker;
-    visitEntryXRPChangePtr visitEntryXRPChange;
-    // FakeSOElement[] innerObjectFormat; // optional
+class NoZeroEscrow
+{
+public:
+    static std::map<void*, NoZeroEscrow&> checks;
+    static void visitEntryExport(
+        void* id,
+        bool isDelete,
+        std::shared_ptr<SLE const> const& before,
+        std::shared_ptr<SLE const> const& after)
+    {
+        if (auto it = checks.find(id);
+            it != checks.end())
+        {
+            return it->second.visitEntry(isDelete, before, after);
+        }
+        NoZeroEscrow* check = new NoZeroEscrow();
+        check->visitEntry(isDelete, before, after);
+        checks.insert({id, *check});
+    }
+
+    static bool finalizeExport(
+        void* id,
+        STTx const& tx,
+        TER const result,
+        XRPAmount const fee,
+        ReadView const& view,
+        beast::Journal const& j)
+    {
+        if (auto it = checks.find(id);
+            it != checks.end())
+        {
+            bool const finalizeResult = it->second.finalize(tx, result, fee, view, j);
+            checks.erase(id);
+            return finalizeResult;
+        }
+        JLOG(j.fatal())
+                    << "Invariant failed: could not find matching ID";
+        return false;
+    }
+
+private:
+    bool bad_ = false;
+
+    void
+    visitEntry(
+        bool isDelete,
+        std::shared_ptr<SLE const> const& before,
+        std::shared_ptr<SLE const> const& after)
+    {
+        auto isBad = [](STAmount const& amount) {
+            if (!amount.native())
+                return true;
+
+            if (amount.xrp() <= XRPAmount{0})
+                return true;
+
+            if (amount.xrp() >= INITIAL_XRP)
+                return true;
+
+            return false;
+        };
+
+        if (before && before->getType() == ltNEW_ESCROW)
+            bad_ |= isBad((*before)[sfAmount]);
+
+        if (after && after->getType() == ltNEW_ESCROW)
+            bad_ |= isBad((*after)[sfAmount]);
+    }
+
+    bool
+    finalize(
+        STTx const&,
+        TER const,
+        XRPAmount const,
+        ReadView const&,
+        beast::Journal const& j)
+    {
+        if (bad_)
+        {
+            JLOG(j.fatal()) << "Invariant failed: new escrow specifies invalid amount";
+            return false;
+        }
+
+        return true;
+    }
 };
+std::map<void*, NoZeroEscrow&> NoZeroEscrow::checks{};
 
 extern "C"
-std::vector<LedgerObjectInfo>
+Container<LedgerObjectExport>
 getLedgerObjects()
 {
-    return std::vector<LedgerObjectInfo>{
-        {
-            ltNEW_ESCROW,
-            "NewEscrow",
-            "new_escrow",
-            std::vector<FakeSOElement>{
+    static SOElementExport format[] = {
                 {ripple::sfAccount.getCode(),              ripple::soeREQUIRED},
                 {ripple::sfDestination.getCode(),          ripple::soeREQUIRED},
                 {ripple::sfAmount.getCode(),               ripple::soeREQUIRED},
@@ -568,9 +443,49 @@ getLedgerObjects()
                 {ripple::sfPreviousTxnID.getCode(),        ripple::soeREQUIRED},
                 {ripple::sfPreviousTxnLgrSeq.getCode(),    ripple::soeREQUIRED},
                 {ripple::sfDestinationNode.getCode(),      ripple::soeOPTIONAL},
-            },
-            false,
+    };
+    static LedgerObjectExport list[] = {
+        {
+            ltNEW_ESCROW,
+            "NewEscrow",
+            "new_escrow",
+            {format, 12},
+            true,
+            NULL,
             visitEntryXRPChange
         }
     };
+    LedgerObjectExport* ptr = list;
+    return {ptr, 1};
+}
+
+extern "C"
+Container<InvariantCheckExport>
+getInvariantChecks()
+{
+    static InvariantCheckExport list[] = {
+        {
+            NoZeroEscrow::visitEntryExport,
+            NoZeroEscrow::finalizeExport,
+        }
+    };
+    InvariantCheckExport* ptr = list;
+    return {ptr, 1};
+}
+
+extern "C"
+Container<AmendmentExport>
+getAmendments()
+{
+    AmendmentExport const amendment = {
+        "featurePluginTest2",
+        true,
+        VoteBehavior::DefaultNo,
+    };
+    pluginAmendment = registerPluginAmendment(amendment);
+    static AmendmentExport list[] = {
+        amendment
+    };
+    AmendmentExport* ptr = list;
+    return {ptr, 1};
 }

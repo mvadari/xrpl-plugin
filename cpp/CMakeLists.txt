@@ -6,13 +6,22 @@ find_package(SOCI REQUIRED)
 
 
 add_subdirectory(../external/rippled subproject/rippled EXCLUDE_FROM_ALL)
-target_link_libraries(xrpl_core PUBLIC soci::soci)
+target_link_libraries(xrpl_plugin PUBLIC soci::soci)
 
-add_library(plugin_transactor SHARED)
-target_sources(plugin_transactor PRIVATE 
+add_library(trustset2 SHARED)
+target_sources(trustset2 PRIVATE 
+  src/TrustSet.cpp
+)
+target_link_libraries(trustset2 PUBLIC
+  xrpl_plugin
+)
+install(TARGETS trustset2)
+
+add_library(newescrowcreate SHARED)
+target_sources(newescrowcreate PRIVATE 
   src/EscrowCreate.cpp
 )
-target_link_libraries(plugin_transactor PUBLIC
-  xrpl_core
+target_link_libraries(newescrowcreate PUBLIC
+  xrpl_plugin
 )
-install(TARGETS plugin_transactor)
+install(TARGETS newescrowcreate)
