@@ -1,4 +1,4 @@
-# C++ Plugin Transactors
+# C++ Plugins
 
 ```bash
 cd cpp

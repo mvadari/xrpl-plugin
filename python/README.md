@@ -1,4 +1,4 @@
-# Python Plugin Transactors
+# Python Plugins
 
 ```bash
 pip install ./python
