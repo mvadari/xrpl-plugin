@@ -15,7 +15,6 @@ target_sources(trustset2 PRIVATE
 target_link_libraries(trustset2 PUBLIC
   xrpl_plugin
 )
-install(TARGETS trustset2)
 
 add_library(newescrowcreate SHARED)
 target_sources(newescrowcreate PRIVATE 
@@ -24,4 +23,8 @@ target_sources(newescrowcreate PRIVATE
 target_link_libraries(newescrowcreate PUBLIC
   xrpl_plugin
 )
+
+set_target_properties(trustset2 newescrowcreate PROPERTIES PREFIX "" SUFFIX ".xrplugin")
+
+install(TARGETS trustset2)
 install(TARGETS newescrowcreate)

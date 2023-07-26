@@ -176,3 +176,4 @@ graph_info.json
 .cupcake.toml
 
 .DS_Store
+*.xrplugin
