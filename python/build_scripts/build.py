@@ -33,6 +33,24 @@ struct WSF {{
   }};
 }};
 
+static int interpreterCount = 0;
+
+class CustomScopedInterpreter
+{{
+public:
+    explicit CustomScopedInterpreter()
+    {{
+        if (interpreterCount == 0) py::initialize_interpreter();
+        interpreterCount += 1;
+    }}
+
+    ~CustomScopedInterpreter()
+    {{
+        interpreterCount -= 1;
+        if (interpreterCount == 0) py::finalize_interpreter();
+    }}
+}};
+
 // ----------------------------------------------------------------------------
 // Transactors
 // ----------------------------------------------------------------------------
@@ -74,7 +92,7 @@ getTransactorFromPython(std::uint16_t txType, beast::Journal const j)
 TxConsequences
 makeTxConsequences(PreflightContext const& ctx)
 {{
-    py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+    CustomScopedInterpreter guard{{}}; // start the interpreter and keep it alive
     py::object transactor = getTransactorFromPython(ctx.tx.getTxnType(), ctx.j);
     py::object function = transactor.attr("makeTxConsequences");
     try {{
@@ -91,7 +109,7 @@ makeTxConsequences(PreflightContext const& ctx)
 XRPAmount
 calculateBaseFee(ReadView const& view, STTx const& tx)
 {{
-    py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+    CustomScopedInterpreter guard{{}}; // start the interpreter and keep it alive
     py::object transactor = getTransactorFromPython(tx.getTxnType());
     py::object function = transactor.attr("calculateBaseFee");
     try {{
@@ -111,7 +129,7 @@ calculateBaseFee(ReadView const& view, STTx const& tx)
 NotTEC
 preflight(PreflightContext const& ctx)
 {{
-    py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+    CustomScopedInterpreter guard{{}}; // start the interpreter and keep it alive
     py::object transactor = getTransactorFromPython(ctx.tx.getTxnType(), ctx.j);
     py::object function = transactor.attr("preflight");
     try {{
@@ -132,7 +150,7 @@ preflight(PreflightContext const& ctx)
 TER
 preclaim(PreclaimContext const& ctx)
 {{
-    py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+    CustomScopedInterpreter guard{{}}; // start the interpreter and keep it alive
     py::object transactor = getTransactorFromPython(ctx.tx.getTxnType(), ctx.j);
     py::object function = transactor.attr("preclaim");
     try {{
@@ -149,7 +167,7 @@ preclaim(PreclaimContext const& ctx)
 TER
 doApply(ApplyContext& ctx, XRPAmount mPriorBalance, XRPAmount mSourceBalance)
 {{
-    py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+    CustomScopedInterpreter guard{{}}; // start the interpreter and keep it alive
     py::object transactor = getTransactorFromPython(ctx.tx.getTxnType(), ctx.journal);
     py::object function = transactor.attr("do_apply");
     try {{
@@ -169,7 +187,7 @@ doApply(ApplyContext& ctx, XRPAmount mPriorBalance, XRPAmount mSourceBalance)
 NotTEC
 checkSeqProxy(ReadView const& view, STTx const& tx, beast::Journal j)
 {{
-    py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+    CustomScopedInterpreter guard{{}}; // start the interpreter and keep it alive
     py::object transactor = getTransactorFromPython(tx.getTxnType(), j);
     py::object function = transactor.attr("check_seq_proxy");
     try {{
@@ -194,7 +212,7 @@ checkSeqProxy(ReadView const& view, STTx const& tx, beast::Journal j)
 NotTEC
 checkPriorTxAndLastLedger(PreclaimContext const& ctx)
 {{
-    py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+    CustomScopedInterpreter guard{{}}; // start the interpreter and keep it alive
     py::object transactor = getTransactorFromPython(ctx.tx.getTxnType(), ctx.j);
     py::object function = transactor.attr("check_prior_tx_and_last_ledger_ptr");
     try {{
@@ -211,7 +229,7 @@ checkPriorTxAndLastLedger(PreclaimContext const& ctx)
 TER
 checkFee(PreclaimContext const& ctx, XRPAmount baseFee)
 {{
-    py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+    CustomScopedInterpreter guard{{}}; // start the interpreter and keep it alive
     py::object transactor = getTransactorFromPython(ctx.tx.getTxnType(), ctx.j);
     py::object function = transactor.attr("check_fee");
     try {{
@@ -231,7 +249,7 @@ checkFee(PreclaimContext const& ctx, XRPAmount baseFee)
 NotTEC
 checkSign(PreclaimContext const& ctx)
 {{
-    py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+    CustomScopedInterpreter guard{{}}; // start the interpreter and keep it alive
     py::object transactor = getTransactorFromPython(ctx.tx.getTxnType(), ctx.j);
     py::object function = transactor.attr("check_sign");
     try {{
@@ -287,7 +305,7 @@ getTransactors()
 {{
     static std::vector<TransactorExportInternal> const transactors = []{{
         std::vector<TransactorExportInternal> temp = {{}};
-        py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+        CustomScopedInterpreter guard{{}}; // start the interpreter and keep it alive
         py::module_::import("sys").attr("path").attr("append")("{python_folder}");
         py::module pluginImport = py::module_::import("{module_name}");
         if (!hasattr(pluginImport, "transactors")) {{
@@ -393,7 +411,7 @@ deleteObject(
     std::shared_ptr<SLE> const& sleDel,
     beast::Journal j)
 {{
-    py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+    CustomScopedInterpreter guard{{}}; // start the interpreter and keep it alive
     py::object object = getLedgerObjectFromPython(sleDel->getType());
     py::object function = object.attr("delete_object");
     try {{
@@ -420,7 +438,7 @@ visitEntryXRPChange(
     std::shared_ptr<STLedgerEntry const> const& entry,
     bool isBefore)
 {{
-    py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+    CustomScopedInterpreter guard{{}}; // start the interpreter and keep it alive
     py::object object = getLedgerObjectFromPython(entry->getType());
     py::object function = object.attr("visit_entry_xrp_change");
     try {{
@@ -443,7 +461,7 @@ Container<LedgerObjectExport>
 getLedgerObjects()
 {{
     static std::vector<LedgerObjectExportInternal> const objects = []{{
-        py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+        CustomScopedInterpreter guard{{}}; // start the interpreter and keep it alive
         py::module_::import("sys").attr("path").attr("append")("{python_folder}");
         py::module_ module = py::module_::import("{module_name}");
         std::vector<LedgerObjectExportInternal> temp = {{}};
@@ -503,7 +521,7 @@ getSFields()
 {{
     static std::vector<SFieldExport> const sFields = []{{
         std::vector<SFieldExport> temp = {{}};
-        py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+        CustomScopedInterpreter guard{{}}; // start the interpreter and keep it alive
         py::module_::import("sys").attr("path").attr("append")("{python_folder}");
         py::module pluginImport = py::module_::import("{module_name}");
         if (!hasattr(pluginImport, "sfields")) {{
@@ -556,7 +574,7 @@ parseValue(
     Json::Value const& value,
     Json::Value& error)
 {{
-    py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+    CustomScopedInterpreter guard{{}}; // start the interpreter and keep it alive
     py::object object = getSTypeFromPython(field.fieldType);
     py::object function = object.attr("parse_value");
     try {{
@@ -585,7 +603,7 @@ parseValue(
 std::string
 toString(int typeId, Buffer const& buf)
 {{
-    py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+    CustomScopedInterpreter guard{{}}; // start the interpreter and keep it alive
     py::object object = getSTypeFromPython(typeId);
     py::object function = object.attr("to_string");
     try {{
@@ -602,7 +620,7 @@ toString(int typeId, Buffer const& buf)
 Json::Value
 toJson(int typeId, Buffer const& buf)
 {{
-    py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+    CustomScopedInterpreter guard{{}}; // start the interpreter and keep it alive
     py::object object = getSTypeFromPython(typeId);
     py::object function = object.attr("to_json");
     try {{
@@ -619,7 +637,7 @@ toJson(int typeId, Buffer const& buf)
 void
 toSerializer(int typeId, Buffer const& buf, Serializer& s)
 {{
-    py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+    CustomScopedInterpreter guard{{}}; // start the interpreter and keep it alive
     py::object object = getSTypeFromPython(typeId);
     py::object function = object.attr("to_serializer");
     try {{
@@ -639,7 +657,7 @@ toSerializer(int typeId, Buffer const& buf, Serializer& s)
 Buffer
 fromSerialIter(int typeId, SerialIter& st)
 {{
-    py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+    CustomScopedInterpreter guard{{}}; // start the interpreter and keep it alive
     py::object object = getSTypeFromPython(typeId);
     py::object function = object.attr("from_serial_iter");
     try {{
@@ -658,7 +676,7 @@ Container<STypeExport>
 getSTypes()
 {{
     static std::vector<STypeExport> const types = []{{
-        py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+        CustomScopedInterpreter guard{{}}; // start the interpreter and keep it alive
         py::module_::import("sys").attr("path").attr("append")("{python_folder}");
         py::module_ module = py::module_::import("{module_name}");
         std::vector<STypeExport> temp = {{}};
@@ -710,7 +728,7 @@ Container<AmendmentExport>
 getAmendments()
 {{
     static std::vector<AmendmentExportInternal> const amendments = []{{
-        py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+        CustomScopedInterpreter guard{{}}; // start the interpreter and keep it alive
         std::vector<AmendmentExportInternal> temp = {{}};
         py::module_::import("sys").attr("path").attr("append")("{python_folder}");
         py::module pluginImport = py::module_::import("{module_name}");
@@ -758,7 +776,7 @@ Container<TERExport>
 getTERcodes()
 {{
     static std::vector<TERExportInternal> const codes = []{{
-        py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+        CustomScopedInterpreter guard{{}}; // start the interpreter and keep it alive
         std::vector<TERExportInternal> temp = {{}};
         py::module_::import("sys").attr("path").attr("append")("{python_folder}");
         py::module pluginImport = py::module_::import("{module_name}");
@@ -794,7 +812,7 @@ visitEntryExport(
     std::shared_ptr<SLE const> const& before,
     std::shared_ptr<SLE const> const& after)
 {{
-    py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+    CustomScopedInterpreter guard{{}}; // start the interpreter and keep it alive
     py::module_::import("sys").attr("path").attr("append")("{python_folder}");
     py::module pluginImport = py::module_::import("{module_name}");
     if (!hasattr(pluginImport, "invariant_checks")) {{
@@ -850,7 +868,7 @@ finalizeExport(
 {{
     bool finalizeResult = true;
 
-    py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+    CustomScopedInterpreter guard{{}}; // start the interpreter and keep it alive
     py::module_::import("sys").attr("path").attr("append")("{python_folder}");
     py::module pluginImport = py::module_::import("{module_name}");
     if (!hasattr(pluginImport, "invariant_checks")) {{
@@ -899,7 +917,7 @@ Container<InvariantCheckExport>
 getInvariantChecks()
 {{
     static std::vector<InvariantCheckExport> const checks = []{{
-        py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+        CustomScopedInterpreter guard{{}}; // start the interpreter and keep it alive
         py::module_::import("sys").attr("path").attr("append")("{python_folder}");
         py::module_ module = py::module_::import("{module_name}");
         std::vector<InvariantCheckExport> temp = {{}};
@@ -940,7 +958,7 @@ getInnerObjectFormats()
 {{
     static std::vector<InnerObjectExportInternal> const innerObjects = []{{
         std::vector<InnerObjectExportInternal> temp = {{}};
-        py::scoped_interpreter guard{{}}; // start the interpreter and keep it alive
+        CustomScopedInterpreter guard{{}}; // start the interpreter and keep it alive
         py::module_::import("sys").attr("path").attr("append")("{python_folder}");
         py::module pluginImport = py::module_::import("{module_name}");
         if (!hasattr(pluginImport, "inner_objects")) {{

@@ -1,6 +1,8 @@
 from xrpl_plugin import (
+    Amendment,
     ConsequencesFactoryType,
     Transactor,
+    VoteBehavior,
     account_keylet,
     fixMasterKeyAsRegularKey,
     lsfDisableMaster,
@@ -65,3 +67,7 @@ transactors = [
         do_apply=do_apply,
     )
 ]
+
+amendment = Amendment("featurePluginTest", True, VoteBehavior.DEFAULT_NO)
+
+amendments = [amendment]
