@@ -1,5 +1,7 @@
 # XRPL Plugins
 
+Compile and build this branch of rippled: https://github.com/mvadari/rippled/tree/plugin
+
 Setup:
 
 ```bash
