@@ -153,6 +153,14 @@ namespace py = pybind11;
 
 PYBIND11_MODULE(xrpl_plugin_py, m) {
 
+    m.doc() = R"pbdoc(
+        XRPL Plugin Python
+        -----------------------
+
+        .. currentmodule:: xrpl_plugin
+
+    )pbdoc";
+
     /*
     * Enums
     */
@@ -629,6 +637,7 @@ PYBIND11_MODULE(xrpl_plugin_py, m) {
     py::class_<ripple::STObject, std::shared_ptr<ripple::STObject>> STObject(m, "STObject");
     STObject
         .def("is_flag", &ripple::STObject::isFlag)
+        .def("get_flags", &ripple::STTx::getFlags)
         .def("__getitem__", [](const ripple::STObject &obj, TWSF<ripple::STAccount> sf) {
             return obj[static_cast<ripple::TypedField<ripple::STAccount> const&>(sf)];
         }, py::return_value_policy::move)
@@ -691,7 +700,6 @@ PYBIND11_MODULE(xrpl_plugin_py, m) {
     py::class_<ripple::STTx, ripple::STObject, std::shared_ptr<ripple::STTx>> STTx(m, "STTx");
     STTx
         .def("get_txn_type", &ripple::STTx::getTxnType)
-        .def("get_flags", &ripple::STTx::getFlags)
         .def("get_seq_proxy", &ripple::STTx::getSeqProxy)
     ;
 
@@ -981,8 +989,8 @@ PYBIND11_MODULE(xrpl_plugin_py, m) {
         .def("nft_sells_keylet", &ripple::keylet::nft_sells)
 
         // Other
-        .def("preflight1", &ripple::preflight1)
-        .def("preflight2", &ripple::preflight2)
+        .def("preflight1", &ripple::preflight1, "Performs early sanity checks on the account and fee fields")
+        .def("preflight2", &ripple::preflight2, "Checks whether the signature appears valid")
         .def("is_tes_success", &ripple::isTesSuccess)
         .def("make_sle",
             [](const ripple::Keylet &keylet) {
@@ -992,21 +1000,21 @@ PYBIND11_MODULE(xrpl_plugin_py, m) {
         )
         .def("describe_owner_dir", &ripple::describeOwnerDir)
         .def("adjust_owner_count", &ripple::adjustOwnerCount)
-        .def("create_new_sfield_STAccount", &wrappedNewSField<ripple::STAccount>)
-        .def("create_new_sfield_STAmount", &wrappedNewSField<ripple::STAmount>)
-        .def("create_new_sfield_STUInt8", &wrappedNewSField<ripple::STUInt8>)
-        .def("create_new_sfield_STUInt16", &wrappedNewSField<ripple::STUInt16>)
-        .def("create_new_sfield_STUInt32", &wrappedNewSField<ripple::STUInt32>)
-        .def("create_new_sfield_STUInt64", &wrappedNewSField<ripple::STUInt64>)
-        .def("create_new_sfield_STUInt128", &wrappedNewSField<ripple::STUInt128>)
-        .def("create_new_sfield_STUInt160", &wrappedNewSField<ripple::STUInt160>)
-        .def("create_new_sfield_STUInt256", &wrappedNewSField<ripple::STUInt256>)
-        .def("create_new_sfield_STBlob", &wrappedNewSField<ripple::STBlob>)
-        .def("create_new_sfield_STPluginType", &wrappedNewSField<ripple::STPluginType>)
-        .def("create_new_sfield_STVector256", &wrappedNewSField<ripple::STVector256>)
-        .def("create_new_sfield_STPluginType", &wrappedNewSField<ripple::STPluginType>)
-        .def("create_new_sfield_STArray", &wrappedNewUntypedSField<ripple::STArray>)
-        .def("create_new_sfield_STObject", &wrappedNewUntypedSField<ripple::STObject>)
+        .def("_create_new_sfield_STAccount", &wrappedNewSField<ripple::STAccount>)
+        .def("_create_new_sfield_STAmount", &wrappedNewSField<ripple::STAmount>)
+        .def("_create_new_sfield_STUInt8", &wrappedNewSField<ripple::STUInt8>)
+        .def("_create_new_sfield_STUInt16", &wrappedNewSField<ripple::STUInt16>)
+        .def("_create_new_sfield_STUInt32", &wrappedNewSField<ripple::STUInt32>)
+        .def("_create_new_sfield_STUInt64", &wrappedNewSField<ripple::STUInt64>)
+        .def("_create_new_sfield_STUInt128", &wrappedNewSField<ripple::STUInt128>)
+        .def("_create_new_sfield_STUInt160", &wrappedNewSField<ripple::STUInt160>)
+        .def("_create_new_sfield_STUInt256", &wrappedNewSField<ripple::STUInt256>)
+        .def("_create_new_sfield_STBlob", &wrappedNewSField<ripple::STBlob>)
+        .def("_create_new_sfield_STPluginType", &wrappedNewSField<ripple::STPluginType>)
+        .def("_create_new_sfield_STVector256", &wrappedNewSField<ripple::STVector256>)
+        .def("_create_new_sfield_STPluginType", &wrappedNewSField<ripple::STPluginType>)
+        .def("_create_new_sfield_STArray", &wrappedNewUntypedSField<ripple::STArray>)
+        .def("_create_new_sfield_STObject", &wrappedNewUntypedSField<ripple::STObject>)
         .def("construct_custom_sfield", &constructCustomWrappedSField)
         .def("make_name", &ripple::make_name)
         .def("not_an_object", py::overload_cast<std::string const&>(&ripple::not_an_object))

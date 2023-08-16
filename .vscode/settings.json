@@ -110,7 +110,9 @@
         "scoped_allocator": "cpp",
         "filesystem": "cpp",
         "format": "cpp",
-        "span": "cpp"
+        "span": "cpp",
+        "qtcore": "cpp",
+        "qtwidgets": "cpp"
     },
     "cSpell.words": [
         "cout",
@@ -144,5 +146,6 @@
         "stype",
         "stypes",
         "trustlines"
-    ]
+    ],
+    "esbonio.sphinx.confDir": ""
 }

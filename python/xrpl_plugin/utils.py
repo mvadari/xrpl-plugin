@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Callable, List, Optional, Tuple
 
 from . import xrpl_plugin_py
-from .xrpl_plugin_py import (
+from xrpl_plugin.xrpl_plugin_py import (
     TER,
     AccountID,
     Application,
@@ -60,7 +60,7 @@ def create_new_sfield(cls, field_name, field_value):
         raise Exception("SField must be of an `ST` type.")
     if cls == STPluginType:
         raise Exception("Must use `construct_custom_sfield` for custom STypes.")
-    fn_name = f"create_new_sfield_{cls.__name__}"
+    fn_name = f"_create_new_sfield_{cls.__name__}"
     create_fn = getattr(xrpl_plugin_py, fn_name, None)
     if create_fn is None:
         # NOTE: This should never be hit in prod
