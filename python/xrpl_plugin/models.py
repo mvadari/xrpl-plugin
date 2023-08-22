@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Callable, List, Optional, Tuple, Union
 
-from xrpl_plugin.rippled_py.transactors import (
+from xrpl_plugin.transactors import (
     Application,
     ApplyContext,
     ApplyView,
