@@ -12,9 +12,7 @@ def create_new_sfield(cls, field_name, field_value):
     if cls == STPluginType:
         raise Exception("Must use `construct_custom_sfield` for custom STypes.")
     fn_name = f"_create_new_sfield_{cls.__name__}"
-    print(fn_name)
     create_fn = getattr(rippled_sfields, fn_name, None)
-    print(create_fn)
     if create_fn is None:
         # NOTE: This should never be hit in prod
         # It may be hit during dev work since not everything is implemented yet
