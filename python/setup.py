@@ -10,8 +10,6 @@ from pybind11 import get_cmake_dir
 
 import sys
 
-__version__ = "0.0.1"
-
 # The main interface is through Pybind11Extension.
 # * You can add cxx_std=11/14/17, and then build_ext can be removed.
 # * You can set include_pybind11=false to add the include directory yourself,
@@ -25,8 +23,6 @@ ext_modules = [
     Pybind11Extension(
         "xrpl_plugin.rippled_py",
         ["src/main.cpp"],
-        # Example: passing in the version to the compiled code
-        define_macros=[("VERSION_INFO", __version__)],
         cxx_std=17,
     ),
 ]
