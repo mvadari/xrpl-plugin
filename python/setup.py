@@ -161,4 +161,8 @@ setup(
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
     python_requires=">=3.10",
+    entry_points="""
+        [console_scripts]
+        plugin-build=xrpl_plugin:build
+    """,
 )

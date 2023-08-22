@@ -12,6 +12,7 @@ from xrpl_plugin import return_codes
 from xrpl_plugin import keylets
 from xrpl_plugin import ledger_objects
 from xrpl_plugin import transactors
+from xrpl_plugin.build_scripts import build
 
 __all__ = [
     "models",
@@ -22,4 +23,6 @@ __all__ = [
     "keylets",
     "ledger_objects",
     "transactors",
+    "build_scripts",
+    "build",
 ]

@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 find_package(SOCI REQUIRED)
 find_package(pybind11 REQUIRED)
 
-add_subdirectory(../../external/rippled subproject/rippled EXCLUDE_FROM_ALL)
+add_subdirectory(../../rippled subproject/rippled EXCLUDE_FROM_ALL)
 target_link_libraries(xrpl_plugin PUBLIC soci::soci)
 
 add_library(${PROJECT_NAME} SHARED)
