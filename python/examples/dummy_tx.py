@@ -2,24 +2,22 @@ from xrpl_plugin import (
     Amendment,
     ConsequencesFactoryType,
     Transactor,
-    VoteBehavior,
-    account_keylet,
     fixMasterKeyAsRegularKey,
     lsfDisableMaster,
     preflight1,
     preflight2,
-    sf_account,
-    sf_regular_key,
-    sf_ticket_sequence,
-    signers_keylet,
     soeOPTIONAL,
+    tf_universal_mask,
+)
+from xrpl_plugin.basic_types import VoteBehavior
+from xrpl_plugin.keylets import account_keylet, signers_keylet
+from xrpl_plugin.return_codes import (
     tecNO_ALTERNATIVE_KEY,
     temBAD_REGKEY,
     temINVALID_FLAG,
     tesSUCCESS,
-    tf_universal_mask,
 )
-
+from xrpl_plugin.sfields import sf_account, sf_regular_key, sf_ticket_sequence
 
 def preflight(ctx):
     print("This is a Python plugin")

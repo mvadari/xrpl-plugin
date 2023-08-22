@@ -112,7 +112,8 @@
         "format": "cpp",
         "span": "cpp",
         "qtcore": "cpp",
-        "qtwidgets": "cpp"
+        "qtwidgets": "cpp",
+        "qtgui": "cpp"
     },
     "cSpell.words": [
         "cout",
@@ -128,6 +129,7 @@
         "INSUF",
         "JLOG",
         "keylet",
+        "keylets",
         "multisignature",
         "nftoffer",
         "NFTOKEN",
@@ -147,5 +149,9 @@
         "stypes",
         "trustlines"
     ],
-    "esbonio.sphinx.confDir": ""
+    "esbonio.sphinx.confDir": "",
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter"
+    },
+    "python.formatting.provider": "none"
 }

@@ -17,7 +17,8 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 import sys
 import os
-sys.path.insert(0, os.path.abspath('.'))
+
+sys.path.insert(0, os.path.abspath("."))
 
 # -- General configuration ------------------------------------------------
 
@@ -258,9 +259,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [
-    (master_doc, "xrpl_plugin", "xrpl_plugin Documentation", [author], 1)
-]
+man_pages = [(master_doc, "xrpl_plugin", "xrpl_plugin Documentation", [author], 1)]
 
 # If true, show URL addresses after external links.
 # man_show_urls = False
@@ -298,3 +297,26 @@ texinfo_documents = [
 
 # Example configuration for intersphinx: refer to the Python standard library.
 # intersphinx_mapping = {"https://docs.python.org/": None}
+
+
+def autodoc_process_signature(
+    app, what, name, obj, bound_method, signature, return_annotation
+):
+    if "parse_base58" in name:
+        print(what, name, obj, bound_method, signature, return_annotation)
+    new_sig = (
+        signature.replace(".rippled_py", "") if signature is not None else signature
+    )
+    new_return = (
+        return_annotation.replace(".rippled_py", "")
+        if return_annotation is not None
+        else return_annotation
+    )
+
+    # Return the modified signature
+    return new_sig, new_return
+
+
+# Connect the event handler to the autodoc-before-process-signature event
+def setup(app):
+    app.connect("autodoc-process-signature", autodoc_process_signature)

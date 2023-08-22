@@ -1,3 +1,28 @@
+[tool.poetry]
+name = "xrpl-plugin"
+version = "0.0.1"
+description = "A Python package for writing plugins for XRPL nodes."
+readme = "README.md"
+repository = "https://github.com/mvadari/xrpl-plugin"
+authors = [
+  "Mayukha Vadari <mvadari@ripple.com>"
+]
+keywords = [
+  "xrp",
+  "xrpl",
+  "cryptocurrency",
+  "web3",
+  "extensibility"
+]
+license = "ISC"
+documentation = "https://xrpl-plugin.readthedocs.io"
+include = [
+  "LICENSE",
+]
+packages = [
+  { include = "xrpl_plugin" },
+]
+
 [build-system]
 requires = [
     "setuptools>=42",
@@ -12,7 +37,7 @@ profile = "black"
 
 [tool.mypy]
 files = "setup.py"
-python_version = "3.7"
+python_version = "3.10"
 strict = true
 show_error_codes = true
 enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]

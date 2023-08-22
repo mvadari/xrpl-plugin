@@ -1,40 +1,36 @@
 import json
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Callable, List, Optional, Tuple
+from typing import Callable, List, Optional, Tuple, Union
 
-from . import xrpl_plugin_py
-from xrpl_plugin.xrpl_plugin_py import (
-    TER,
-    AccountID,
+from xrpl_plugin.rippled_py.transactors import (
     Application,
     ApplyContext,
     ApplyView,
-    Buffer,
     ConsequencesFactoryType,
-    Journal,
-    JsonValue,
-    NotTEC,
     PreclaimContext,
     PreflightContext,
     ReadView,
     SerialIter,
     Serializer,
-    SField,
-    SOEStyle,
-    STArray,
-    STBase,
-    STLedgerEntry,
-    STObject,
-    STPluginType,
-    STTx,
     TxConsequences,
+)
+from xrpl_plugin.basic_types import (
+    AccountID,
+    Buffer,
+    Journal,
+    JsonValue,
     VoteBehavior,
     XRPAmount,
     uint256,
+    SOEStyle,
 )
-
-# TODO: move this file into the package
+from xrpl_plugin.sfields import SField
+from xrpl_plugin.stypes import (
+    STLedgerEntry,
+    STTx,
+)
+from xrpl_plugin.return_codes import TER, NotTEC
 
 
 @dataclass(frozen=True)
@@ -54,27 +50,12 @@ class Transactor:
     check_sign: Optional[Callable[[PreclaimContext], TER]] = None
 
 
-def create_new_sfield(cls, field_name, field_value):
-    if not issubclass(cls, STBase) and cls != STObject:
-        # TODO: fix inheritance
-        raise Exception("SField must be of an `ST` type.")
-    if cls == STPluginType:
-        raise Exception("Must use `construct_custom_sfield` for custom STypes.")
-    fn_name = f"_create_new_sfield_{cls.__name__}"
-    create_fn = getattr(xrpl_plugin_py, fn_name, None)
-    if create_fn is None:
-        # NOTE: This should never be hit in prod
-        # It may be hit during dev work since not everything is implemented yet
-        raise Exception(
-            f"`create_new_sfield` function does not exist for {cls.__name__}"
-        )
-    return create_fn(field_value, field_name)
-
-
 @dataclass(frozen=True)
 class SType:
     type_id: int
-    parse_value: Callable[[SField, str, str, SField, JsonValue], Buffer | JsonValue]
+    parse_value: Callable[
+        [SField, str, str, SField, JsonValue], Union[Buffer, JsonValue]
+    ]
     to_string: Callable[[Buffer], str]
     to_serializer: Callable[[Buffer, Serializer], None]
     from_serial_iter: Callable[[SerialIter], Buffer]

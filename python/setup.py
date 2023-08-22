@@ -149,9 +149,9 @@ setup(
     description="XRPL Plugins",
     long_description="",
     packages=["xrpl_plugin"],
-    ext_modules=[CMakeExtension("xrpl_plugin.xrpl_plugin_py")],
+    ext_modules=[CMakeExtension("xrpl_plugin.rippled_py")],
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
     extras_require={"test": ["pytest>=6.0"]},
-    python_requires=">=3.7",
+    python_requires=">=3.10",
 )
