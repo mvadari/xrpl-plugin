@@ -1,30 +1,42 @@
+from setuptools import setup
 import os
 import subprocess
 from pathlib import Path
 
-from setuptools import Extension, setup
+# Available at setup time due to pyproject.toml
+from pybind11.setup_helpers import Pybind11Extension  # , build_ext
 from setuptools.command.build_ext import build_ext
+from pybind11 import get_cmake_dir
 
-# Convert distutils Windows platform specifiers to CMake -A arguments
-PLAT_TO_CMAKE = {
-    "win32": "Win32",
-    "win-amd64": "x64",
-    "win-arm32": "ARM",
-    "win-arm64": "ARM64",
-}
+import sys
 
+__version__ = "0.0.1"
 
-# A CMakeExtension needs a sourcedir instead of a file list.
-# The name must be the _single_ output extension from the CMake build.
-# If you need multiple extensions, see scikit-build.
-class CMakeExtension(Extension):
-    def __init__(self, name: str, sourcedir: str = "") -> None:
-        super().__init__(name, sources=[])
-        self.sourcedir = os.fspath(Path(sourcedir).resolve())
+# The main interface is through Pybind11Extension.
+# * You can add cxx_std=11/14/17, and then build_ext can be removed.
+# * You can set include_pybind11=false to add the include directory yourself,
+#   say from a submodule.
+#
+# Note:
+#   Sort input source files if you glob sources to ensure bit-for-bit
+#   reproducible builds (https://github.com/pybind/python_example/pull/53)
+
+ext_modules = [
+    Pybind11Extension(
+        "xrpl_plugin.rippled_py",
+        ["src/main.cpp"],
+        # Example: passing in the version to the compiled code
+        define_macros=[("VERSION_INFO", __version__)],
+        cxx_std=17,
+    ),
+]
+
+with open("README.md", "r", encoding="utf-8") as fh:
+    long_description = fh.read()
 
 
 class CMakeBuild(build_ext):
-    def build_extension(self, ext: CMakeExtension) -> None:
+    def build_extension(self, ext) -> None:
         # Must be in this form due to bug in .resolve() only fixed in Python 3.10+
         ext_fullpath = Path.cwd() / self.get_ext_fullpath(ext.name)  # type: ignore[no-untyped-call]
         extdir = ext_fullpath.parent.resolve()
@@ -121,7 +133,7 @@ class CMakeBuild(build_ext):
                 [
                     "conan",
                     "install",
-                    ext.sourcedir,
+                    os.getcwd(),
                     "--build",
                     "missing",
                     "--settings",
@@ -131,27 +143,26 @@ class CMakeBuild(build_ext):
                 check=True,
             )
         cmake_args += [f"-DCMAKE_TOOLCHAIN_FILE:FILEPATH={conan_cmake}"]
-        subprocess.run(
-            ["cmake", ext.sourcedir] + cmake_args, cwd=build_temp, check=True
-        )
+        subprocess.run(["cmake", os.getcwd()] + cmake_args, cwd=build_temp, check=True)
         subprocess.run(
             ["cmake", "--build", "."] + build_args, cwd=build_temp, check=True
         )
 
 
-# The information here can also be placed in setup.cfg - better separation of
-# logic and declaration, and simpler if you include description/version in a file.
 setup(
     name="xrpl-plugin",
     version="0.0.1",
     author="Mayukha Vadari",
     author_email="mvadari@ripple.com",
+    url="https://github.com/mvadari/xrpl-plugin",
     description="XRPL Plugins",
-    long_description="",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     packages=["xrpl_plugin"],
-    ext_modules=[CMakeExtension("xrpl_plugin.rippled_py")],
+    ext_modules=ext_modules,
+    # Currently, build_ext only provides an optional "highest supported C++
+    # level" feature, but in the future it may provide more features.
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
-    extras_require={"test": ["pytest>=6.0"]},
     python_requires=">=3.10",
 )
