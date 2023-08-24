@@ -1024,7 +1024,7 @@ def create_files(python_file):
 def build_files(cpp_file, project_name):
     with tempfile.TemporaryDirectory() as build_temp:
         build_source_dir = os.path.dirname(__file__)
-        conan_source_dir = Path(build_source_dir).parent.parent
+        conan_source_dir = build_source_dir
         conan_build_dir = os.path.join(conan_source_dir, "build", "generators")
         cmake_args = []
         build_args = []
