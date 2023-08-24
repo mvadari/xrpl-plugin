@@ -302,8 +302,6 @@ texinfo_documents = [
 def autodoc_process_signature(
     app, what, name, obj, bound_method, signature, return_annotation
 ):
-    if "parse_base58" in name:
-        print(what, name, obj, bound_method, signature, return_annotation)
     new_sig = (
         signature.replace(".rippled_py", "") if signature is not None else signature
     )

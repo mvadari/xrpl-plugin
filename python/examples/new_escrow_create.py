@@ -1,29 +1,34 @@
-from xrpl_plugin import (
-    AccountID,
-    Amendment,
+from xrpl_plugin.transactors import (
     ConsequencesFactoryType,
+    fix1543,
+    fix1571,
+    preflight1,
+    preflight2,
+    tf_universal_mask,
+)
+from xrpl_plugin.ledger_objects import (
+    adjust_owner_count,
+    make_sle,
+)
+from xrpl_plugin.rippled_py.stypes.parser_errors import bad_type, invalid_data
+from xrpl_plugin.models import (
+    Amendment,
     InnerObject,
     InvariantCheck,
     LedgerObject,
     SType,
     TERCode,
     Transactor,
-    adjust_owner_count,
-    bad_type,
-    create_new_sfield,
-    fix1543,
-    fix1571,
-    index_hash,
-    invalid_data,
-    make_sle,
+)
+from xrpl_plugin.basic_types import (
+    zero_amount,
+    VoteBehavior,
+    XRPAmount,
+    Slice,
     parse_base58,
-    preflight1,
-    preflight2,
     soeOPTIONAL,
     soeREQUIRED,
-    tf_universal_mask,
 )
-from xrpl_plugin.basic_types import zero_amount, VoteBehavior, XRPAmount, Slice
 from xrpl_plugin.keylets import Keylet, account_keylet
 from xrpl_plugin.return_codes import (
     tecDIR_FULL,
@@ -53,12 +58,14 @@ from xrpl_plugin.sfields import (
     sf_source_tag,
     sf_ticket_sequence,
     construct_custom_sfield,
+    create_new_sfield,
 )
 from xrpl_plugin.stypes import (
     STAmount,
     STArray,
     STObject,
     STUInt32,
+    index_hash,
 )
 
 sf_finish_after2 = create_new_sfield(STUInt32, "FinishAfter2", 53)
@@ -312,7 +319,7 @@ transactors = [
             (sf_finish_after2, soeOPTIONAL),
             (sf_destination_tag, soeOPTIONAL),
             (sf_ticket_sequence, soeOPTIONAL),
-            (sf_fake_array,       soeOPTIONAL),
+            (sf_fake_array, soeOPTIONAL),
         ],
         consequences_factory_type=ConsequencesFactoryType.Normal,
         preflight=preflight,
@@ -320,6 +327,4 @@ transactors = [
     )
 ]
 
-inner_objects = [
-    InnerObject(sf_fake_element, [(sf_account, soeOPTIONAL)])
-]
+inner_objects = [InnerObject(sf_fake_element, [(sf_account, soeOPTIONAL)])]

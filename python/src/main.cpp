@@ -2,12 +2,17 @@
 #include <pybind11/stl.h>
 #include <pybind11/operators.h>
 
-#include <ripple/app/tx/impl/Transactor.h>
 #include <ripple/protocol/Serializer.h>
 #include <ripple/protocol/st.h>
 #include <ripple/protocol/TxFlags.h>
 #include <ripple/protocol/Feature.h>
 #include <ripple/ledger/View.h>
+#include <ripple/ledger/ApplyViewImpl.h>
+#include <ripple/app/main/Application.h>
+#include <ripple/app/tx/TxConsequences.h>
+#include <ripple/app/tx/impl/PreflightContext.h>
+#include <ripple/app/tx/impl/PreclaimContext.h>
+#include <ripple/app/tx/impl/ApplyContext.h>
 #include <ripple/protocol/digest.h>
 #include <map>
 #include <iostream>
@@ -930,10 +935,10 @@ PYBIND11_MODULE(rippled_py, m) {
         .def_readonly("close_time", &ripple::LedgerInfo::closeTime)
     ;
 
-    py::enum_<ripple::Transactor::ConsequencesFactoryType>(transactorModule, "ConsequencesFactoryType", "The type of TxConsequences that the transactor needs.")
-        .value("Normal", ripple::Transactor::ConsequencesFactoryType::Normal)
-        .value("Blocker", ripple::Transactor::ConsequencesFactoryType::Blocker)
-        .value("Custom", ripple::Transactor::ConsequencesFactoryType::Custom);
+    py::enum_<ripple::ConsequencesFactoryType>(transactorModule, "ConsequencesFactoryType", "The type of TxConsequences that the transactor needs.")
+        .value("Normal", ripple::ConsequencesFactoryType::Normal)
+        .value("Blocker", ripple::ConsequencesFactoryType::Blocker)
+        .value("Custom", ripple::ConsequencesFactoryType::Custom);
 
     py::enum_<ripple::TxConsequences::Category>(transactorModule, "TxConsequencesCategory", "Describes how the transaction affects subsequent transactions.")
         .value("normal", ripple::TxConsequences::Category::normal)

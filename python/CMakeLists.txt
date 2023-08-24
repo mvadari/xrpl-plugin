@@ -6,7 +6,7 @@ find_package(SOCI REQUIRED)
 find_package(pybind11 REQUIRED)
 
 
-add_subdirectory(../external/rippled subproject/rippled EXCLUDE_FROM_ALL)
+add_subdirectory(xrpl_plugin/rippled subproject/rippled EXCLUDE_FROM_ALL)
 target_link_libraries(xrpl_plugin PUBLIC soci::soci)
 
 

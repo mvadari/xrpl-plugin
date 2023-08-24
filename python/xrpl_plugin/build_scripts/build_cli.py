@@ -2,10 +2,11 @@ import os
 import sys
 import subprocess
 import tempfile
+from pathlib import Path
 
 
 def generate_cpp(tx_name, module_name, python_folder):
-    return f"""#include <ripple/app/tx/impl/Transactor.h>
+    return f"""#include <ripple/app/tx/TxConsequences.h>
 #include <ripple/basics/Log.h>
 #include <ripple/basics/XRPAmount.h>
 #include <ripple/ledger/ApplyView.h>
@@ -267,7 +268,7 @@ struct TransactorExportInternal {{
     std::string txName;
     std::uint16_t txType;
     std::vector<SOElementExport> txFormat;
-    Transactor::ConsequencesFactoryType consequencesFactoryType;
+    ConsequencesFactoryType consequencesFactoryType;
     makeTxConsequencesPtr makeTxConsequences = nullptr;
     calculateBaseFeePtr calculateBaseFee = nullptr;
     preflightPtr preflight = nullptr;
@@ -334,7 +335,7 @@ getTransactors()
                 transactor.attr("name").cast<std::string>(),
                 txType,
                 format,
-                transactor.attr("consequences_factory_type").cast<Transactor::ConsequencesFactoryType>(),
+                transactor.attr("consequences_factory_type").cast<ConsequencesFactoryType>(),
                 transactor.attr("make_tx_consequences").is_none() ? nullptr : makeTxConsequences,
                 transactor.attr("calculate_base_fee").is_none() ? nullptr : calculateBaseFee,
                 transactor.attr("preflight").is_none() ? nullptr : preflight,
@@ -1007,7 +1008,7 @@ def create_files(python_file):
     python_folder = os.path.dirname(abs_python_file)
     sys.path.append(python_folder)
     last_slash = abs_python_file.rfind("/")
-    module_name = abs_python_file[(last_slash + 1): -3]
+    module_name = abs_python_file[(last_slash + 1) : -3]
     # module = importlib.import_module(module_name)
     tx_name = "NewEscrowCreate"  # module.tx_name
     # TODO: add logic to check validity of Python transactors
@@ -1023,7 +1024,7 @@ def create_files(python_file):
 def build_files(cpp_file, project_name):
     with tempfile.TemporaryDirectory() as build_temp:
         build_source_dir = os.path.dirname(__file__)
-        conan_source_dir = os.path.dirname(build_source_dir)
+        conan_source_dir = build_source_dir
         conan_build_dir = os.path.join(conan_source_dir, "build", "generators")
         cmake_args = []
         build_args = []
@@ -1065,6 +1066,6 @@ def build_files(cpp_file, project_name):
         )
 
 
-if __name__ == "__main__":
+def build():
     cpp_file_fullpath, module_name = create_files(sys.argv[1])
     build_files(cpp_file_fullpath, module_name)

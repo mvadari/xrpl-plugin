@@ -1,0 +1,5 @@
+include conanfile.py
+include CMakeLists.txt
+recursive-include xrpl_plugin/rippled/ *
+include xrpl_plugin/build_scripts/CMakeLists.txt
+include xrpl_plugin/build_scripts/conanfile.py
