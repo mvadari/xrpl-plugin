@@ -2,6 +2,7 @@ from setuptools import setup
 import os
 import subprocess
 from pathlib import Path
+import sys
 
 # Available at setup time due to pyproject.toml
 from pybind11.setup_helpers import Pybind11Extension  # , build_ext
@@ -140,6 +141,10 @@ class CMakeBuild(build_ext):
                 check=True,
             )
         cmake_args += [f"-DCMAKE_TOOLCHAIN_FILE:FILEPATH={conan_cmake}"]
+
+        subprocess.run(
+            ["ls", "-l", os.getcwd() + "/xrpl_plugin"], cwd=build_temp, check=True
+        )
         subprocess.run(["cmake", os.getcwd()] + cmake_args, cwd=build_temp, check=True)
         subprocess.run(
             ["cmake", "--build", "."] + build_args, cwd=build_temp, check=True
@@ -148,7 +153,7 @@ class CMakeBuild(build_ext):
 
 setup(
     name="xrpl-plugin",
-    version="0.0.1",
+    version="0.0.2",
     author="Mayukha Vadari",
     author_email="mvadari@ripple.com",
     url="https://github.com/mvadari/xrpl-plugin",
