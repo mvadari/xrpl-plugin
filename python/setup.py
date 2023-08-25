@@ -163,7 +163,7 @@ setup(
     # level" feature, but in the future it may provide more features.
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
-    python_requires=">=3.10",
+    python_requires=">=3.8",
     entry_points="""
         [console_scripts]
         plugin-build=xrpl_plugin:build
