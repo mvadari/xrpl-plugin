@@ -3,7 +3,7 @@ python:
   version: 3.8
   install:
     - method: pip
-      path: .
+      path: python/
 sphinx:
   builder: html
-  configuration: docs/conf.py
+  configuration: python/docs/conf.py
