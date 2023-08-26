@@ -1,4 +1,9 @@
 version: 2
+build:
+  os: ubuntu-22.04
+  apt_packages:
+    - gcc
+    - g++
 python:
   version: 3.8
   install:
