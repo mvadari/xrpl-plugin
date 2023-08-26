@@ -4,6 +4,8 @@ build:
   apt_packages:
     - gcc
     - g++
+  tools:
+    python: "3.8"
 python:
   version: 3.8
   install:
