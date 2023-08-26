@@ -7,3 +7,7 @@ python:
 sphinx:
   builder: html
   configuration: python/docs/conf.py
+
+submodules:
+  include:
+    - external/rippled/
