@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>SFields &#8212; xrpl_plugin 0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=039e1c02" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=f6245a2f"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Transactor Things" href="xrpl_plugin.transactors.html" />
+    <link rel="prev" title="Serialized Types" href="xrpl_plugin.stypes.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="sfields">
+<h1>SFields<a class="headerlink" href="#sfields" title="Permalink to this heading">¶</a></h1>
+<p>All existing rippled SFields. (They’re all here, they just haven’t been fully documented yet.)</p>
+<p>The full list is available <a class="reference external" href="https://github.com/XRPLF/rippled/blob/develop/src/ripple/protocol/impl/SField.cpp">in the rippled codebase</a>.</p>
+<span class="target" id="module-xrpl_plugin.sfields"></span><p>All existing SFields.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.sfields.SF_ACCOUNT">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.sfields.</span></span><span class="sig-name descname"><span class="pre">SF_ACCOUNT</span></span><a class="headerlink" href="#xrpl_plugin.sfields.SF_ACCOUNT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#xrpl_plugin.sfields.SField" title="xrpl_plugin.rippled_py.sfields.SField"><code class="xref py py-class docutils literal notranslate"><span class="pre">SField</span></code></a></p>
+<p>An SField representing an Account type.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.sfields.SF_AMOUNT">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.sfields.</span></span><span class="sig-name descname"><span class="pre">SF_AMOUNT</span></span><a class="headerlink" href="#xrpl_plugin.sfields.SF_AMOUNT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#xrpl_plugin.sfields.SField" title="xrpl_plugin.rippled_py.sfields.SField"><code class="xref py py-class docutils literal notranslate"><span class="pre">SField</span></code></a></p>
+<p>An SField representing an Amount type.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.sfields.SF_PLUGINTYPE">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.sfields.</span></span><span class="sig-name descname"><span class="pre">SF_PLUGINTYPE</span></span><a class="headerlink" href="#xrpl_plugin.sfields.SF_PLUGINTYPE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#xrpl_plugin.sfields.SField" title="xrpl_plugin.rippled_py.sfields.SField"><code class="xref py py-class docutils literal notranslate"><span class="pre">SField</span></code></a></p>
+<p>An SField representing a type that has been imported via a plugin.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.sfields.SF_UINT128">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.sfields.</span></span><span class="sig-name descname"><span class="pre">SF_UINT128</span></span><a class="headerlink" href="#xrpl_plugin.sfields.SF_UINT128" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#xrpl_plugin.sfields.SField" title="xrpl_plugin.rippled_py.sfields.SField"><code class="xref py py-class docutils literal notranslate"><span class="pre">SField</span></code></a></p>
+<p>An SField representing a uint128 type.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.sfields.SF_UINT16">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.sfields.</span></span><span class="sig-name descname"><span class="pre">SF_UINT16</span></span><a class="headerlink" href="#xrpl_plugin.sfields.SF_UINT16" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#xrpl_plugin.sfields.SField" title="xrpl_plugin.rippled_py.sfields.SField"><code class="xref py py-class docutils literal notranslate"><span class="pre">SField</span></code></a></p>
+<p>An SField representing a uint16 type.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.sfields.SF_UINT160">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.sfields.</span></span><span class="sig-name descname"><span class="pre">SF_UINT160</span></span><a class="headerlink" href="#xrpl_plugin.sfields.SF_UINT160" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#xrpl_plugin.sfields.SField" title="xrpl_plugin.rippled_py.sfields.SField"><code class="xref py py-class docutils literal notranslate"><span class="pre">SField</span></code></a></p>
+<p>An SField representing a uint160 type.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.sfields.SF_UINT256">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.sfields.</span></span><span class="sig-name descname"><span class="pre">SF_UINT256</span></span><a class="headerlink" href="#xrpl_plugin.sfields.SF_UINT256" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#xrpl_plugin.sfields.SField" title="xrpl_plugin.rippled_py.sfields.SField"><code class="xref py py-class docutils literal notranslate"><span class="pre">SField</span></code></a></p>
+<p>An SField representing a uint256 type.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.sfields.SF_UINT32">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.sfields.</span></span><span class="sig-name descname"><span class="pre">SF_UINT32</span></span><a class="headerlink" href="#xrpl_plugin.sfields.SF_UINT32" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#xrpl_plugin.sfields.SField" title="xrpl_plugin.rippled_py.sfields.SField"><code class="xref py py-class docutils literal notranslate"><span class="pre">SField</span></code></a></p>
+<p>An SField representing a uint32 type.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.sfields.SF_UINT64">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.sfields.</span></span><span class="sig-name descname"><span class="pre">SF_UINT64</span></span><a class="headerlink" href="#xrpl_plugin.sfields.SF_UINT64" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#xrpl_plugin.sfields.SField" title="xrpl_plugin.rippled_py.sfields.SField"><code class="xref py py-class docutils literal notranslate"><span class="pre">SField</span></code></a></p>
+<p>An SField representing a uint64 type.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.sfields.SF_UINT8">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.sfields.</span></span><span class="sig-name descname"><span class="pre">SF_UINT8</span></span><a class="headerlink" href="#xrpl_plugin.sfields.SF_UINT8" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#xrpl_plugin.sfields.SField" title="xrpl_plugin.rippled_py.sfields.SField"><code class="xref py py-class docutils literal notranslate"><span class="pre">SField</span></code></a></p>
+<p>An SField representing a uint8 type.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.sfields.SF_VECTOR256">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.sfields.</span></span><span class="sig-name descname"><span class="pre">SF_VECTOR256</span></span><a class="headerlink" href="#xrpl_plugin.sfields.SF_VECTOR256" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#xrpl_plugin.sfields.SField" title="xrpl_plugin.rippled_py.sfields.SField"><code class="xref py py-class docutils literal notranslate"><span class="pre">SField</span></code></a></p>
+<p>An SField representing a 256-bit vector type.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.sfields.SF_VL">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.sfields.</span></span><span class="sig-name descname"><span class="pre">SF_VL</span></span><a class="headerlink" href="#xrpl_plugin.sfields.SF_VL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#xrpl_plugin.sfields.SField" title="xrpl_plugin.rippled_py.sfields.SField"><code class="xref py py-class docutils literal notranslate"><span class="pre">SField</span></code></a></p>
+<p>An SField representing a variable length type.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.sfields.SField">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.sfields.</span></span><span class="sig-name descname"><span class="pre">SField</span></span><a class="headerlink" href="#xrpl_plugin.sfields.SField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>A serialized field that can be included in transactions and ledger objects.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.sfields.SField.fieldCode">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fieldCode</span></span><a class="headerlink" href="#xrpl_plugin.sfields.SField.fieldCode" title="Permalink to this definition">¶</a></dt>
+<dd><p>(fieldType&lt;&lt;16)|fieldValue</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.sfields.SField.fieldName">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fieldName</span></span><a class="headerlink" href="#xrpl_plugin.sfields.SField.fieldName" title="Permalink to this definition">¶</a></dt>
+<dd><p>The name of the field.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.sfields.SField.fieldNum">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fieldNum</span></span><a class="headerlink" href="#xrpl_plugin.sfields.SField.fieldNum" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.sfields.SField.fieldType">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fieldType</span></span><a class="headerlink" href="#xrpl_plugin.sfields.SField.fieldType" title="Permalink to this definition">¶</a></dt>
+<dd><p>The SType of the field.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.sfields.SField.fieldValue">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fieldValue</span></span><a class="headerlink" href="#xrpl_plugin.sfields.SField.fieldValue" title="Permalink to this definition">¶</a></dt>
+<dd><p>The unique value of the field for that SType.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.sfields.construct_custom_sfield">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.sfields.</span></span><span class="sig-name descname"><span class="pre">construct_custom_sfield</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#xrpl_plugin.sfields.SF_PLUGINTYPE" title="xrpl_plugin.sfields.SF_PLUGINTYPE"><span class="pre">xrpl_plugin.sfields.SF_PLUGINTYPE</span></a></span></span><a class="headerlink" href="#xrpl_plugin.sfields.construct_custom_sfield" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.sfields.create_new_sfield">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.sfields.</span></span><span class="sig-name descname"><span class="pre">create_new_sfield</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#xrpl_plugin.sfields.create_new_sfield" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="xrpl_plugin.sfields.sf_tick_size">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.sfields.</span></span><span class="sig-name descname"><span class="pre">sf_tick_size</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">sfTickSize</span></em><a class="headerlink" href="#xrpl_plugin.sfields.sf_tick_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of significant digits in the exchange rate of an offer.</p>
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">xrpl_plugin</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.basic_types.html">Basic Types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.stypes.html">Serialized Types</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">SFields</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.transactors.html">Transactor Things</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.ledger_objects.html">Ledger Object Things</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.keylets.html">Keylets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.return_codes.html">Return Codes</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="xrpl_plugin.stypes.html" title="previous chapter">Serialized Types</a></li>
+      <li>Next: <a href="xrpl_plugin.transactors.html" title="next chapter">Transactor Things</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, ripplex.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.1.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+      |
+      <a href="_sources/xrpl_plugin.sfields.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Return Codes &#8212; xrpl_plugin 0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=039e1c02" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=f6245a2f"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Keylets" href="xrpl_plugin.keylets.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-xrpl_plugin.return_codes">
+<span id="return-codes"></span><h1>Return Codes<a class="headerlink" href="#module-xrpl_plugin.return_codes" title="Permalink to this heading">¶</a></h1>
+<p>Existing TER return codes.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.NotTEC">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.return_codes.</span></span><span class="sig-name descname"><span class="pre">NotTEC</span></span><a class="headerlink" href="#xrpl_plugin.return_codes.NotTEC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>A subset of return codes that includes all return codes <em>except</em> <cite>tec</cite> codes.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.return_codes.</span></span><span class="sig-name descname"><span class="pre">TECcodes</span></span><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>Codes that indicate that the transaction failed, but it was applied to a ledger to apply the transaction cost.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecCANT_ACCEPT_OWN_NFTOKEN_OFFER">
+<span class="sig-name descname"><span class="pre">tecCANT_ACCEPT_OWN_NFTOKEN_OFFER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecCANT_ACCEPT_OWN_NFTOKEN_OFFER:</span> <span class="pre">158&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecCANT_ACCEPT_OWN_NFTOKEN_OFFER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecCLAIM">
+<span class="sig-name descname"><span class="pre">tecCLAIM</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecCLAIM:</span> <span class="pre">100&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecCLAIM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecCRYPTOCONDITION_ERROR">
+<span class="sig-name descname"><span class="pre">tecCRYPTOCONDITION_ERROR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecCRYPTOCONDITION_ERROR:</span> <span class="pre">146&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecCRYPTOCONDITION_ERROR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecDIR_FULL">
+<span class="sig-name descname"><span class="pre">tecDIR_FULL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecDIR_FULL:</span> <span class="pre">121&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecDIR_FULL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecDST_TAG_NEEDED">
+<span class="sig-name descname"><span class="pre">tecDST_TAG_NEEDED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecDST_TAG_NEEDED:</span> <span class="pre">143&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecDST_TAG_NEEDED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecDUPLICATE">
+<span class="sig-name descname"><span class="pre">tecDUPLICATE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecDUPLICATE:</span> <span class="pre">149&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecDUPLICATE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecEXPIRED">
+<span class="sig-name descname"><span class="pre">tecEXPIRED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecEXPIRED:</span> <span class="pre">148&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecEXPIRED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecFAILED_PROCESSING">
+<span class="sig-name descname"><span class="pre">tecFAILED_PROCESSING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecFAILED_PROCESSING:</span> <span class="pre">105&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecFAILED_PROCESSING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecFROZEN">
+<span class="sig-name descname"><span class="pre">tecFROZEN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecFROZEN:</span> <span class="pre">137&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecFROZEN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecHAS_OBLIGATIONS">
+<span class="sig-name descname"><span class="pre">tecHAS_OBLIGATIONS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecHAS_OBLIGATIONS:</span> <span class="pre">151&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecHAS_OBLIGATIONS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecHOOK_ERROR">
+<span class="sig-name descname"><span class="pre">tecHOOK_ERROR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecHOOK_ERROR:</span> <span class="pre">153&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecHOOK_ERROR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecINSUFFICIENT_FUNDS">
+<span class="sig-name descname"><span class="pre">tecINSUFFICIENT_FUNDS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecINSUFFICIENT_FUNDS:</span> <span class="pre">159&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecINSUFFICIENT_FUNDS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecINSUFFICIENT_PAYMENT">
+<span class="sig-name descname"><span class="pre">tecINSUFFICIENT_PAYMENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecINSUFFICIENT_PAYMENT:</span> <span class="pre">161&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecINSUFFICIENT_PAYMENT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecINSUFFICIENT_RESERVE">
+<span class="sig-name descname"><span class="pre">tecINSUFFICIENT_RESERVE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecINSUFFICIENT_RESERVE:</span> <span class="pre">141&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecINSUFFICIENT_RESERVE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecINSUFF_FEE">
+<span class="sig-name descname"><span class="pre">tecINSUFF_FEE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecINSUFF_FEE:</span> <span class="pre">136&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecINSUFF_FEE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecINSUF_RESERVE_LINE">
+<span class="sig-name descname"><span class="pre">tecINSUF_RESERVE_LINE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecINSUF_RESERVE_LINE:</span> <span class="pre">122&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecINSUF_RESERVE_LINE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecINSUF_RESERVE_OFFER">
+<span class="sig-name descname"><span class="pre">tecINSUF_RESERVE_OFFER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecINSUF_RESERVE_OFFER:</span> <span class="pre">123&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecINSUF_RESERVE_OFFER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecINTERNAL">
+<span class="sig-name descname"><span class="pre">tecINTERNAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecINTERNAL:</span> <span class="pre">144&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecINTERNAL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecINVARIANT_FAILED">
+<span class="sig-name descname"><span class="pre">tecINVARIANT_FAILED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecINVARIANT_FAILED:</span> <span class="pre">147&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecINVARIANT_FAILED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecKILLED">
+<span class="sig-name descname"><span class="pre">tecKILLED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecKILLED:</span> <span class="pre">150&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecKILLED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecMAX_SEQUENCE_REACHED">
+<span class="sig-name descname"><span class="pre">tecMAX_SEQUENCE_REACHED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecMAX_SEQUENCE_REACHED:</span> <span class="pre">154&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecMAX_SEQUENCE_REACHED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecNEED_MASTER_KEY">
+<span class="sig-name descname"><span class="pre">tecNEED_MASTER_KEY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecNEED_MASTER_KEY:</span> <span class="pre">142&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecNEED_MASTER_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecNFTOKEN_BUY_SELL_MISMATCH">
+<span class="sig-name descname"><span class="pre">tecNFTOKEN_BUY_SELL_MISMATCH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecNFTOKEN_BUY_SELL_MISMATCH:</span> <span class="pre">156&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecNFTOKEN_BUY_SELL_MISMATCH" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecNFTOKEN_OFFER_TYPE_MISMATCH">
+<span class="sig-name descname"><span class="pre">tecNFTOKEN_OFFER_TYPE_MISMATCH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecNFTOKEN_OFFER_TYPE_MISMATCH:</span> <span class="pre">157&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecNFTOKEN_OFFER_TYPE_MISMATCH" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecNO_ALTERNATIVE_KEY">
+<span class="sig-name descname"><span class="pre">tecNO_ALTERNATIVE_KEY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecNO_ALTERNATIVE_KEY:</span> <span class="pre">130&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecNO_ALTERNATIVE_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecNO_AUTH">
+<span class="sig-name descname"><span class="pre">tecNO_AUTH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecNO_AUTH:</span> <span class="pre">134&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecNO_AUTH" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecNO_DST">
+<span class="sig-name descname"><span class="pre">tecNO_DST</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecNO_DST:</span> <span class="pre">124&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecNO_DST" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecNO_DST_INSUF_XRP">
+<span class="sig-name descname"><span class="pre">tecNO_DST_INSUF_XRP</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecNO_DST_INSUF_XRP:</span> <span class="pre">125&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecNO_DST_INSUF_XRP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecNO_ENTRY">
+<span class="sig-name descname"><span class="pre">tecNO_ENTRY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecNO_ENTRY:</span> <span class="pre">140&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecNO_ENTRY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecNO_ISSUER">
+<span class="sig-name descname"><span class="pre">tecNO_ISSUER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecNO_ISSUER:</span> <span class="pre">133&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecNO_ISSUER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecNO_LINE">
+<span class="sig-name descname"><span class="pre">tecNO_LINE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecNO_LINE:</span> <span class="pre">135&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecNO_LINE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecNO_LINE_INSUF_RESERVE">
+<span class="sig-name descname"><span class="pre">tecNO_LINE_INSUF_RESERVE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecNO_LINE_INSUF_RESERVE:</span> <span class="pre">126&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecNO_LINE_INSUF_RESERVE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecNO_LINE_REDUNDANT">
+<span class="sig-name descname"><span class="pre">tecNO_LINE_REDUNDANT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecNO_LINE_REDUNDANT:</span> <span class="pre">127&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecNO_LINE_REDUNDANT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecNO_PERMISSION">
+<span class="sig-name descname"><span class="pre">tecNO_PERMISSION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecNO_PERMISSION:</span> <span class="pre">139&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecNO_PERMISSION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecNO_REGULAR_KEY">
+<span class="sig-name descname"><span class="pre">tecNO_REGULAR_KEY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecNO_REGULAR_KEY:</span> <span class="pre">131&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecNO_REGULAR_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecNO_SUITABLE_NFTOKEN_PAGE">
+<span class="sig-name descname"><span class="pre">tecNO_SUITABLE_NFTOKEN_PAGE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecNO_SUITABLE_NFTOKEN_PAGE:</span> <span class="pre">155&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecNO_SUITABLE_NFTOKEN_PAGE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecNO_TARGET">
+<span class="sig-name descname"><span class="pre">tecNO_TARGET</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecNO_TARGET:</span> <span class="pre">138&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecNO_TARGET" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecOBJECT_NOT_FOUND">
+<span class="sig-name descname"><span class="pre">tecOBJECT_NOT_FOUND</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecOBJECT_NOT_FOUND:</span> <span class="pre">160&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecOBJECT_NOT_FOUND" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecOVERSIZE">
+<span class="sig-name descname"><span class="pre">tecOVERSIZE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecOVERSIZE:</span> <span class="pre">145&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecOVERSIZE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecOWNERS">
+<span class="sig-name descname"><span class="pre">tecOWNERS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecOWNERS:</span> <span class="pre">132&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecOWNERS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecPATH_DRY">
+<span class="sig-name descname"><span class="pre">tecPATH_DRY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecPATH_DRY:</span> <span class="pre">128&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecPATH_DRY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecPATH_PARTIAL">
+<span class="sig-name descname"><span class="pre">tecPATH_PARTIAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecPATH_PARTIAL:</span> <span class="pre">101&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecPATH_PARTIAL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecTOO_SOON">
+<span class="sig-name descname"><span class="pre">tecTOO_SOON</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecTOO_SOON:</span> <span class="pre">152&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecTOO_SOON" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecUNFUNDED">
+<span class="sig-name descname"><span class="pre">tecUNFUNDED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecUNFUNDED:</span> <span class="pre">129&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecUNFUNDED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecUNFUNDED_ADD">
+<span class="sig-name descname"><span class="pre">tecUNFUNDED_ADD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecUNFUNDED_ADD:</span> <span class="pre">102&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecUNFUNDED_ADD" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecUNFUNDED_OFFER">
+<span class="sig-name descname"><span class="pre">tecUNFUNDED_OFFER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecUNFUNDED_OFFER:</span> <span class="pre">103&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecUNFUNDED_OFFER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.tecUNFUNDED_PAYMENT">
+<span class="sig-name descname"><span class="pre">tecUNFUNDED_PAYMENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TECcodes.tecUNFUNDED_PAYMENT:</span> <span class="pre">104&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.tecUNFUNDED_PAYMENT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TECcodes.value">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">value</span></span><a class="headerlink" href="#xrpl_plugin.return_codes.TECcodes.value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEFcodes">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.return_codes.</span></span><span class="sig-name descname"><span class="pre">TEFcodes</span></span><a class="headerlink" href="#xrpl_plugin.return_codes.TEFcodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>Codes that indicate that the transaction failed and was not included in a ledger, but the transaction could have succeeded in some theoretical ledger.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEFcodes.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#xrpl_plugin.return_codes.TEFcodes.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEFcodes.tefALREADY">
+<span class="sig-name descname"><span class="pre">tefALREADY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEFcodes.tefALREADY:</span> <span class="pre">-198&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEFcodes.tefALREADY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEFcodes.tefBAD_ADD_AUTH">
+<span class="sig-name descname"><span class="pre">tefBAD_ADD_AUTH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEFcodes.tefBAD_ADD_AUTH:</span> <span class="pre">-197&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEFcodes.tefBAD_ADD_AUTH" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEFcodes.tefBAD_AUTH">
+<span class="sig-name descname"><span class="pre">tefBAD_AUTH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEFcodes.tefBAD_AUTH:</span> <span class="pre">-196&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEFcodes.tefBAD_AUTH" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEFcodes.tefBAD_AUTH_MASTER">
+<span class="sig-name descname"><span class="pre">tefBAD_AUTH_MASTER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEFcodes.tefBAD_AUTH_MASTER:</span> <span class="pre">-183&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEFcodes.tefBAD_AUTH_MASTER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEFcodes.tefBAD_LEDGER">
+<span class="sig-name descname"><span class="pre">tefBAD_LEDGER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEFcodes.tefBAD_LEDGER:</span> <span class="pre">-195&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEFcodes.tefBAD_LEDGER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEFcodes.tefBAD_QUORUM">
+<span class="sig-name descname"><span class="pre">tefBAD_QUORUM</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEFcodes.tefBAD_QUORUM:</span> <span class="pre">-185&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEFcodes.tefBAD_QUORUM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEFcodes.tefBAD_SIGNATURE">
+<span class="sig-name descname"><span class="pre">tefBAD_SIGNATURE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEFcodes.tefBAD_SIGNATURE:</span> <span class="pre">-186&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEFcodes.tefBAD_SIGNATURE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEFcodes.tefCREATED">
+<span class="sig-name descname"><span class="pre">tefCREATED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEFcodes.tefCREATED:</span> <span class="pre">-194&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEFcodes.tefCREATED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEFcodes.tefEXCEPTION">
+<span class="sig-name descname"><span class="pre">tefEXCEPTION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEFcodes.tefEXCEPTION:</span> <span class="pre">-193&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEFcodes.tefEXCEPTION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEFcodes.tefFAILURE">
+<span class="sig-name descname"><span class="pre">tefFAILURE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEFcodes.tefFAILURE:</span> <span class="pre">-199&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEFcodes.tefFAILURE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEFcodes.tefINTERNAL">
+<span class="sig-name descname"><span class="pre">tefINTERNAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEFcodes.tefINTERNAL:</span> <span class="pre">-192&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEFcodes.tefINTERNAL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEFcodes.tefINVARIANT_FAILED">
+<span class="sig-name descname"><span class="pre">tefINVARIANT_FAILED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEFcodes.tefINVARIANT_FAILED:</span> <span class="pre">-182&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEFcodes.tefINVARIANT_FAILED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEFcodes.tefMASTER_DISABLED">
+<span class="sig-name descname"><span class="pre">tefMASTER_DISABLED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEFcodes.tefMASTER_DISABLED:</span> <span class="pre">-188&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEFcodes.tefMASTER_DISABLED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEFcodes.tefMAX_LEDGER">
+<span class="sig-name descname"><span class="pre">tefMAX_LEDGER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEFcodes.tefMAX_LEDGER:</span> <span class="pre">-187&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEFcodes.tefMAX_LEDGER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEFcodes.tefNFTOKEN_IS_NOT_TRANSFERABLE">
+<span class="sig-name descname"><span class="pre">tefNFTOKEN_IS_NOT_TRANSFERABLE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEFcodes.tefNFTOKEN_IS_NOT_TRANSFERABLE:</span> <span class="pre">-179&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEFcodes.tefNFTOKEN_IS_NOT_TRANSFERABLE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEFcodes.tefNOT_MULTI_SIGNING">
+<span class="sig-name descname"><span class="pre">tefNOT_MULTI_SIGNING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEFcodes.tefNOT_MULTI_SIGNING:</span> <span class="pre">-184&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEFcodes.tefNOT_MULTI_SIGNING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEFcodes.tefNO_AUTH_REQUIRED">
+<span class="sig-name descname"><span class="pre">tefNO_AUTH_REQUIRED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEFcodes.tefNO_AUTH_REQUIRED:</span> <span class="pre">-191&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEFcodes.tefNO_AUTH_REQUIRED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEFcodes.tefNO_TICKET">
+<span class="sig-name descname"><span class="pre">tefNO_TICKET</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEFcodes.tefNO_TICKET:</span> <span class="pre">-180&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEFcodes.tefNO_TICKET" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEFcodes.tefPAST_SEQ">
+<span class="sig-name descname"><span class="pre">tefPAST_SEQ</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEFcodes.tefPAST_SEQ:</span> <span class="pre">-190&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEFcodes.tefPAST_SEQ" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEFcodes.tefTOO_BIG">
+<span class="sig-name descname"><span class="pre">tefTOO_BIG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEFcodes.tefTOO_BIG:</span> <span class="pre">-181&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEFcodes.tefTOO_BIG" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEFcodes.tefWRONG_PRIOR">
+<span class="sig-name descname"><span class="pre">tefWRONG_PRIOR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEFcodes.tefWRONG_PRIOR:</span> <span class="pre">-189&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEFcodes.tefWRONG_PRIOR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEFcodes.value">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">value</span></span><a class="headerlink" href="#xrpl_plugin.return_codes.TEFcodes.value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TELcodes">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.return_codes.</span></span><span class="sig-name descname"><span class="pre">TELcodes</span></span><a class="headerlink" href="#xrpl_plugin.return_codes.TELcodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>Codes that indicate an error in the local server processing the transaction; it is possible that another server with a different configuration or load level could process the transaction successfully.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TELcodes.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#xrpl_plugin.return_codes.TELcodes.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TELcodes.telBAD_DOMAIN">
+<span class="sig-name descname"><span class="pre">telBAD_DOMAIN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TELcodes.telBAD_DOMAIN:</span> <span class="pre">-398&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TELcodes.telBAD_DOMAIN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TELcodes.telBAD_PATH_COUNT">
+<span class="sig-name descname"><span class="pre">telBAD_PATH_COUNT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TELcodes.telBAD_PATH_COUNT:</span> <span class="pre">-397&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TELcodes.telBAD_PATH_COUNT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TELcodes.telBAD_PUBLIC_KEY">
+<span class="sig-name descname"><span class="pre">telBAD_PUBLIC_KEY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TELcodes.telBAD_PUBLIC_KEY:</span> <span class="pre">-396&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TELcodes.telBAD_PUBLIC_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TELcodes.telCAN_NOT_QUEUE">
+<span class="sig-name descname"><span class="pre">telCAN_NOT_QUEUE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TELcodes.telCAN_NOT_QUEUE:</span> <span class="pre">-392&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TELcodes.telCAN_NOT_QUEUE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TELcodes.telCAN_NOT_QUEUE_BALANCE">
+<span class="sig-name descname"><span class="pre">telCAN_NOT_QUEUE_BALANCE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TELcodes.telCAN_NOT_QUEUE_BALANCE:</span> <span class="pre">-391&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TELcodes.telCAN_NOT_QUEUE_BALANCE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TELcodes.telCAN_NOT_QUEUE_BLOCKED">
+<span class="sig-name descname"><span class="pre">telCAN_NOT_QUEUE_BLOCKED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TELcodes.telCAN_NOT_QUEUE_BLOCKED:</span> <span class="pre">-389&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TELcodes.telCAN_NOT_QUEUE_BLOCKED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TELcodes.telCAN_NOT_QUEUE_BLOCKS">
+<span class="sig-name descname"><span class="pre">telCAN_NOT_QUEUE_BLOCKS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TELcodes.telCAN_NOT_QUEUE_BLOCKS:</span> <span class="pre">-390&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TELcodes.telCAN_NOT_QUEUE_BLOCKS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TELcodes.telCAN_NOT_QUEUE_FEE">
+<span class="sig-name descname"><span class="pre">telCAN_NOT_QUEUE_FEE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TELcodes.telCAN_NOT_QUEUE_FEE:</span> <span class="pre">-388&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TELcodes.telCAN_NOT_QUEUE_FEE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TELcodes.telCAN_NOT_QUEUE_FULL">
+<span class="sig-name descname"><span class="pre">telCAN_NOT_QUEUE_FULL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TELcodes.telCAN_NOT_QUEUE_FULL:</span> <span class="pre">-387&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TELcodes.telCAN_NOT_QUEUE_FULL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TELcodes.telFAILED_PROCESSING">
+<span class="sig-name descname"><span class="pre">telFAILED_PROCESSING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TELcodes.telFAILED_PROCESSING:</span> <span class="pre">-395&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TELcodes.telFAILED_PROCESSING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TELcodes.telINSUF_FEE_P">
+<span class="sig-name descname"><span class="pre">telINSUF_FEE_P</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TELcodes.telINSUF_FEE_P:</span> <span class="pre">-394&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TELcodes.telINSUF_FEE_P" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TELcodes.telLOCAL_ERROR">
+<span class="sig-name descname"><span class="pre">telLOCAL_ERROR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TELcodes.telLOCAL_ERROR:</span> <span class="pre">-399&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TELcodes.telLOCAL_ERROR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TELcodes.telNETWORK_ID_MAKES_TX_NON_CANONICAL">
+<span class="sig-name descname"><span class="pre">telNETWORK_ID_MAKES_TX_NON_CANONICAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TELcodes.telNETWORK_ID_MAKES_TX_NON_CANONICAL:</span> <span class="pre">-384&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TELcodes.telNETWORK_ID_MAKES_TX_NON_CANONICAL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TELcodes.telNO_DST_PARTIAL">
+<span class="sig-name descname"><span class="pre">telNO_DST_PARTIAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TELcodes.telNO_DST_PARTIAL:</span> <span class="pre">-393&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TELcodes.telNO_DST_PARTIAL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TELcodes.telREQUIRES_NETWORK_ID">
+<span class="sig-name descname"><span class="pre">telREQUIRES_NETWORK_ID</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TELcodes.telREQUIRES_NETWORK_ID:</span> <span class="pre">-385&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TELcodes.telREQUIRES_NETWORK_ID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TELcodes.telWRONG_NETWORK">
+<span class="sig-name descname"><span class="pre">telWRONG_NETWORK</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TELcodes.telWRONG_NETWORK:</span> <span class="pre">-386&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TELcodes.telWRONG_NETWORK" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TELcodes.value">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">value</span></span><a class="headerlink" href="#xrpl_plugin.return_codes.TELcodes.value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEMcodes">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.return_codes.</span></span><span class="sig-name descname"><span class="pre">TEMcodes</span></span><a class="headerlink" href="#xrpl_plugin.return_codes.TEMcodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>Codes that  indicate that the transaction was malformed, and cannot succeed according to the XRP Ledger protocol.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEMcodes.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#xrpl_plugin.return_codes.TEMcodes.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEMcodes.temBAD_AMOUNT">
+<span class="sig-name descname"><span class="pre">temBAD_AMOUNT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEMcodes.temBAD_AMOUNT:</span> <span class="pre">-298&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEMcodes.temBAD_AMOUNT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEMcodes.temBAD_CURRENCY">
+<span class="sig-name descname"><span class="pre">temBAD_CURRENCY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEMcodes.temBAD_CURRENCY:</span> <span class="pre">-297&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEMcodes.temBAD_CURRENCY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEMcodes.temBAD_EXPIRATION">
+<span class="sig-name descname"><span class="pre">temBAD_EXPIRATION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEMcodes.temBAD_EXPIRATION:</span> <span class="pre">-296&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEMcodes.temBAD_EXPIRATION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEMcodes.temBAD_FEE">
+<span class="sig-name descname"><span class="pre">temBAD_FEE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEMcodes.temBAD_FEE:</span> <span class="pre">-295&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEMcodes.temBAD_FEE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEMcodes.temBAD_ISSUER">
+<span class="sig-name descname"><span class="pre">temBAD_ISSUER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEMcodes.temBAD_ISSUER:</span> <span class="pre">-294&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEMcodes.temBAD_ISSUER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEMcodes.temBAD_LIMIT">
+<span class="sig-name descname"><span class="pre">temBAD_LIMIT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEMcodes.temBAD_LIMIT:</span> <span class="pre">-293&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEMcodes.temBAD_LIMIT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEMcodes.temBAD_NFTOKEN_TRANSFER_FEE">
+<span class="sig-name descname"><span class="pre">temBAD_NFTOKEN_TRANSFER_FEE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEMcodes.temBAD_NFTOKEN_TRANSFER_FEE:</span> <span class="pre">-262&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEMcodes.temBAD_NFTOKEN_TRANSFER_FEE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEMcodes.temBAD_OFFER">
+<span class="sig-name descname"><span class="pre">temBAD_OFFER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEMcodes.temBAD_OFFER:</span> <span class="pre">-292&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEMcodes.temBAD_OFFER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEMcodes.temBAD_PATH">
+<span class="sig-name descname"><span class="pre">temBAD_PATH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEMcodes.temBAD_PATH:</span> <span class="pre">-291&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEMcodes.temBAD_PATH" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEMcodes.temBAD_PATH_LOOP">
+<span class="sig-name descname"><span class="pre">temBAD_PATH_LOOP</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEMcodes.temBAD_PATH_LOOP:</span> <span class="pre">-290&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEMcodes.temBAD_PATH_LOOP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEMcodes.temBAD_QUORUM">
+<span class="sig-name descname"><span class="pre">temBAD_QUORUM</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEMcodes.temBAD_QUORUM:</span> <span class="pre">-271&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEMcodes.temBAD_QUORUM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEMcodes.temBAD_REGKEY">
+<span class="sig-name descname"><span class="pre">temBAD_REGKEY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEMcodes.temBAD_REGKEY:</span> <span class="pre">-289&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEMcodes.temBAD_REGKEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEMcodes.temBAD_SEND_XRP_LIMIT">
+<span class="sig-name descname"><span class="pre">temBAD_SEND_XRP_LIMIT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEMcodes.temBAD_SEND_XRP_LIMIT:</span> <span class="pre">-288&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEMcodes.temBAD_SEND_XRP_LIMIT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEMcodes.temBAD_SEND_XRP_MAX">
+<span class="sig-name descname"><span class="pre">temBAD_SEND_XRP_MAX</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEMcodes.temBAD_SEND_XRP_MAX:</span> <span class="pre">-287&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEMcodes.temBAD_SEND_XRP_MAX" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEMcodes.temBAD_SEND_XRP_NO_DIRECT">
+<span class="sig-name descname"><span class="pre">temBAD_SEND_XRP_NO_DIRECT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEMcodes.temBAD_SEND_XRP_NO_DIRECT:</span> <span class="pre">-286&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEMcodes.temBAD_SEND_XRP_NO_DIRECT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEMcodes.temBAD_SEND_XRP_PARTIAL">
+<span class="sig-name descname"><span class="pre">temBAD_SEND_XRP_PARTIAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEMcodes.temBAD_SEND_XRP_PARTIAL:</span> <span class="pre">-285&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEMcodes.temBAD_SEND_XRP_PARTIAL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEMcodes.temBAD_SEND_XRP_PATHS">
+<span class="sig-name descname"><span class="pre">temBAD_SEND_XRP_PATHS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEMcodes.temBAD_SEND_XRP_PATHS:</span> <span class="pre">-284&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEMcodes.temBAD_SEND_XRP_PATHS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEMcodes.temBAD_SEQUENCE">
+<span class="sig-name descname"><span class="pre">temBAD_SEQUENCE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEMcodes.temBAD_SEQUENCE:</span> <span class="pre">-283&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEMcodes.temBAD_SEQUENCE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEMcodes.temBAD_SIGNATURE">
+<span class="sig-name descname"><span class="pre">temBAD_SIGNATURE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEMcodes.temBAD_SIGNATURE:</span> <span class="pre">-282&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEMcodes.temBAD_SIGNATURE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEMcodes.temBAD_SIGNER">
+<span class="sig-name descname"><span class="pre">temBAD_SIGNER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEMcodes.temBAD_SIGNER:</span> <span class="pre">-272&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEMcodes.temBAD_SIGNER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEMcodes.temBAD_SRC_ACCOUNT">
+<span class="sig-name descname"><span class="pre">temBAD_SRC_ACCOUNT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEMcodes.temBAD_SRC_ACCOUNT:</span> <span class="pre">-281&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEMcodes.temBAD_SRC_ACCOUNT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEMcodes.temBAD_TICK_SIZE">
+<span class="sig-name descname"><span class="pre">temBAD_TICK_SIZE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEMcodes.temBAD_TICK_SIZE:</span> <span class="pre">-269&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEMcodes.temBAD_TICK_SIZE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEMcodes.temBAD_TRANSFER_RATE">
+<span class="sig-name descname"><span class="pre">temBAD_TRANSFER_RATE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEMcodes.temBAD_TRANSFER_RATE:</span> <span class="pre">-280&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEMcodes.temBAD_TRANSFER_RATE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEMcodes.temBAD_WEIGHT">
+<span class="sig-name descname"><span class="pre">temBAD_WEIGHT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEMcodes.temBAD_WEIGHT:</span> <span class="pre">-270&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEMcodes.temBAD_WEIGHT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEMcodes.temCANNOT_PREAUTH_SELF">
+<span class="sig-name descname"><span class="pre">temCANNOT_PREAUTH_SELF</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEMcodes.temCANNOT_PREAUTH_SELF:</span> <span class="pre">-267&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEMcodes.temCANNOT_PREAUTH_SELF" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEMcodes.temDISABLED">
+<span class="sig-name descname"><span class="pre">temDISABLED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEMcodes.temDISABLED:</span> <span class="pre">-273&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEMcodes.temDISABLED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEMcodes.temDST_IS_SRC">
+<span class="sig-name descname"><span class="pre">temDST_IS_SRC</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEMcodes.temDST_IS_SRC:</span> <span class="pre">-279&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEMcodes.temDST_IS_SRC" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEMcodes.temDST_NEEDED">
+<span class="sig-name descname"><span class="pre">temDST_NEEDED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEMcodes.temDST_NEEDED:</span> <span class="pre">-278&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEMcodes.temDST_NEEDED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEMcodes.temINVALID">
+<span class="sig-name descname"><span class="pre">temINVALID</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEMcodes.temINVALID:</span> <span class="pre">-277&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEMcodes.temINVALID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEMcodes.temINVALID_ACCOUNT_ID">
+<span class="sig-name descname"><span class="pre">temINVALID_ACCOUNT_ID</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEMcodes.temINVALID_ACCOUNT_ID:</span> <span class="pre">-268&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEMcodes.temINVALID_ACCOUNT_ID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEMcodes.temINVALID_COUNT">
+<span class="sig-name descname"><span class="pre">temINVALID_COUNT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEMcodes.temINVALID_COUNT:</span> <span class="pre">-266&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEMcodes.temINVALID_COUNT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEMcodes.temINVALID_FLAG">
+<span class="sig-name descname"><span class="pre">temINVALID_FLAG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEMcodes.temINVALID_FLAG:</span> <span class="pre">-276&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEMcodes.temINVALID_FLAG" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEMcodes.temMALFORMED">
+<span class="sig-name descname"><span class="pre">temMALFORMED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEMcodes.temMALFORMED:</span> <span class="pre">-299&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEMcodes.temMALFORMED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEMcodes.temREDUNDANT">
+<span class="sig-name descname"><span class="pre">temREDUNDANT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEMcodes.temREDUNDANT:</span> <span class="pre">-275&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEMcodes.temREDUNDANT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEMcodes.temRIPPLE_EMPTY">
+<span class="sig-name descname"><span class="pre">temRIPPLE_EMPTY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEMcodes.temRIPPLE_EMPTY:</span> <span class="pre">-274&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEMcodes.temRIPPLE_EMPTY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEMcodes.temSEQ_AND_TICKET">
+<span class="sig-name descname"><span class="pre">temSEQ_AND_TICKET</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEMcodes.temSEQ_AND_TICKET:</span> <span class="pre">-263&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEMcodes.temSEQ_AND_TICKET" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEMcodes.temUNCERTAIN">
+<span class="sig-name descname"><span class="pre">temUNCERTAIN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEMcodes.temUNCERTAIN:</span> <span class="pre">-265&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEMcodes.temUNCERTAIN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEMcodes.temUNKNOWN">
+<span class="sig-name descname"><span class="pre">temUNKNOWN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEMcodes.temUNKNOWN:</span> <span class="pre">-264&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEMcodes.temUNKNOWN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEMcodes.value">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">value</span></span><a class="headerlink" href="#xrpl_plugin.return_codes.TEMcodes.value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TER">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.return_codes.</span></span><span class="sig-name descname"><span class="pre">TER</span></span><a class="headerlink" href="#xrpl_plugin.return_codes.TER" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>An overarching class representing all possible return types.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TERcodes">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.return_codes.</span></span><span class="sig-name descname"><span class="pre">TERcodes</span></span><a class="headerlink" href="#xrpl_plugin.return_codes.TERcodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>Codes that indicate that the transaction failed, but it could apply successfully in the future, usually if some other hypothetical transaction applies first.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TERcodes.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#xrpl_plugin.return_codes.TERcodes.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TERcodes.terFUNDS_SPENT">
+<span class="sig-name descname"><span class="pre">terFUNDS_SPENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TERcodes.terFUNDS_SPENT:</span> <span class="pre">-98&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TERcodes.terFUNDS_SPENT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TERcodes.terINSUF_FEE_B">
+<span class="sig-name descname"><span class="pre">terINSUF_FEE_B</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TERcodes.terINSUF_FEE_B:</span> <span class="pre">-97&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TERcodes.terINSUF_FEE_B" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TERcodes.terLAST">
+<span class="sig-name descname"><span class="pre">terLAST</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TERcodes.terLAST:</span> <span class="pre">-91&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TERcodes.terLAST" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TERcodes.terNO_ACCOUNT">
+<span class="sig-name descname"><span class="pre">terNO_ACCOUNT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TERcodes.terNO_ACCOUNT:</span> <span class="pre">-96&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TERcodes.terNO_ACCOUNT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TERcodes.terNO_AUTH">
+<span class="sig-name descname"><span class="pre">terNO_AUTH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TERcodes.terNO_AUTH:</span> <span class="pre">-95&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TERcodes.terNO_AUTH" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TERcodes.terNO_LINE">
+<span class="sig-name descname"><span class="pre">terNO_LINE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TERcodes.terNO_LINE:</span> <span class="pre">-94&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TERcodes.terNO_LINE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TERcodes.terNO_RIPPLE">
+<span class="sig-name descname"><span class="pre">terNO_RIPPLE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TERcodes.terNO_RIPPLE:</span> <span class="pre">-90&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TERcodes.terNO_RIPPLE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TERcodes.terOWNERS">
+<span class="sig-name descname"><span class="pre">terOWNERS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TERcodes.terOWNERS:</span> <span class="pre">-93&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TERcodes.terOWNERS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TERcodes.terPRE_SEQ">
+<span class="sig-name descname"><span class="pre">terPRE_SEQ</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TERcodes.terPRE_SEQ:</span> <span class="pre">-92&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TERcodes.terPRE_SEQ" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TERcodes.terPRE_TICKET">
+<span class="sig-name descname"><span class="pre">terPRE_TICKET</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TERcodes.terPRE_TICKET:</span> <span class="pre">-88&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TERcodes.terPRE_TICKET" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TERcodes.terQUEUED">
+<span class="sig-name descname"><span class="pre">terQUEUED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TERcodes.terQUEUED:</span> <span class="pre">-89&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TERcodes.terQUEUED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TERcodes.terRETRY">
+<span class="sig-name descname"><span class="pre">terRETRY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TERcodes.terRETRY:</span> <span class="pre">-99&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TERcodes.terRETRY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TERcodes.value">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">value</span></span><a class="headerlink" href="#xrpl_plugin.return_codes.TERcodes.value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEScodes">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.return_codes.</span></span><span class="sig-name descname"><span class="pre">TEScodes</span></span><a class="headerlink" href="#xrpl_plugin.return_codes.TEScodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>Codes that indicate a transaction succeeded.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEScodes.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#xrpl_plugin.return_codes.TEScodes.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEScodes.tesSUCCESS">
+<span class="sig-name descname"><span class="pre">tesSUCCESS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TEScodes.tesSUCCESS:</span> <span class="pre">0&gt;</span></em><a class="headerlink" href="#xrpl_plugin.return_codes.TEScodes.tesSUCCESS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.TEScodes.value">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">value</span></span><a class="headerlink" href="#xrpl_plugin.return_codes.TEScodes.value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.return_codes.is_tes_success">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.return_codes.</span></span><span class="sig-name descname"><span class="pre">is_tes_success</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.return_codes.TER" title="xrpl_plugin.return_codes.TER"><span class="pre">xrpl_plugin.return_codes.TER</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#xrpl_plugin.return_codes.is_tes_success" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns true if the TER passed in is <code class="docutils literal notranslate"><span class="pre">tesSUCCESS</span></code> or not.</p>
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">xrpl_plugin</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.basic_types.html">Basic Types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.stypes.html">Serialized Types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.sfields.html">SFields</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.transactors.html">Transactor Things</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.ledger_objects.html">Ledger Object Things</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.keylets.html">Keylets</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Return Codes</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="xrpl_plugin.keylets.html" title="previous chapter">Keylets</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, ripplex.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.1.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+      |
+      <a href="_sources/xrpl_plugin.return_codes.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

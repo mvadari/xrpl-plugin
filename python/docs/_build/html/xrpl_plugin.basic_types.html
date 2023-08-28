@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Basic Types &#8212; xrpl_plugin 0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=039e1c02" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=f6245a2f"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Serialized Types" href="xrpl_plugin.stypes.html" />
+    <link rel="prev" title="xrpl_plugin Documentation" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-xrpl_plugin.basic_types">
+<span id="basic-types"></span><h1>Basic Types<a class="headerlink" href="#module-xrpl_plugin.basic_types" title="Permalink to this heading">¶</a></h1>
+<p>Basic/fundamental types.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.AccountID">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.basic_types.</span></span><span class="sig-name descname"><span class="pre">AccountID</span></span><a class="headerlink" href="#xrpl_plugin.basic_types.AccountID" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>A 160-bit unsigned int that uniquely identifies an account.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.AccountID.from_buffer">
+<span class="sig-name descname"><span class="pre">from_buffer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.basic_types.Buffer" title="xrpl_plugin.basic_types.Buffer"><span class="pre">xrpl_plugin.basic_types.Buffer</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#xrpl_plugin.basic_types.AccountID" title="xrpl_plugin.basic_types.AccountID"><span class="pre">xrpl_plugin.basic_types.AccountID</span></a></span></span><a class="headerlink" href="#xrpl_plugin.basic_types.AccountID.from_buffer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert the data in a buffer to an AccountID.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.AccountID.parse_hex">
+<span class="sig-name descname"><span class="pre">parse_hex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.basic_types.AccountID" title="xrpl_plugin.basic_types.AccountID"><span class="pre">xrpl_plugin.basic_types.AccountID</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#xrpl_plugin.basic_types.AccountID.parse_hex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse a hex representation of an account.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.AccountID.to_base58">
+<span class="sig-name descname"><span class="pre">to_base58</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.basic_types.AccountID" title="xrpl_plugin.basic_types.AccountID"><span class="pre">xrpl_plugin.basic_types.AccountID</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#xrpl_plugin.basic_types.AccountID.to_base58" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the base58 representation of the account.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.AccountID.to_buffer">
+<span class="sig-name descname"><span class="pre">to_buffer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.basic_types.AccountID" title="xrpl_plugin.basic_types.AccountID"><span class="pre">xrpl_plugin.basic_types.AccountID</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#xrpl_plugin.basic_types.Buffer" title="xrpl_plugin.basic_types.Buffer"><span class="pre">xrpl_plugin.basic_types.Buffer</span></a></span></span><a class="headerlink" href="#xrpl_plugin.basic_types.AccountID.to_buffer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert the AccountID data to a buffer.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.ApplyFlags">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.basic_types.</span></span><span class="sig-name descname"><span class="pre">ApplyFlags</span></span><a class="headerlink" href="#xrpl_plugin.basic_types.ApplyFlags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>An enum representing the type of transaction, in terms of how to process it.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.ApplyFlags.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#xrpl_plugin.basic_types.ApplyFlags.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.ApplyFlags.tapFAIL_HARD">
+<span class="sig-name descname"><span class="pre">tapFAIL_HARD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;ApplyFlags.tapFAIL_HARD:</span> <span class="pre">16&gt;</span></em><a class="headerlink" href="#xrpl_plugin.basic_types.ApplyFlags.tapFAIL_HARD" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.ApplyFlags.tapNONE">
+<span class="sig-name descname"><span class="pre">tapNONE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;ApplyFlags.tapNONE:</span> <span class="pre">0&gt;</span></em><a class="headerlink" href="#xrpl_plugin.basic_types.ApplyFlags.tapNONE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.ApplyFlags.tapRETRY">
+<span class="sig-name descname"><span class="pre">tapRETRY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;ApplyFlags.tapRETRY:</span> <span class="pre">32&gt;</span></em><a class="headerlink" href="#xrpl_plugin.basic_types.ApplyFlags.tapRETRY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.ApplyFlags.tapUNLIMITED">
+<span class="sig-name descname"><span class="pre">tapUNLIMITED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;ApplyFlags.tapUNLIMITED:</span> <span class="pre">1024&gt;</span></em><a class="headerlink" href="#xrpl_plugin.basic_types.ApplyFlags.tapUNLIMITED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.ApplyFlags.value">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">value</span></span><a class="headerlink" href="#xrpl_plugin.basic_types.ApplyFlags.value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.BeastZero">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.basic_types.</span></span><span class="sig-name descname"><span class="pre">BeastZero</span></span><a class="headerlink" href="#xrpl_plugin.basic_types.BeastZero" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.Buffer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.basic_types.</span></span><span class="sig-name descname"><span class="pre">Buffer</span></span><a class="headerlink" href="#xrpl_plugin.basic_types.Buffer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>A custom char vector implementation.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.Currency">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.basic_types.</span></span><span class="sig-name descname"><span class="pre">Currency</span></span><a class="headerlink" href="#xrpl_plugin.basic_types.Currency" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>A hash representing a specific currency.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.IOUAmount">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.basic_types.</span></span><span class="sig-name descname"><span class="pre">IOUAmount</span></span><a class="headerlink" href="#xrpl_plugin.basic_types.IOUAmount" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>A class representing an amount of an IOU.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.Issue">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.basic_types.</span></span><span class="sig-name descname"><span class="pre">Issue</span></span><a class="headerlink" href="#xrpl_plugin.basic_types.Issue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>A currency issued by an account.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.Journal">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.basic_types.</span></span><span class="sig-name descname"><span class="pre">Journal</span></span><a class="headerlink" href="#xrpl_plugin.basic_types.Journal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>A generic endpoint for log messages.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.JsonValue">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.basic_types.</span></span><span class="sig-name descname"><span class="pre">JsonValue</span></span><a class="headerlink" href="#xrpl_plugin.basic_types.JsonValue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>Represents a JSON value.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.JsonValue.as_string">
+<span class="sig-name descname"><span class="pre">as_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.basic_types.JsonValue" title="xrpl_plugin.basic_types.JsonValue"><span class="pre">xrpl_plugin.basic_types.JsonValue</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#xrpl_plugin.basic_types.JsonValue.as_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts the value to a string.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.JsonValue.is_string">
+<span class="sig-name descname"><span class="pre">is_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.basic_types.JsonValue" title="xrpl_plugin.basic_types.JsonValue"><span class="pre">xrpl_plugin.basic_types.JsonValue</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#xrpl_plugin.basic_types.JsonValue.is_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if the value is a string.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.SOEStyle">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.basic_types.</span></span><span class="sig-name descname"><span class="pre">SOEStyle</span></span><a class="headerlink" href="#xrpl_plugin.basic_types.SOEStyle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>The kind of parameter in each entry of a transactor/ledger object template.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.SOEStyle.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#xrpl_plugin.basic_types.SOEStyle.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.SOEStyle.soeDEFAULT">
+<span class="sig-name descname"><span class="pre">soeDEFAULT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SOEStyle.soeDEFAULT:</span> <span class="pre">2&gt;</span></em><a class="headerlink" href="#xrpl_plugin.basic_types.SOEStyle.soeDEFAULT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.SOEStyle.soeINVALID">
+<span class="sig-name descname"><span class="pre">soeINVALID</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SOEStyle.soeINVALID:</span> <span class="pre">-1&gt;</span></em><a class="headerlink" href="#xrpl_plugin.basic_types.SOEStyle.soeINVALID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.SOEStyle.soeOPTIONAL">
+<span class="sig-name descname"><span class="pre">soeOPTIONAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SOEStyle.soeOPTIONAL:</span> <span class="pre">1&gt;</span></em><a class="headerlink" href="#xrpl_plugin.basic_types.SOEStyle.soeOPTIONAL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.SOEStyle.soeREQUIRED">
+<span class="sig-name descname"><span class="pre">soeREQUIRED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SOEStyle.soeREQUIRED:</span> <span class="pre">0&gt;</span></em><a class="headerlink" href="#xrpl_plugin.basic_types.SOEStyle.soeREQUIRED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.SOEStyle.value">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">value</span></span><a class="headerlink" href="#xrpl_plugin.basic_types.SOEStyle.value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.Seed">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.basic_types.</span></span><span class="sig-name descname"><span class="pre">Seed</span></span><a class="headerlink" href="#xrpl_plugin.basic_types.Seed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>A secret used to generate deterministic secret keys.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.SeqProxy">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.basic_types.</span></span><span class="sig-name descname"><span class="pre">SeqProxy</span></span><a class="headerlink" href="#xrpl_plugin.basic_types.SeqProxy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>A type that represents either a sequence value or a ticket value.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.SeqProxy.value">
+<span class="sig-name descname"><span class="pre">value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.basic_types.SeqProxy" title="xrpl_plugin.basic_types.SeqProxy"><span class="pre">xrpl_plugin.basic_types.SeqProxy</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#xrpl_plugin.basic_types.SeqProxy.value" title="Permalink to this definition">¶</a></dt>
+<dd><p>The integer value.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.Slice">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.basic_types.</span></span><span class="sig-name descname"><span class="pre">Slice</span></span><a class="headerlink" href="#xrpl_plugin.basic_types.Slice" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>An immutable linear range of bytes.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.Slice.from_buffer">
+<span class="sig-name descname"><span class="pre">from_buffer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.basic_types.Buffer" title="xrpl_plugin.basic_types.Buffer"><span class="pre">xrpl_plugin.basic_types.Buffer</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#xrpl_plugin.basic_types.Slice" title="xrpl_plugin.basic_types.Slice"><span class="pre">xrpl_plugin.basic_types.Slice</span></a></span></span><a class="headerlink" href="#xrpl_plugin.basic_types.Slice.from_buffer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert Buffer data to a Slice.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.Slice.to_buffer">
+<span class="sig-name descname"><span class="pre">to_buffer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.basic_types.Slice" title="xrpl_plugin.basic_types.Slice"><span class="pre">xrpl_plugin.basic_types.Slice</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#xrpl_plugin.basic_types.Buffer" title="xrpl_plugin.basic_types.Buffer"><span class="pre">xrpl_plugin.basic_types.Buffer</span></a></span></span><a class="headerlink" href="#xrpl_plugin.basic_types.Slice.to_buffer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert the Slice data to a buffer.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.VoteBehavior">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.basic_types.</span></span><span class="sig-name descname"><span class="pre">VoteBehavior</span></span><a class="headerlink" href="#xrpl_plugin.basic_types.VoteBehavior" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>An enum representing the default vote for an amendment.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.VoteBehavior.DEFAULT_NO">
+<span class="sig-name descname"><span class="pre">DEFAULT_NO</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;VoteBehavior.DEFAULT_NO:</span> <span class="pre">0&gt;</span></em><a class="headerlink" href="#xrpl_plugin.basic_types.VoteBehavior.DEFAULT_NO" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.VoteBehavior.DEFAULT_YES">
+<span class="sig-name descname"><span class="pre">DEFAULT_YES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;VoteBehavior.DEFAULT_YES:</span> <span class="pre">1&gt;</span></em><a class="headerlink" href="#xrpl_plugin.basic_types.VoteBehavior.DEFAULT_YES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.VoteBehavior.OBSOLETE">
+<span class="sig-name descname"><span class="pre">OBSOLETE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;VoteBehavior.OBSOLETE:</span> <span class="pre">-1&gt;</span></em><a class="headerlink" href="#xrpl_plugin.basic_types.VoteBehavior.OBSOLETE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.VoteBehavior.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#xrpl_plugin.basic_types.VoteBehavior.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.VoteBehavior.value">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">value</span></span><a class="headerlink" href="#xrpl_plugin.basic_types.VoteBehavior.value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.XRPAmount">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.basic_types.</span></span><span class="sig-name descname"><span class="pre">XRPAmount</span></span><a class="headerlink" href="#xrpl_plugin.basic_types.XRPAmount" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>A class representing an amount of XRP.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.XRPAmount.drops">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">drops</span></span><a class="headerlink" href="#xrpl_plugin.basic_types.XRPAmount.drops" title="Permalink to this definition">¶</a></dt>
+<dd><p>The amount of XRP represented in drops.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.parse_base58">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.basic_types.</span></span><span class="sig-name descname"><span class="pre">parse_base58</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#xrpl_plugin.basic_types.parse_base58" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic simple">
+<li><p>parse_base58(arg0: str) -&gt; Optional[xrpl_plugin.rippled_py.basic_types.AccountID]</p></li>
+<li><p>parse_base58(arg0: str) -&gt; Optional[xrpl_plugin.rippled_py.basic_types.Seed]</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.uint128">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.basic_types.</span></span><span class="sig-name descname"><span class="pre">uint128</span></span><a class="headerlink" href="#xrpl_plugin.basic_types.uint128" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>A 128-bit uint.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.uint160">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.basic_types.</span></span><span class="sig-name descname"><span class="pre">uint160</span></span><a class="headerlink" href="#xrpl_plugin.basic_types.uint160" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>A 160-bit uint.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.basic_types.uint256">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.basic_types.</span></span><span class="sig-name descname"><span class="pre">uint256</span></span><a class="headerlink" href="#xrpl_plugin.basic_types.uint256" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>A 256-bit uint.</p>
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">xrpl_plugin</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Basic Types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.stypes.html">Serialized Types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.sfields.html">SFields</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.transactors.html">Transactor Things</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.ledger_objects.html">Ledger Object Things</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.keylets.html">Keylets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.return_codes.html">Return Codes</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">xrpl_plugin Documentation</a></li>
+      <li>Next: <a href="xrpl_plugin.stypes.html" title="next chapter">Serialized Types</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, ripplex.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.1.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+      |
+      <a href="_sources/xrpl_plugin.basic_types.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

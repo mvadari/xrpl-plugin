@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Ledger Object Things &#8212; xrpl_plugin 0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=039e1c02" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=f6245a2f"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Keylets" href="xrpl_plugin.keylets.html" />
+    <link rel="prev" title="Transactor Things" href="xrpl_plugin.transactors.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-xrpl_plugin.ledger_objects">
+<span id="ledger-object-things"></span><h1>Ledger Object Things<a class="headerlink" href="#module-xrpl_plugin.ledger_objects" title="Permalink to this heading">¶</a></h1>
+<p>Info pertaining to ledger object manipulation.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerEntryType">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.ledger_objects.</span></span><span class="sig-name descname"><span class="pre">LedgerEntryType</span></span><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerEntryType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>Identifiers for on-ledger objects.    Each ledger object requires a unique type identifier, which is stored     within the object itself; this makes it possible to iterate the entire     ledger and determine each object’s type and verify that the object you     retrieved from a given hash matches the expected type.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerEntryType.ltACCOUNT_ROOT">
+<span class="sig-name descname"><span class="pre">ltACCOUNT_ROOT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerEntryType.ltACCOUNT_ROOT:</span> <span class="pre">97&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerEntryType.ltACCOUNT_ROOT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerEntryType.ltAMENDMENTS">
+<span class="sig-name descname"><span class="pre">ltAMENDMENTS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerEntryType.ltAMENDMENTS:</span> <span class="pre">102&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerEntryType.ltAMENDMENTS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerEntryType.ltANY">
+<span class="sig-name descname"><span class="pre">ltANY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerEntryType.ltANY:</span> <span class="pre">0&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerEntryType.ltANY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerEntryType.ltCHECK">
+<span class="sig-name descname"><span class="pre">ltCHECK</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerEntryType.ltCHECK:</span> <span class="pre">67&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerEntryType.ltCHECK" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerEntryType.ltCHILD">
+<span class="sig-name descname"><span class="pre">ltCHILD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerEntryType.ltCHILD:</span> <span class="pre">7378&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerEntryType.ltCHILD" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerEntryType.ltDEPOSIT_PREAUTH">
+<span class="sig-name descname"><span class="pre">ltDEPOSIT_PREAUTH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerEntryType.ltDEPOSIT_PREAUTH:</span> <span class="pre">112&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerEntryType.ltDEPOSIT_PREAUTH" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerEntryType.ltDIR_NODE">
+<span class="sig-name descname"><span class="pre">ltDIR_NODE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerEntryType.ltDIR_NODE:</span> <span class="pre">100&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerEntryType.ltDIR_NODE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerEntryType.ltESCROW">
+<span class="sig-name descname"><span class="pre">ltESCROW</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerEntryType.ltESCROW:</span> <span class="pre">117&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerEntryType.ltESCROW" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerEntryType.ltFEE_SETTINGS">
+<span class="sig-name descname"><span class="pre">ltFEE_SETTINGS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerEntryType.ltFEE_SETTINGS:</span> <span class="pre">115&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerEntryType.ltFEE_SETTINGS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerEntryType.ltLEDGER_HASHES">
+<span class="sig-name descname"><span class="pre">ltLEDGER_HASHES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerEntryType.ltLEDGER_HASHES:</span> <span class="pre">104&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerEntryType.ltLEDGER_HASHES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerEntryType.ltNEGATIVE_UNL">
+<span class="sig-name descname"><span class="pre">ltNEGATIVE_UNL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerEntryType.ltNEGATIVE_UNL:</span> <span class="pre">78&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerEntryType.ltNEGATIVE_UNL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerEntryType.ltNFTOKEN_OFFER">
+<span class="sig-name descname"><span class="pre">ltNFTOKEN_OFFER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerEntryType.ltNFTOKEN_OFFER:</span> <span class="pre">55&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerEntryType.ltNFTOKEN_OFFER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerEntryType.ltNFTOKEN_PAGE">
+<span class="sig-name descname"><span class="pre">ltNFTOKEN_PAGE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerEntryType.ltNFTOKEN_PAGE:</span> <span class="pre">80&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerEntryType.ltNFTOKEN_PAGE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerEntryType.ltOFFER">
+<span class="sig-name descname"><span class="pre">ltOFFER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerEntryType.ltOFFER:</span> <span class="pre">111&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerEntryType.ltOFFER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerEntryType.ltPAYCHAN">
+<span class="sig-name descname"><span class="pre">ltPAYCHAN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerEntryType.ltPAYCHAN:</span> <span class="pre">120&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerEntryType.ltPAYCHAN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerEntryType.ltRIPPLE_STATE">
+<span class="sig-name descname"><span class="pre">ltRIPPLE_STATE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerEntryType.ltRIPPLE_STATE:</span> <span class="pre">114&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerEntryType.ltRIPPLE_STATE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerEntryType.ltSIGNER_LIST">
+<span class="sig-name descname"><span class="pre">ltSIGNER_LIST</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerEntryType.ltSIGNER_LIST:</span> <span class="pre">83&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerEntryType.ltSIGNER_LIST" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerEntryType.ltTICKET">
+<span class="sig-name descname"><span class="pre">ltTICKET</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerEntryType.ltTICKET:</span> <span class="pre">84&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerEntryType.ltTICKET" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerEntryType.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerEntryType.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerEntryType.value">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">value</span></span><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerEntryType.value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerSpecificFlags">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.ledger_objects.</span></span><span class="sig-name descname"><span class="pre">LedgerSpecificFlags</span></span><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerSpecificFlags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>Valid flag values for ledger objects.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfDefaultRipple">
+<span class="sig-name descname"><span class="pre">lsfDefaultRipple</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerSpecificFlags.lsfDefaultRipple:</span> <span class="pre">8388608&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfDefaultRipple" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfDepositAuth">
+<span class="sig-name descname"><span class="pre">lsfDepositAuth</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerSpecificFlags.lsfDepositAuth:</span> <span class="pre">16777216&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfDepositAuth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfDisableMaster">
+<span class="sig-name descname"><span class="pre">lsfDisableMaster</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerSpecificFlags.lsfDisableMaster:</span> <span class="pre">1048576&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfDisableMaster" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfDisallowIncomingCheck">
+<span class="sig-name descname"><span class="pre">lsfDisallowIncomingCheck</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerSpecificFlags.lsfDisallowIncomingCheck:</span> <span class="pre">134217728&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfDisallowIncomingCheck" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfDisallowIncomingNFTokenOffer">
+<span class="sig-name descname"><span class="pre">lsfDisallowIncomingNFTokenOffer</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerSpecificFlags.lsfDisallowIncomingNFTokenOffer:</span> <span class="pre">67108864&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfDisallowIncomingNFTokenOffer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfDisallowIncomingPayChan">
+<span class="sig-name descname"><span class="pre">lsfDisallowIncomingPayChan</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerSpecificFlags.lsfDisallowIncomingPayChan:</span> <span class="pre">268435456&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfDisallowIncomingPayChan" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfDisallowIncomingTrustline">
+<span class="sig-name descname"><span class="pre">lsfDisallowIncomingTrustline</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerSpecificFlags.lsfDisallowIncomingTrustline:</span> <span class="pre">536870912&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfDisallowIncomingTrustline" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfDisallowXRP">
+<span class="sig-name descname"><span class="pre">lsfDisallowXRP</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerSpecificFlags.lsfDisallowXRP:</span> <span class="pre">524288&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfDisallowXRP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfGlobalFreeze">
+<span class="sig-name descname"><span class="pre">lsfGlobalFreeze</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerSpecificFlags.lsfGlobalFreeze:</span> <span class="pre">4194304&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfGlobalFreeze" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfHighAuth">
+<span class="sig-name descname"><span class="pre">lsfHighAuth</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerSpecificFlags.lsfDisallowXRP:</span> <span class="pre">524288&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfHighAuth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfHighFreeze">
+<span class="sig-name descname"><span class="pre">lsfHighFreeze</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerSpecificFlags.lsfDefaultRipple:</span> <span class="pre">8388608&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfHighFreeze" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfHighNoRipple">
+<span class="sig-name descname"><span class="pre">lsfHighNoRipple</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerSpecificFlags.lsfNoFreeze:</span> <span class="pre">2097152&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfHighNoRipple" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfHighReserve">
+<span class="sig-name descname"><span class="pre">lsfHighReserve</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerSpecificFlags.lsfRequireDestTag:</span> <span class="pre">131072&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfHighReserve" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfLowAuth">
+<span class="sig-name descname"><span class="pre">lsfLowAuth</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerSpecificFlags.lsfRequireAuth:</span> <span class="pre">262144&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfLowAuth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfLowFreeze">
+<span class="sig-name descname"><span class="pre">lsfLowFreeze</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerSpecificFlags.lsfGlobalFreeze:</span> <span class="pre">4194304&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfLowFreeze" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfLowNoRipple">
+<span class="sig-name descname"><span class="pre">lsfLowNoRipple</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerSpecificFlags.lsfDisableMaster:</span> <span class="pre">1048576&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfLowNoRipple" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfLowReserve">
+<span class="sig-name descname"><span class="pre">lsfLowReserve</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerSpecificFlags.lsfPasswordSpent:</span> <span class="pre">65536&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfLowReserve" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfNFTokenBuyOffers">
+<span class="sig-name descname"><span class="pre">lsfNFTokenBuyOffers</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerSpecificFlags.lsfNFTokenBuyOffers:</span> <span class="pre">1&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfNFTokenBuyOffers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfNFTokenSellOffers">
+<span class="sig-name descname"><span class="pre">lsfNFTokenSellOffers</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerSpecificFlags.lsfNFTokenSellOffers:</span> <span class="pre">2&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfNFTokenSellOffers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfNoFreeze">
+<span class="sig-name descname"><span class="pre">lsfNoFreeze</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerSpecificFlags.lsfNoFreeze:</span> <span class="pre">2097152&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfNoFreeze" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfOneOwnerCount">
+<span class="sig-name descname"><span class="pre">lsfOneOwnerCount</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerSpecificFlags.lsfPasswordSpent:</span> <span class="pre">65536&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfOneOwnerCount" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfPassive">
+<span class="sig-name descname"><span class="pre">lsfPassive</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerSpecificFlags.lsfPasswordSpent:</span> <span class="pre">65536&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfPassive" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfPasswordSpent">
+<span class="sig-name descname"><span class="pre">lsfPasswordSpent</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerSpecificFlags.lsfPasswordSpent:</span> <span class="pre">65536&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfPasswordSpent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfRequireAuth">
+<span class="sig-name descname"><span class="pre">lsfRequireAuth</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerSpecificFlags.lsfRequireAuth:</span> <span class="pre">262144&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfRequireAuth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfRequireDestTag">
+<span class="sig-name descname"><span class="pre">lsfRequireDestTag</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerSpecificFlags.lsfRequireDestTag:</span> <span class="pre">131072&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfRequireDestTag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfSell">
+<span class="sig-name descname"><span class="pre">lsfSell</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerSpecificFlags.lsfRequireDestTag:</span> <span class="pre">131072&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfSell" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfSellNFToken">
+<span class="sig-name descname"><span class="pre">lsfSellNFToken</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LedgerSpecificFlags.lsfNFTokenBuyOffers:</span> <span class="pre">1&gt;</span></em><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfSellNFToken" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerSpecificFlags.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerSpecificFlags.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.LedgerSpecificFlags.value">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">value</span></span><a class="headerlink" href="#xrpl_plugin.ledger_objects.LedgerSpecificFlags.value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.adjust_owner_count">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.ledger_objects.</span></span><span class="sig-name descname"><span class="pre">adjust_owner_count</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="xrpl_plugin.transactors.html#xrpl_plugin.transactors.ApplyView" title="xrpl_plugin.transactors.ApplyView"><span class="pre">xrpl_plugin.transactors.ApplyView</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="xrpl_plugin.stypes.html#xrpl_plugin.stypes.STLedgerEntry" title="xrpl_plugin.stypes.STLedgerEntry"><span class="pre">xrpl_plugin.stypes.STLedgerEntry</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg3</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.Journal" title="xrpl_plugin.basic_types.Journal"><span class="pre">xrpl_plugin.basic_types.Journal</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#xrpl_plugin.ledger_objects.adjust_owner_count" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adjust the owner count of an account after creating/deleting a new ledger object.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.ledger_objects.make_sle">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.ledger_objects.</span></span><span class="sig-name descname"><span class="pre">make_sle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="xrpl_plugin.keylets.html#xrpl_plugin.keylets.Keylet" title="xrpl_plugin.keylets.Keylet"><span class="pre">xrpl_plugin.keylets.Keylet</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="xrpl_plugin.stypes.html#xrpl_plugin.stypes.STLedgerEntry" title="xrpl_plugin.stypes.STLedgerEntry"><span class="pre">xrpl_plugin.stypes.STLedgerEntry</span></a></span></span><a class="headerlink" href="#xrpl_plugin.ledger_objects.make_sle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new SLE object with the provided keylet.</p>
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">xrpl_plugin</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.basic_types.html">Basic Types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.stypes.html">Serialized Types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.sfields.html">SFields</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.transactors.html">Transactor Things</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Ledger Object Things</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.keylets.html">Keylets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.return_codes.html">Return Codes</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="xrpl_plugin.transactors.html" title="previous chapter">Transactor Things</a></li>
+      <li>Next: <a href="xrpl_plugin.keylets.html" title="next chapter">Keylets</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, ripplex.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.1.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+      |
+      <a href="_sources/xrpl_plugin.ledger_objects.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
