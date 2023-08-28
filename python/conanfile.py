@@ -14,20 +14,19 @@ class TryXrpl(ConanFile):
     }
 
     requires = [
-        "boost/1.77.0",
+        "boost/1.82.0",
         "date/3.0.1",
-        "libarchive/3.6.0",
-        "lz4/1.9.3",
         "grpc/1.50.1",
+        "libarchive/3.6.2",
+        "lz4/1.9.3",
         "nudb/2.0.8",
-        "openssl/1.1.1m",
-        "protobuf/3.21.4",
+        "openssl/1.1.1u",
+        "protobuf/3.21.9",
         "pybind11/2.10.4",
-        "rocksdb/6.27.3",
-        "snappy/1.1.9",
+        "snappy/1.1.10",
         "soci/4.0.3",
-        "sqlite3/3.38.0",
-        "zlib/1.2.12",
+        "sqlite3/3.42.0",
+        "zlib/1.2.13",
     ]
 
     default_options = {
