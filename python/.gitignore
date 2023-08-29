@@ -1,2 +1,4 @@
 *.cpp
 *.h
+docs/_build/.doctrees
+docs/_build/doctrees
