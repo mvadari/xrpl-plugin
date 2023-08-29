@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Transactor Things &mdash; xrpl_plugin 0.0.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=f6245a2f"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Ledger Object Things" href="xrpl_plugin.ledger_objects.html" />
+    <link rel="prev" title="SFields" href="xrpl_plugin.sfields.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            xrpl_plugin
+          </a>
+              <div class="version">
+                0.0.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.basic_types.html">Basic Types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.stypes.html">Serialized Types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.sfields.html">SFields</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Transactor Things</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.ledger_objects.html">Ledger Object Things</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.keylets.html">Keylets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.return_codes.html">Return Codes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">xrpl_plugin</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Transactor Things</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/xrpl_plugin.transactors.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-xrpl_plugin.transactors">
+<span id="transactor-things"></span><h1>Transactor Things<a class="headerlink" href="#module-xrpl_plugin.transactors" title="Permalink to this heading">¶</a></h1>
+<p>Contexts and other classes used in transaction processing.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.Application">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.transactors.</span></span><span class="sig-name descname"><span class="pre">Application</span></span><a class="headerlink" href="#xrpl_plugin.transactors.Application" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>The ledger and transaction processor.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.ApplyContext">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.transactors.</span></span><span class="sig-name descname"><span class="pre">ApplyContext</span></span><a class="headerlink" href="#xrpl_plugin.transactors.ApplyContext" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>State information when applying a transaction.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.ApplyContext.app">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">app</span></span><a class="headerlink" href="#xrpl_plugin.transactors.ApplyContext.app" title="Permalink to this definition">¶</a></dt>
+<dd><p>The application.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.ApplyContext.base_fee">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">base_fee</span></span><a class="headerlink" href="#xrpl_plugin.transactors.ApplyContext.base_fee" title="Permalink to this definition">¶</a></dt>
+<dd><p>The base fee on the transaction.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.ApplyContext.deliver">
+<span class="sig-name descname"><span class="pre">deliver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.transactors.ApplyContext" title="xrpl_plugin.transactors.ApplyContext"><span class="pre">xrpl_plugin.transactors.ApplyContext</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="xrpl_plugin.stypes.html#xrpl_plugin.stypes.STAmount" title="xrpl_plugin.stypes.STAmount"><span class="pre">xrpl_plugin.stypes.STAmount</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#xrpl_plugin.transactors.ApplyContext.deliver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the DeliveredAmount field in the metadata.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.ApplyContext.journal">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">journal</span></span><a class="headerlink" href="#xrpl_plugin.transactors.ApplyContext.journal" title="Permalink to this definition">¶</a></dt>
+<dd><p>The journal logger.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.ApplyContext.preclaim_result">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">preclaim_result</span></span><a class="headerlink" href="#xrpl_plugin.transactors.ApplyContext.preclaim_result" title="Permalink to this definition">¶</a></dt>
+<dd><p>The result from the preclaim processing.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.ApplyContext.tx">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tx</span></span><a class="headerlink" href="#xrpl_plugin.transactors.ApplyContext.tx" title="Permalink to this definition">¶</a></dt>
+<dd><p>The transaction.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.ApplyContext.view">
+<span class="sig-name descname"><span class="pre">view</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.transactors.ApplyContext" title="xrpl_plugin.transactors.ApplyContext"><span class="pre">xrpl_plugin.transactors.ApplyContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#xrpl_plugin.transactors.ApplyView" title="xrpl_plugin.transactors.ApplyView"><span class="pre">xrpl_plugin.transactors.ApplyView</span></a></span></span><a class="headerlink" href="#xrpl_plugin.transactors.ApplyContext.view" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get an editable view into the current state of the ledger.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.ApplyView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.transactors.</span></span><span class="sig-name descname"><span class="pre">ApplyView</span></span><a class="headerlink" href="#xrpl_plugin.transactors.ApplyView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#xrpl_plugin.transactors.ReadView" title="xrpl_plugin.rippled_py.transactors.ReadView"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReadView</span></code></a></p>
+<p>Writeable view to a ledger, for applying a transaction.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.ApplyView.dir_insert">
+<span class="sig-name descname"><span class="pre">dir_insert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.transactors.ApplyView" title="xrpl_plugin.transactors.ApplyView"><span class="pre">xrpl_plugin.transactors.ApplyView</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.AccountID" title="xrpl_plugin.basic_types.AccountID"><span class="pre">xrpl_plugin.basic_types.AccountID</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="xrpl_plugin.keylets.html#xrpl_plugin.keylets.Keylet" title="xrpl_plugin.keylets.Keylet"><span class="pre">xrpl_plugin.keylets.Keylet</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#xrpl_plugin.transactors.ApplyView.dir_insert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert an entry to a directory.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.ApplyView.dir_remove">
+<span class="sig-name descname"><span class="pre">dir_remove</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#xrpl_plugin.transactors.ApplyView.dir_remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic simple">
+<li><p>dir_remove(self: xrpl_plugin.rippled_py.transactors.ApplyView, arg0: xrpl_plugin.rippled_py.keylets.Keylet, arg1: int, arg2: xrpl_plugin.rippled_py.basic_types.uint256, arg3: bool) -&gt; bool</p></li>
+</ol>
+<p>Remove an entry from a directory.</p>
+<ol class="arabic simple" start="2">
+<li><p>dir_remove(self: xrpl_plugin.rippled_py.transactors.ApplyView, arg0: xrpl_plugin.rippled_py.keylets.Keylet, arg1: int, arg2: xrpl_plugin.rippled_py.keylets.Keylet, arg3: bool) -&gt; bool</p></li>
+</ol>
+<p>Remove an entry from a directory.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.ApplyView.erase">
+<span class="sig-name descname"><span class="pre">erase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.transactors.ApplyView" title="xrpl_plugin.transactors.ApplyView"><span class="pre">xrpl_plugin.transactors.ApplyView</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="xrpl_plugin.stypes.html#xrpl_plugin.stypes.STLedgerEntry" title="xrpl_plugin.stypes.STLedgerEntry"><span class="pre">xrpl_plugin.stypes.STLedgerEntry</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#xrpl_plugin.transactors.ApplyView.erase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove a peeked SLE.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.ApplyView.flags">
+<span class="sig-name descname"><span class="pre">flags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.transactors.ApplyView" title="xrpl_plugin.transactors.ApplyView"><span class="pre">xrpl_plugin.transactors.ApplyView</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.ApplyFlags" title="xrpl_plugin.basic_types.ApplyFlags"><span class="pre">xrpl_plugin.basic_types.ApplyFlags</span></a></span></span><a class="headerlink" href="#xrpl_plugin.transactors.ApplyView.flags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the tx apply flags.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.ApplyView.insert">
+<span class="sig-name descname"><span class="pre">insert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.transactors.ApplyView" title="xrpl_plugin.transactors.ApplyView"><span class="pre">xrpl_plugin.transactors.ApplyView</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="xrpl_plugin.stypes.html#xrpl_plugin.stypes.STLedgerEntry" title="xrpl_plugin.stypes.STLedgerEntry"><span class="pre">xrpl_plugin.stypes.STLedgerEntry</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#xrpl_plugin.transactors.ApplyView.insert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert a new state SLE.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.ApplyView.peek">
+<span class="sig-name descname"><span class="pre">peek</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.transactors.ApplyView" title="xrpl_plugin.transactors.ApplyView"><span class="pre">xrpl_plugin.transactors.ApplyView</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="xrpl_plugin.keylets.html#xrpl_plugin.keylets.Keylet" title="xrpl_plugin.keylets.Keylet"><span class="pre">xrpl_plugin.keylets.Keylet</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="xrpl_plugin.stypes.html#xrpl_plugin.stypes.STLedgerEntry" title="xrpl_plugin.stypes.STLedgerEntry"><span class="pre">xrpl_plugin.stypes.STLedgerEntry</span></a></span></span><a class="headerlink" href="#xrpl_plugin.transactors.ApplyView.peek" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a modifiable version of a SLE.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.ApplyView.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.transactors.ApplyView" title="xrpl_plugin.transactors.ApplyView"><span class="pre">xrpl_plugin.transactors.ApplyView</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="xrpl_plugin.stypes.html#xrpl_plugin.stypes.STLedgerEntry" title="xrpl_plugin.stypes.STLedgerEntry"><span class="pre">xrpl_plugin.stypes.STLedgerEntry</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#xrpl_plugin.transactors.ApplyView.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicate changes to a peeked SLE.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.ConsequencesFactoryType">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.transactors.</span></span><span class="sig-name descname"><span class="pre">ConsequencesFactoryType</span></span><a class="headerlink" href="#xrpl_plugin.transactors.ConsequencesFactoryType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>The type of TxConsequences that the transactor needs.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.ConsequencesFactoryType.Blocker">
+<span class="sig-name descname"><span class="pre">Blocker</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;ConsequencesFactoryType.Blocker:</span> <span class="pre">1&gt;</span></em><a class="headerlink" href="#xrpl_plugin.transactors.ConsequencesFactoryType.Blocker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.ConsequencesFactoryType.Custom">
+<span class="sig-name descname"><span class="pre">Custom</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;ConsequencesFactoryType.Custom:</span> <span class="pre">2&gt;</span></em><a class="headerlink" href="#xrpl_plugin.transactors.ConsequencesFactoryType.Custom" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.ConsequencesFactoryType.Normal">
+<span class="sig-name descname"><span class="pre">Normal</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;ConsequencesFactoryType.Normal:</span> <span class="pre">0&gt;</span></em><a class="headerlink" href="#xrpl_plugin.transactors.ConsequencesFactoryType.Normal" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.ConsequencesFactoryType.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#xrpl_plugin.transactors.ConsequencesFactoryType.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.ConsequencesFactoryType.value">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">value</span></span><a class="headerlink" href="#xrpl_plugin.transactors.ConsequencesFactoryType.value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.Fees">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.transactors.</span></span><span class="sig-name descname"><span class="pre">Fees</span></span><a class="headerlink" href="#xrpl_plugin.transactors.Fees" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>Reflects the fee settings for a particular ledger.     The fees are always the same for any transactions applied     to a ledger. Changes to fees occur in between ledgers.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.Fees.account_reserve">
+<span class="sig-name descname"><span class="pre">account_reserve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.transactors.Fees" title="xrpl_plugin.transactors.Fees"><span class="pre">xrpl_plugin.transactors.Fees</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.XRPAmount" title="xrpl_plugin.basic_types.XRPAmount"><span class="pre">xrpl_plugin.basic_types.XRPAmount</span></a></span></span><a class="headerlink" href="#xrpl_plugin.transactors.Fees.account_reserve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the account reserve given the owner count, in drops.         The reserve is calculated as the reserve base plus the reserve increment times the number of increments.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.Fees.base">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">base</span></span><a class="headerlink" href="#xrpl_plugin.transactors.Fees.base" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reference tx cost (drops).</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.Fees.increment">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">increment</span></span><a class="headerlink" href="#xrpl_plugin.transactors.Fees.increment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reserve increment (drops).</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.Fees.reserve">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">reserve</span></span><a class="headerlink" href="#xrpl_plugin.transactors.Fees.reserve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reserve base (drops).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.LedgerInfo">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.transactors.</span></span><span class="sig-name descname"><span class="pre">LedgerInfo</span></span><a class="headerlink" href="#xrpl_plugin.transactors.LedgerInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>Information about the notional ledger backing the view.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.LedgerInfo.accepted">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">accepted</span></span><a class="headerlink" href="#xrpl_plugin.transactors.LedgerInfo.accepted" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.LedgerInfo.account_hash">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">account_hash</span></span><a class="headerlink" href="#xrpl_plugin.transactors.LedgerInfo.account_hash" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.LedgerInfo.close_flags">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">close_flags</span></span><a class="headerlink" href="#xrpl_plugin.transactors.LedgerInfo.close_flags" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.LedgerInfo.close_time">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">close_time</span></span><a class="headerlink" href="#xrpl_plugin.transactors.LedgerInfo.close_time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.LedgerInfo.close_time_resolution">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">close_time_resolution</span></span><a class="headerlink" href="#xrpl_plugin.transactors.LedgerInfo.close_time_resolution" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.LedgerInfo.drops">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">drops</span></span><a class="headerlink" href="#xrpl_plugin.transactors.LedgerInfo.drops" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.LedgerInfo.hash">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">hash</span></span><a class="headerlink" href="#xrpl_plugin.transactors.LedgerInfo.hash" title="Permalink to this definition">¶</a></dt>
+<dd><p>The hash of the ledger.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.LedgerInfo.parent_close_time">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parent_close_time</span></span><a class="headerlink" href="#xrpl_plugin.transactors.LedgerInfo.parent_close_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>The time the previous ledger closed.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.LedgerInfo.parent_hash">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parent_hash</span></span><a class="headerlink" href="#xrpl_plugin.transactors.LedgerInfo.parent_hash" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.LedgerInfo.seq">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">seq</span></span><a class="headerlink" href="#xrpl_plugin.transactors.LedgerInfo.seq" title="Permalink to this definition">¶</a></dt>
+<dd><p>The ledger index.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.LedgerInfo.tx_hash">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tx_hash</span></span><a class="headerlink" href="#xrpl_plugin.transactors.LedgerInfo.tx_hash" title="Permalink to this definition">¶</a></dt>
+<dd><p>The hash of the transactions in the ledger.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.LedgerInfo.validated">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">validated</span></span><a class="headerlink" href="#xrpl_plugin.transactors.LedgerInfo.validated" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.OpenView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.transactors.</span></span><span class="sig-name descname"><span class="pre">OpenView</span></span><a class="headerlink" href="#xrpl_plugin.transactors.OpenView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#xrpl_plugin.transactors.ReadView" title="xrpl_plugin.rippled_py.transactors.ReadView"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReadView</span></code></a></p>
+<p>Writable ledger view that accumulates state and tx changes.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.OpenView.tx_count">
+<span class="sig-name descname"><span class="pre">tx_count</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.transactors.OpenView" title="xrpl_plugin.transactors.OpenView"><span class="pre">xrpl_plugin.transactors.OpenView</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#xrpl_plugin.transactors.OpenView.tx_count" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the number of transactions inserted since creation.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.PreclaimContext">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.transactors.</span></span><span class="sig-name descname"><span class="pre">PreclaimContext</span></span><a class="headerlink" href="#xrpl_plugin.transactors.PreclaimContext" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>State information when preclaiming a transaction.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.PreclaimContext.app">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">app</span></span><a class="headerlink" href="#xrpl_plugin.transactors.PreclaimContext.app" title="Permalink to this definition">¶</a></dt>
+<dd><p>The application.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.PreclaimContext.flags">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">flags</span></span><a class="headerlink" href="#xrpl_plugin.transactors.PreclaimContext.flags" title="Permalink to this definition">¶</a></dt>
+<dd><p>The flags on the transaction.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.PreclaimContext.j">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">j</span></span><a class="headerlink" href="#xrpl_plugin.transactors.PreclaimContext.j" title="Permalink to this definition">¶</a></dt>
+<dd><p>The journal logger.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.PreclaimContext.preflight_result">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">preflight_result</span></span><a class="headerlink" href="#xrpl_plugin.transactors.PreclaimContext.preflight_result" title="Permalink to this definition">¶</a></dt>
+<dd><p>The result from the preflight processing.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.PreclaimContext.tx">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tx</span></span><a class="headerlink" href="#xrpl_plugin.transactors.PreclaimContext.tx" title="Permalink to this definition">¶</a></dt>
+<dd><p>The transaction.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.PreclaimContext.view">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">view</span></span><a class="headerlink" href="#xrpl_plugin.transactors.PreclaimContext.view" title="Permalink to this definition">¶</a></dt>
+<dd><p>A read-only view into the current state of the ledger.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.PreflightContext">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.transactors.</span></span><span class="sig-name descname"><span class="pre">PreflightContext</span></span><a class="headerlink" href="#xrpl_plugin.transactors.PreflightContext" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>State information when preflighting a transaction.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.PreflightContext.app">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">app</span></span><a class="headerlink" href="#xrpl_plugin.transactors.PreflightContext.app" title="Permalink to this definition">¶</a></dt>
+<dd><p>The application.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.PreflightContext.flags">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">flags</span></span><a class="headerlink" href="#xrpl_plugin.transactors.PreflightContext.flags" title="Permalink to this definition">¶</a></dt>
+<dd><p>The flags on the transaction.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.PreflightContext.j">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">j</span></span><a class="headerlink" href="#xrpl_plugin.transactors.PreflightContext.j" title="Permalink to this definition">¶</a></dt>
+<dd><p>The journal logger.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.PreflightContext.rules">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rules</span></span><a class="headerlink" href="#xrpl_plugin.transactors.PreflightContext.rules" title="Permalink to this definition">¶</a></dt>
+<dd><p>The current governing rules of the network.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.PreflightContext.tx">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tx</span></span><a class="headerlink" href="#xrpl_plugin.transactors.PreflightContext.tx" title="Permalink to this definition">¶</a></dt>
+<dd><p>The transaction.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.ReadView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.transactors.</span></span><span class="sig-name descname"><span class="pre">ReadView</span></span><a class="headerlink" href="#xrpl_plugin.transactors.ReadView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>A view into a ledger.     This interface provides read access to state     and transaction items. There is no checkpointing     or calculation of metadata.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.ReadView.exists">
+<span class="sig-name descname"><span class="pre">exists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.transactors.ReadView" title="xrpl_plugin.transactors.ReadView"><span class="pre">xrpl_plugin.transactors.ReadView</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="xrpl_plugin.keylets.html#xrpl_plugin.keylets.Keylet" title="xrpl_plugin.keylets.Keylet"><span class="pre">xrpl_plugin.keylets.Keylet</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#xrpl_plugin.transactors.ReadView.exists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if a state item exists.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.ReadView.fees">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fees</span></span><a class="headerlink" href="#xrpl_plugin.transactors.ReadView.fees" title="Permalink to this definition">¶</a></dt>
+<dd><p>The fees for the base ledger.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.ReadView.info">
+<span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.transactors.ReadView" title="xrpl_plugin.transactors.ReadView"><span class="pre">xrpl_plugin.transactors.ReadView</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#xrpl_plugin.transactors.LedgerInfo" title="xrpl_plugin.transactors.LedgerInfo"><span class="pre">xrpl_plugin.transactors.LedgerInfo</span></a></span></span><a class="headerlink" href="#xrpl_plugin.transactors.ReadView.info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns information about the ledger.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.ReadView.open">
+<span class="sig-name descname"><span class="pre">open</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.transactors.ReadView" title="xrpl_plugin.transactors.ReadView"><span class="pre">xrpl_plugin.transactors.ReadView</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#xrpl_plugin.transactors.ReadView.open" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns true if this reflects an open ledger.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.ReadView.parent_close_time">
+<span class="sig-name descname"><span class="pre">parent_close_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.transactors.ReadView" title="xrpl_plugin.transactors.ReadView"><span class="pre">xrpl_plugin.transactors.ReadView</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#xrpl_plugin.transactors.TimePoint" title="xrpl_plugin.transactors.TimePoint"><span class="pre">xrpl_plugin.transactors.TimePoint</span></a></span></span><a class="headerlink" href="#xrpl_plugin.transactors.ReadView.parent_close_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the close time of the previous ledger.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.ReadView.rules">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rules</span></span><a class="headerlink" href="#xrpl_plugin.transactors.ReadView.rules" title="Permalink to this definition">¶</a></dt>
+<dd><p>The tx processing rules.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.ReadView.seq">
+<span class="sig-name descname"><span class="pre">seq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.transactors.ReadView" title="xrpl_plugin.transactors.ReadView"><span class="pre">xrpl_plugin.transactors.ReadView</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#xrpl_plugin.transactors.ReadView.seq" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the sequence number of the base ledger.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.Rules">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.transactors.</span></span><span class="sig-name descname"><span class="pre">Rules</span></span><a class="headerlink" href="#xrpl_plugin.transactors.Rules" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>Rules controlling protocol behavior, such as amendments.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.Rules.enabled">
+<span class="sig-name descname"><span class="pre">enabled</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#xrpl_plugin.transactors.Rules.enabled" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic simple">
+<li><p>enabled(self: xrpl_plugin.rippled_py.transactors.Rules, arg0: xrpl_plugin.rippled_py.basic_types.uint256) -&gt; bool</p></li>
+</ol>
+<p>Whether an amendment is enabled.</p>
+<ol class="arabic simple" start="2">
+<li><p>enabled(self: xrpl_plugin.rippled_py.transactors.Rules, arg0: object) -&gt; bool</p></li>
+</ol>
+<p>Whether an amendment is enabled.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.SerialIter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.transactors.</span></span><span class="sig-name descname"><span class="pre">SerialIter</span></span><a class="headerlink" href="#xrpl_plugin.transactors.SerialIter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>Transitional adapter to new serialization interfaces.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.SerialIter.get128">
+<span class="sig-name descname"><span class="pre">get128</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.transactors.SerialIter" title="xrpl_plugin.transactors.SerialIter"><span class="pre">xrpl_plugin.transactors.SerialIter</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.uint128" title="xrpl_plugin.basic_types.uint128"><span class="pre">xrpl_plugin.basic_types.uint128</span></a></span></span><a class="headerlink" href="#xrpl_plugin.transactors.SerialIter.get128" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the next 128 bits.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.SerialIter.get16">
+<span class="sig-name descname"><span class="pre">get16</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.transactors.SerialIter" title="xrpl_plugin.transactors.SerialIter"><span class="pre">xrpl_plugin.transactors.SerialIter</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#xrpl_plugin.transactors.SerialIter.get16" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the next 16 bits.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.SerialIter.get160">
+<span class="sig-name descname"><span class="pre">get160</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.transactors.SerialIter" title="xrpl_plugin.transactors.SerialIter"><span class="pre">xrpl_plugin.transactors.SerialIter</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.uint160" title="xrpl_plugin.basic_types.uint160"><span class="pre">xrpl_plugin.basic_types.uint160</span></a></span></span><a class="headerlink" href="#xrpl_plugin.transactors.SerialIter.get160" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the next 160 bits.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.SerialIter.get256">
+<span class="sig-name descname"><span class="pre">get256</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.transactors.SerialIter" title="xrpl_plugin.transactors.SerialIter"><span class="pre">xrpl_plugin.transactors.SerialIter</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.uint256" title="xrpl_plugin.basic_types.uint256"><span class="pre">xrpl_plugin.basic_types.uint256</span></a></span></span><a class="headerlink" href="#xrpl_plugin.transactors.SerialIter.get256" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the next 256 bits.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.SerialIter.get32">
+<span class="sig-name descname"><span class="pre">get32</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.transactors.SerialIter" title="xrpl_plugin.transactors.SerialIter"><span class="pre">xrpl_plugin.transactors.SerialIter</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#xrpl_plugin.transactors.SerialIter.get32" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the next 32 bits.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.SerialIter.get64">
+<span class="sig-name descname"><span class="pre">get64</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.transactors.SerialIter" title="xrpl_plugin.transactors.SerialIter"><span class="pre">xrpl_plugin.transactors.SerialIter</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#xrpl_plugin.transactors.SerialIter.get64" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the next 64 bits.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.SerialIter.get8">
+<span class="sig-name descname"><span class="pre">get8</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.transactors.SerialIter" title="xrpl_plugin.transactors.SerialIter"><span class="pre">xrpl_plugin.transactors.SerialIter</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#xrpl_plugin.transactors.SerialIter.get8" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the next 8 bits.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.SerialIter.get_vl_buffer">
+<span class="sig-name descname"><span class="pre">get_vl_buffer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.transactors.SerialIter" title="xrpl_plugin.transactors.SerialIter"><span class="pre">xrpl_plugin.transactors.SerialIter</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.Buffer" title="xrpl_plugin.basic_types.Buffer"><span class="pre">xrpl_plugin.basic_types.Buffer</span></a></span></span><a class="headerlink" href="#xrpl_plugin.transactors.SerialIter.get_vl_buffer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assuming a variable-length buffer is next, get the buffer.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.Serializer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.transactors.</span></span><span class="sig-name descname"><span class="pre">Serializer</span></span><a class="headerlink" href="#xrpl_plugin.transactors.Serializer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>A serializer to the rippled serialization format.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.Serializer.add16">
+<span class="sig-name descname"><span class="pre">add16</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.transactors.Serializer" title="xrpl_plugin.transactors.Serializer"><span class="pre">xrpl_plugin.transactors.Serializer</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#xrpl_plugin.transactors.Serializer.add16" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add 16 bits.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.Serializer.add32">
+<span class="sig-name descname"><span class="pre">add32</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.transactors.Serializer" title="xrpl_plugin.transactors.Serializer"><span class="pre">xrpl_plugin.transactors.Serializer</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#xrpl_plugin.transactors.Serializer.add32" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add 32 bits.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.Serializer.add64">
+<span class="sig-name descname"><span class="pre">add64</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.transactors.Serializer" title="xrpl_plugin.transactors.Serializer"><span class="pre">xrpl_plugin.transactors.Serializer</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#xrpl_plugin.transactors.Serializer.add64" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add 64 bits.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.Serializer.add8">
+<span class="sig-name descname"><span class="pre">add8</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.transactors.Serializer" title="xrpl_plugin.transactors.Serializer"><span class="pre">xrpl_plugin.transactors.Serializer</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#xrpl_plugin.transactors.Serializer.add8" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add 8 bits.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.Serializer.add_raw">
+<span class="sig-name descname"><span class="pre">add_raw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#xrpl_plugin.transactors.Serializer.add_raw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic simple">
+<li><p>add_raw(self: xrpl_plugin.rippled_py.transactors.Serializer, arg0: List[int]) -&gt; int</p></li>
+</ol>
+<p>Add raw bytes as a blob.</p>
+<ol class="arabic simple" start="2">
+<li><p>add_raw(self: xrpl_plugin.rippled_py.transactors.Serializer, arg0: xrpl_plugin.rippled_py.basic_types.Slice) -&gt; int</p></li>
+</ol>
+<p>Add raw bytes as a slice.</p>
+<ol class="arabic simple" start="3">
+<li><p>add_raw(self: xrpl_plugin.rippled_py.transactors.Serializer, arg0: xrpl_plugin.rippled_py.transactors.Serializer) -&gt; int</p></li>
+</ol>
+<p>Add raw bytes from another Serializer.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.Serializer.add_vl">
+<span class="sig-name descname"><span class="pre">add_vl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#xrpl_plugin.transactors.Serializer.add_vl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic simple">
+<li><p>add_vl(self: xrpl_plugin.rippled_py.transactors.Serializer, arg0: List[int]) -&gt; int</p></li>
+</ol>
+<p>Add raw bytes as a variable length blob.</p>
+<ol class="arabic simple" start="2">
+<li><p>add_vl(self: xrpl_plugin.rippled_py.transactors.Serializer, arg0: xrpl_plugin.rippled_py.basic_types.Slice) -&gt; int</p></li>
+</ol>
+<p>Add raw bytes as a variable length slice.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.TimePoint">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.transactors.</span></span><span class="sig-name descname"><span class="pre">TimePoint</span></span><a class="headerlink" href="#xrpl_plugin.transactors.TimePoint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.TimePoint.time_since_epoch">
+<span class="sig-name descname"><span class="pre">time_since_epoch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.transactors.TimePoint" title="xrpl_plugin.transactors.TimePoint"><span class="pre">xrpl_plugin.transactors.TimePoint</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#xrpl_plugin.transactors.TimePoint.time_since_epoch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the amount of time that has passed since the UNIX epoch.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.TxConsequences">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.transactors.</span></span><span class="sig-name descname"><span class="pre">TxConsequences</span></span><a class="headerlink" href="#xrpl_plugin.transactors.TxConsequences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>Class describing the consequences to the account of applying a transaction if the transaction consumes the maximum XRP allowed.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.TxConsequences.fee">
+<span class="sig-name descname"><span class="pre">fee</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.transactors.TxConsequences" title="xrpl_plugin.transactors.TxConsequences"><span class="pre">xrpl_plugin.transactors.TxConsequences</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.XRPAmount" title="xrpl_plugin.basic_types.XRPAmount"><span class="pre">xrpl_plugin.basic_types.XRPAmount</span></a></span></span><a class="headerlink" href="#xrpl_plugin.transactors.TxConsequences.fee" title="Permalink to this definition">¶</a></dt>
+<dd><p>The fee.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.TxConsequences.following_seq">
+<span class="sig-name descname"><span class="pre">following_seq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.transactors.TxConsequences" title="xrpl_plugin.transactors.TxConsequences"><span class="pre">xrpl_plugin.transactors.TxConsequences</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.SeqProxy" title="xrpl_plugin.basic_types.SeqProxy"><span class="pre">xrpl_plugin.basic_types.SeqProxy</span></a></span></span><a class="headerlink" href="#xrpl_plugin.transactors.TxConsequences.following_seq" title="Permalink to this definition">¶</a></dt>
+<dd><p>The next sequence number.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.TxConsequences.is_blocker">
+<span class="sig-name descname"><span class="pre">is_blocker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.transactors.TxConsequences" title="xrpl_plugin.transactors.TxConsequences"><span class="pre">xrpl_plugin.transactors.TxConsequences</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#xrpl_plugin.transactors.TxConsequences.is_blocker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether the TxConsequences is a blocker.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.TxConsequences.potential_spend">
+<span class="sig-name descname"><span class="pre">potential_spend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.transactors.TxConsequences" title="xrpl_plugin.transactors.TxConsequences"><span class="pre">xrpl_plugin.transactors.TxConsequences</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.XRPAmount" title="xrpl_plugin.basic_types.XRPAmount"><span class="pre">xrpl_plugin.basic_types.XRPAmount</span></a></span></span><a class="headerlink" href="#xrpl_plugin.transactors.TxConsequences.potential_spend" title="Permalink to this definition">¶</a></dt>
+<dd><p>The potential spend.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.TxConsequences.seq_proxy">
+<span class="sig-name descname"><span class="pre">seq_proxy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.transactors.TxConsequences" title="xrpl_plugin.transactors.TxConsequences"><span class="pre">xrpl_plugin.transactors.TxConsequences</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.SeqProxy" title="xrpl_plugin.basic_types.SeqProxy"><span class="pre">xrpl_plugin.basic_types.SeqProxy</span></a></span></span><a class="headerlink" href="#xrpl_plugin.transactors.TxConsequences.seq_proxy" title="Permalink to this definition">¶</a></dt>
+<dd><p>The sequence/ticket number.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.TxConsequences.sequences_consumed">
+<span class="sig-name descname"><span class="pre">sequences_consumed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.transactors.TxConsequences" title="xrpl_plugin.transactors.TxConsequences"><span class="pre">xrpl_plugin.transactors.TxConsequences</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#xrpl_plugin.transactors.TxConsequences.sequences_consumed" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of sequences consumed.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.TxConsequencesCategory">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.transactors.</span></span><span class="sig-name descname"><span class="pre">TxConsequencesCategory</span></span><a class="headerlink" href="#xrpl_plugin.transactors.TxConsequencesCategory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>Describes how the transaction affects subsequent transactions.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.TxConsequencesCategory.blocker">
+<span class="sig-name descname"><span class="pre">blocker</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TxConsequencesCategory.blocker:</span> <span class="pre">1&gt;</span></em><a class="headerlink" href="#xrpl_plugin.transactors.TxConsequencesCategory.blocker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.TxConsequencesCategory.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#xrpl_plugin.transactors.TxConsequencesCategory.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.TxConsequencesCategory.normal">
+<span class="sig-name descname"><span class="pre">normal</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;TxConsequencesCategory.normal:</span> <span class="pre">0&gt;</span></em><a class="headerlink" href="#xrpl_plugin.transactors.TxConsequencesCategory.normal" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.TxConsequencesCategory.value">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">value</span></span><a class="headerlink" href="#xrpl_plugin.transactors.TxConsequencesCategory.value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.preflight1">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.transactors.</span></span><span class="sig-name descname"><span class="pre">preflight1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.transactors.PreflightContext" title="xrpl_plugin.transactors.PreflightContext"><span class="pre">xrpl_plugin.transactors.PreflightContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="xrpl_plugin.return_codes.html#xrpl_plugin.return_codes.NotTEC" title="xrpl_plugin.return_codes.NotTEC"><span class="pre">xrpl_plugin.return_codes.NotTEC</span></a></span></span><a class="headerlink" href="#xrpl_plugin.transactors.preflight1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs early sanity checks on the account and fee fields</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.preflight2">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.transactors.</span></span><span class="sig-name descname"><span class="pre">preflight2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.transactors.PreflightContext" title="xrpl_plugin.transactors.PreflightContext"><span class="pre">xrpl_plugin.transactors.PreflightContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="xrpl_plugin.return_codes.html#xrpl_plugin.return_codes.NotTEC" title="xrpl_plugin.return_codes.NotTEC"><span class="pre">xrpl_plugin.return_codes.NotTEC</span></a></span></span><a class="headerlink" href="#xrpl_plugin.transactors.preflight2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks whether the signature appears valid</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="xrpl_plugin.sfields.html" class="btn btn-neutral float-left" title="SFields" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="xrpl_plugin.ledger_objects.html" class="btn btn-neutral float-right" title="Ledger Object Things" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, ripplex.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

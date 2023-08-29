@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Keylets &mdash; xrpl_plugin 0.0.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=f6245a2f"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Return Codes" href="xrpl_plugin.return_codes.html" />
+    <link rel="prev" title="Ledger Object Things" href="xrpl_plugin.ledger_objects.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            xrpl_plugin
+          </a>
+              <div class="version">
+                0.0.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.basic_types.html">Basic Types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.stypes.html">Serialized Types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.sfields.html">SFields</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.transactors.html">Transactor Things</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.ledger_objects.html">Ledger Object Things</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Keylets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.return_codes.html">Return Codes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">xrpl_plugin</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Keylets</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/xrpl_plugin.keylets.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-xrpl_plugin.keylets">
+<span id="keylets"></span><h1>Keylets<a class="headerlink" href="#module-xrpl_plugin.keylets" title="Permalink to this heading">¶</a></h1>
+<p>Keylets for getting access to ledger objects.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.keylets.Keylet">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.keylets.</span></span><span class="sig-name descname"><span class="pre">Keylet</span></span><a class="headerlink" href="#xrpl_plugin.keylets.Keylet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>A pair of SHAMap key and LedgerEntryType.     A Keylet identifies both a key in the state map and its ledger     entry type. <cite>Keylet</cite> is a portmanteau of the words key and LET,     an acronym for LedgerEntryType.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.keylets.Keylet.key">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">key</span></span><a class="headerlink" href="#xrpl_plugin.keylets.Keylet.key" title="Permalink to this definition">¶</a></dt>
+<dd><p>The unique key of the object.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="xrpl_plugin.keylets.Keylet.type">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#xrpl_plugin.keylets.Keylet.type" title="Permalink to this definition">¶</a></dt>
+<dd><p>The ledger entry type.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.keylets.account_keylet">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.keylets.</span></span><span class="sig-name descname"><span class="pre">account_keylet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.AccountID" title="xrpl_plugin.basic_types.AccountID"><span class="pre">xrpl_plugin.basic_types.AccountID</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#xrpl_plugin.keylets.Keylet" title="xrpl_plugin.keylets.Keylet"><span class="pre">xrpl_plugin.keylets.Keylet</span></a></span></span><a class="headerlink" href="#xrpl_plugin.keylets.account_keylet" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.keylets.amendments_keylet">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.keylets.</span></span><span class="sig-name descname"><span class="pre">amendments_keylet</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#xrpl_plugin.keylets.Keylet" title="xrpl_plugin.keylets.Keylet"><span class="pre">xrpl_plugin.keylets.Keylet</span></a></span></span><a class="headerlink" href="#xrpl_plugin.keylets.amendments_keylet" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.keylets.check_keylet">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.keylets.</span></span><span class="sig-name descname"><span class="pre">check_keylet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#xrpl_plugin.keylets.check_keylet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic simple">
+<li><p>check_keylet(arg0: xrpl_plugin.rippled_py.basic_types.AccountID, arg1: int) -&gt; xrpl_plugin.rippled_py.keylets.Keylet</p></li>
+<li><p>check_keylet(arg0: xrpl_plugin.rippled_py.basic_types.uint256) -&gt; xrpl_plugin.rippled_py.keylets.Keylet</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.keylets.child_keylet">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.keylets.</span></span><span class="sig-name descname"><span class="pre">child_keylet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.uint256" title="xrpl_plugin.basic_types.uint256"><span class="pre">xrpl_plugin.basic_types.uint256</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#xrpl_plugin.keylets.Keylet" title="xrpl_plugin.keylets.Keylet"><span class="pre">xrpl_plugin.keylets.Keylet</span></a></span></span><a class="headerlink" href="#xrpl_plugin.keylets.child_keylet" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.keylets.deposit_preauth_keylet">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.keylets.</span></span><span class="sig-name descname"><span class="pre">deposit_preauth_keylet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#xrpl_plugin.keylets.deposit_preauth_keylet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic simple">
+<li><p>deposit_preauth_keylet(arg0: xrpl_plugin.rippled_py.basic_types.AccountID, arg1: xrpl_plugin.rippled_py.basic_types.AccountID) -&gt; xrpl_plugin.rippled_py.keylets.Keylet</p></li>
+<li><p>deposit_preauth_keylet(arg0: xrpl_plugin.rippled_py.basic_types.uint256) -&gt; xrpl_plugin.rippled_py.keylets.Keylet</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.keylets.escrow_keylet">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.keylets.</span></span><span class="sig-name descname"><span class="pre">escrow_keylet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.AccountID" title="xrpl_plugin.basic_types.AccountID"><span class="pre">xrpl_plugin.basic_types.AccountID</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#xrpl_plugin.keylets.Keylet" title="xrpl_plugin.keylets.Keylet"><span class="pre">xrpl_plugin.keylets.Keylet</span></a></span></span><a class="headerlink" href="#xrpl_plugin.keylets.escrow_keylet" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.keylets.fees_keylet">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.keylets.</span></span><span class="sig-name descname"><span class="pre">fees_keylet</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#xrpl_plugin.keylets.Keylet" title="xrpl_plugin.keylets.Keylet"><span class="pre">xrpl_plugin.keylets.Keylet</span></a></span></span><a class="headerlink" href="#xrpl_plugin.keylets.fees_keylet" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.keylets.negative_unl_keylet">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.keylets.</span></span><span class="sig-name descname"><span class="pre">negative_unl_keylet</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#xrpl_plugin.keylets.Keylet" title="xrpl_plugin.keylets.Keylet"><span class="pre">xrpl_plugin.keylets.Keylet</span></a></span></span><a class="headerlink" href="#xrpl_plugin.keylets.negative_unl_keylet" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.keylets.nft_buys_keylet">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.keylets.</span></span><span class="sig-name descname"><span class="pre">nft_buys_keylet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.uint256" title="xrpl_plugin.basic_types.uint256"><span class="pre">xrpl_plugin.basic_types.uint256</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#xrpl_plugin.keylets.Keylet" title="xrpl_plugin.keylets.Keylet"><span class="pre">xrpl_plugin.keylets.Keylet</span></a></span></span><a class="headerlink" href="#xrpl_plugin.keylets.nft_buys_keylet" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.keylets.nft_offer_keylet">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.keylets.</span></span><span class="sig-name descname"><span class="pre">nft_offer_keylet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#xrpl_plugin.keylets.nft_offer_keylet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic simple">
+<li><p>nft_offer_keylet(arg0: xrpl_plugin.rippled_py.basic_types.AccountID, arg1: int) -&gt; xrpl_plugin.rippled_py.keylets.Keylet</p></li>
+<li><p>nft_offer_keylet(arg0: xrpl_plugin.rippled_py.basic_types.uint256) -&gt; xrpl_plugin.rippled_py.keylets.Keylet</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.keylets.nft_sells_keylet">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.keylets.</span></span><span class="sig-name descname"><span class="pre">nft_sells_keylet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.uint256" title="xrpl_plugin.basic_types.uint256"><span class="pre">xrpl_plugin.basic_types.uint256</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#xrpl_plugin.keylets.Keylet" title="xrpl_plugin.keylets.Keylet"><span class="pre">xrpl_plugin.keylets.Keylet</span></a></span></span><a class="headerlink" href="#xrpl_plugin.keylets.nft_sells_keylet" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.keylets.nftpage_keylet">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.keylets.</span></span><span class="sig-name descname"><span class="pre">nftpage_keylet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.keylets.Keylet" title="xrpl_plugin.keylets.Keylet"><span class="pre">xrpl_plugin.keylets.Keylet</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.uint256" title="xrpl_plugin.basic_types.uint256"><span class="pre">xrpl_plugin.basic_types.uint256</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#xrpl_plugin.keylets.Keylet" title="xrpl_plugin.keylets.Keylet"><span class="pre">xrpl_plugin.keylets.Keylet</span></a></span></span><a class="headerlink" href="#xrpl_plugin.keylets.nftpage_keylet" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.keylets.nftpage_max_keylet">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.keylets.</span></span><span class="sig-name descname"><span class="pre">nftpage_max_keylet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.AccountID" title="xrpl_plugin.basic_types.AccountID"><span class="pre">xrpl_plugin.basic_types.AccountID</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#xrpl_plugin.keylets.Keylet" title="xrpl_plugin.keylets.Keylet"><span class="pre">xrpl_plugin.keylets.Keylet</span></a></span></span><a class="headerlink" href="#xrpl_plugin.keylets.nftpage_max_keylet" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.keylets.nftpage_min_keylet">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.keylets.</span></span><span class="sig-name descname"><span class="pre">nftpage_min_keylet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.AccountID" title="xrpl_plugin.basic_types.AccountID"><span class="pre">xrpl_plugin.basic_types.AccountID</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#xrpl_plugin.keylets.Keylet" title="xrpl_plugin.keylets.Keylet"><span class="pre">xrpl_plugin.keylets.Keylet</span></a></span></span><a class="headerlink" href="#xrpl_plugin.keylets.nftpage_min_keylet" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.keylets.offer_keylet">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.keylets.</span></span><span class="sig-name descname"><span class="pre">offer_keylet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#xrpl_plugin.keylets.offer_keylet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic simple">
+<li><p>offer_keylet(arg0: xrpl_plugin.rippled_py.basic_types.AccountID, arg1: int) -&gt; xrpl_plugin.rippled_py.keylets.Keylet</p></li>
+<li><p>offer_keylet(arg0: xrpl_plugin.rippled_py.basic_types.uint256) -&gt; xrpl_plugin.rippled_py.keylets.Keylet</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.keylets.owner_dir_keylet">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.keylets.</span></span><span class="sig-name descname"><span class="pre">owner_dir_keylet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.AccountID" title="xrpl_plugin.basic_types.AccountID"><span class="pre">xrpl_plugin.basic_types.AccountID</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#xrpl_plugin.keylets.Keylet" title="xrpl_plugin.keylets.Keylet"><span class="pre">xrpl_plugin.keylets.Keylet</span></a></span></span><a class="headerlink" href="#xrpl_plugin.keylets.owner_dir_keylet" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.keylets.page_keylet">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.keylets.</span></span><span class="sig-name descname"><span class="pre">page_keylet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#xrpl_plugin.keylets.page_keylet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic simple">
+<li><p>page_keylet(arg0: xrpl_plugin.rippled_py.basic_types.uint256, arg1: int) -&gt; xrpl_plugin.rippled_py.keylets.Keylet</p></li>
+<li><p>page_keylet(arg0: xrpl_plugin.rippled_py.keylets.Keylet, arg1: int) -&gt; xrpl_plugin.rippled_py.keylets.Keylet</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.keylets.paychan_keylet">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.keylets.</span></span><span class="sig-name descname"><span class="pre">paychan_keylet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.AccountID" title="xrpl_plugin.basic_types.AccountID"><span class="pre">xrpl_plugin.basic_types.AccountID</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.AccountID" title="xrpl_plugin.basic_types.AccountID"><span class="pre">xrpl_plugin.basic_types.AccountID</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#xrpl_plugin.keylets.Keylet" title="xrpl_plugin.keylets.Keylet"><span class="pre">xrpl_plugin.keylets.Keylet</span></a></span></span><a class="headerlink" href="#xrpl_plugin.keylets.paychan_keylet" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.keylets.quality_keylet">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.keylets.</span></span><span class="sig-name descname"><span class="pre">quality_keylet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.keylets.Keylet" title="xrpl_plugin.keylets.Keylet"><span class="pre">xrpl_plugin.keylets.Keylet</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#xrpl_plugin.keylets.Keylet" title="xrpl_plugin.keylets.Keylet"><span class="pre">xrpl_plugin.keylets.Keylet</span></a></span></span><a class="headerlink" href="#xrpl_plugin.keylets.quality_keylet" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.keylets.signers_keylet">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.keylets.</span></span><span class="sig-name descname"><span class="pre">signers_keylet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.AccountID" title="xrpl_plugin.basic_types.AccountID"><span class="pre">xrpl_plugin.basic_types.AccountID</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#xrpl_plugin.keylets.Keylet" title="xrpl_plugin.keylets.Keylet"><span class="pre">xrpl_plugin.keylets.Keylet</span></a></span></span><a class="headerlink" href="#xrpl_plugin.keylets.signers_keylet" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.keylets.skip_keylet">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.keylets.</span></span><span class="sig-name descname"><span class="pre">skip_keylet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#xrpl_plugin.keylets.skip_keylet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic simple">
+<li><p>skip_keylet() -&gt; xrpl_plugin.rippled_py.keylets.Keylet</p></li>
+<li><p>skip_keylet(arg0: int) -&gt; xrpl_plugin.rippled_py.keylets.Keylet</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.keylets.trustline_keylet">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.keylets.</span></span><span class="sig-name descname"><span class="pre">trustline_keylet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#xrpl_plugin.keylets.trustline_keylet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic simple">
+<li><p>trustline_keylet(arg0: xrpl_plugin.rippled_py.basic_types.AccountID, arg1: xrpl_plugin.rippled_py.basic_types.AccountID, arg2: xrpl_plugin.rippled_py.basic_types.Currency) -&gt; xrpl_plugin.rippled_py.keylets.Keylet</p></li>
+<li><p>trustline_keylet(arg0: xrpl_plugin.rippled_py.basic_types.AccountID, arg1: xrpl_plugin.rippled_py.basic_types.Issue) -&gt; xrpl_plugin.rippled_py.keylets.Keylet</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.keylets.unchecked_keylet">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.keylets.</span></span><span class="sig-name descname"><span class="pre">unchecked_keylet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.uint256" title="xrpl_plugin.basic_types.uint256"><span class="pre">xrpl_plugin.basic_types.uint256</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#xrpl_plugin.keylets.Keylet" title="xrpl_plugin.keylets.Keylet"><span class="pre">xrpl_plugin.keylets.Keylet</span></a></span></span><a class="headerlink" href="#xrpl_plugin.keylets.unchecked_keylet" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="xrpl_plugin.ledger_objects.html" class="btn btn-neutral float-left" title="Ledger Object Things" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="xrpl_plugin.return_codes.html" class="btn btn-neutral float-right" title="Return Codes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, ripplex.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

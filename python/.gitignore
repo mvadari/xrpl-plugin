@@ -1,3 +1,5 @@
 *.cpp
 *.h
-docs/_build
+docs/_build/.doctrees
+docs/_build/doctrees
+docs/_build/html/_sources

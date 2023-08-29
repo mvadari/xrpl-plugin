@@ -1,39 +1,57 @@
-from conans import ConanFile
+from conan import ConanFile
 from conan.tools.cmake import CMake, CMakeToolchain, cmake_layout
 import re
 
 
-class TryXrpl(ConanFile):
-    name = "try-xrpl"
+class XrplPlugin(ConanFile):
+    name = "xrpl-plugin"
 
     license = "ISC"
+    url = "https://github.com/mvadari/xrpl-plugin"
+    description = "Plugins for the XRP Ledger"
     settings = "os", "compiler", "build_type", "arch"
     options = {
+        "assertions": [True, False],
+        "coverage": [True, False],
         "fPIC": [True, False],
+        "jemalloc": [True, False],
+        "reporting": [True, False],
+        "rocksdb": [True, False],
         "shared": [True, False],
+        "static": [True, False],
+        "tests": [True, False],
+        "unity": [True, False],
     }
 
     requires = [
-        "boost/1.77.0",
+        "boost/1.82.0",
         "date/3.0.1",
-        "libarchive/3.6.0",
-        "lz4/1.9.3",
         "grpc/1.50.1",
+        "libarchive/3.6.2",
+        "lz4/1.9.3",
         "nudb/2.0.8",
-        "openssl/1.1.1m",
-        "protobuf/3.21.4",
+        "openssl/1.1.1u",
+        "protobuf/3.21.9",
         "pybind11/2.10.4",
-        "rocksdb/6.27.3",
-        "snappy/1.1.9",
+        "snappy/1.1.10",
         "soci/4.0.3",
-        "sqlite3/3.38.0",
-        "zlib/1.2.12",
+        "sqlite3/3.42.0",
+        "zlib/1.2.13",
     ]
 
     default_options = {
+        "assertions": False,
+        "coverage": False,
         "fPIC": True,
+        "jemalloc": False,
+        "reporting": False,
+        "rocksdb": True,
         "shared": False,
+        "static": True,
+        "tests": True,
+        "unity": False,
         "cassandra-cpp-driver:shared": False,
+        "cassandra-cpp-driver:use_atomic": None,
         "date:header_only": True,
         "grpc:shared": False,
         "grpc:secure": True,
@@ -74,7 +92,22 @@ class TryXrpl(ConanFile):
         if self.settings.compiler == "apple-clang":
             self.options["boost"].visibility = "global"
 
-    exports_sources = "CMakeLists.txt", "src/*"
+    def requirements(self):
+        if self.options.jemalloc:
+            self.requires("jemalloc/5.3.0")
+        if self.options.reporting:
+            self.requires("cassandra-cpp-driver/2.15.3")
+            self.requires("libpq/14.7")
+        if self.options.rocksdb:
+            self.requires("rocksdb/6.29.5")
+
+    exports_sources = (
+        "CMakeLists.txt",
+        "Builds/*",
+        "bin/getRippledInfo",
+        "src/*",
+        "cfg/*",
+    )
 
     def layout(self):
         cmake_layout(self)
@@ -86,7 +119,15 @@ class TryXrpl(ConanFile):
 
     def generate(self):
         tc = CMakeToolchain(self)
+        tc.variables["tests"] = self.options.tests
+        tc.variables["assert"] = self.options.assertions
+        tc.variables["coverage"] = self.options.coverage
+        tc.variables["jemalloc"] = self.options.jemalloc
+        tc.variables["reporting"] = self.options.reporting
+        tc.variables["rocksdb"] = self.options.rocksdb
         tc.variables["BUILD_SHARED_LIBS"] = self.options.shared
+        tc.variables["static"] = self.options.static
+        tc.variables["unity"] = self.options.unity
         tc.generate()
 
     def build(self):
@@ -99,3 +140,20 @@ class TryXrpl(ConanFile):
         cmake = CMake(self)
         cmake.verbose = True
         cmake.install()
+
+    def package_info(self):
+        libxrpl = self.cpp_info.components["libxrpl"]
+        libxrpl.libs = [
+            "libxrpl_core.a",
+            "libed25519.a",
+            "libsecp256k1.a",
+        ]
+        # TODO: Fix the protobufs to include each other relative to
+        # `include/`, not `include/ripple/proto/`.
+        libxrpl.includedirs = ["include", "include/ripple/proto"]
+        libxrpl.requires = [
+            "boost::boost",
+            "openssl::crypto",
+            "date::date",
+            "grpc::grpc++",
+        ]

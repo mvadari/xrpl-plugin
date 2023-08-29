@@ -1,9 +1,19 @@
+# NOTE: This doesn't work
 version: 2
+build:
+  os: ubuntu-22.04
+  apt_packages:
+    - gcc
+  tools:
+    python: "3.11"
 python:
-  version: 3.8
   install:
     - method: pip
-      path: .
+      path: python/
 sphinx:
   builder: html
-  configuration: docs/conf.py
+  configuration: python/docs/conf.py
+
+submodules:
+  include:
+    - external/rippled/

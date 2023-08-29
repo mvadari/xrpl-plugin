@@ -141,10 +141,6 @@ class CMakeBuild(build_ext):
                 check=True,
             )
         cmake_args += [f"-DCMAKE_TOOLCHAIN_FILE:FILEPATH={conan_cmake}"]
-
-        subprocess.run(
-            ["ls", "-l", os.getcwd() + "/xrpl_plugin"], cwd=build_temp, check=True
-        )
         subprocess.run(["cmake", os.getcwd()] + cmake_args, cwd=build_temp, check=True)
         subprocess.run(
             ["cmake", "--build", "."] + build_args, cwd=build_temp, check=True
@@ -153,7 +149,7 @@ class CMakeBuild(build_ext):
 
 setup(
     name="xrpl-plugin",
-    version="0.0.2",
+    version="0.0.3",
     author="Mayukha Vadari",
     author_email="mvadari@ripple.com",
     url="https://github.com/mvadari/xrpl-plugin",
@@ -167,7 +163,7 @@ setup(
     # level" feature, but in the future it may provide more features.
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
-    python_requires=">=3.10",
+    python_requires=">=3.8",
     entry_points="""
         [console_scripts]
         plugin-build=xrpl_plugin:build
