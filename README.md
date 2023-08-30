@@ -11,3 +11,19 @@ cd language-of-choice
 ```
 
 See the individual per-language folders for more information about how to run plugins written in that language.
+
+## Debugging
+
+### Import Error
+
+Error (usually shows up on Linux):
+
+```
+ImportError: libxrpl_plugin.so: cannot open shared object file: No such file or directory
+```
+
+Solution:
+
+```
+export LD_LIBRARY_PATH=/usr/local/lib/python3.10/dist-packages/xrpl_plugin
+```
