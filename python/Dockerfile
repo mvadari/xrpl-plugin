@@ -30,3 +30,7 @@ RUN cd /opt/build && cmake --build . --parallel $(nproc)
 
 RUN pip install xrpl-plugin -v
 RUN python -c "import xrpl_plugin"
+
+COPY ./examples .
+RUN plugin-build dummy_tx.py
+RUN plugin-build new_escrow_create.py
