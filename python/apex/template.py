@@ -67,29 +67,6 @@ from xrpl_plugin.stypes import (
 ltNFTOKEN_ESCROW = 0x74
 NFTOKEN_ESCROW_NAMESPACE = ord("t")
 
-
-ledger_objects = [
-    LedgerObject(
-        object_type=ltNFTOKEN_ESCROW,
-        name="NFTokenEscrow",
-        rpc_name="nftoken_escrow",
-        object_format=[
-            (sf_account, soeREQUIRED),
-            (sf_destination, soeREQUIRED),
-            (sf_nftokens, soeREQUIRED),
-            (sf_cancel_after, soeOPTIONAL),
-            (sf_finish_after, soeOPTIONAL),
-            (sf_source_tag, soeOPTIONAL),
-            (sf_destination_tag, soeOPTIONAL),
-            (sf_owner_node, soeREQUIRED),
-            (sf_previous_txn_id, soeREQUIRED),
-            (sf_previous_txn_lgr_seq, soeREQUIRED),
-            (sf_destination_node, soeOPTIONAL),
-        ],
-        is_deletion_blocker=True,
-    )
-]
-
 amendment = Amendment("featureNFTokenEscrow", True, VoteBehavior.DEFAULT_NO)
 
 amendments = [amendment]
@@ -114,31 +91,15 @@ def preflight(ctx):
     if (preflight1ret := preflight1(ctx)) != tesSUCCESS:
         return preflight1ret
 
-    if not ctx.tx.is_field_present(sf_cancel_after) and not ctx.tx.is_field_present(
-        sf_finish_after
-    ):
-        return temBAD_EXPIRATION
-
-    if (
-        ctx.tx.is_field_present(sf_cancel_after)
-        and ctx.tx.is_field_present(sf_finish_after)
-        and ctx.tx[sf_cancel_after] <= ctx.tx[sf_finish_after]
-    ):
-        return temBAD_EXPIRATION
+    # TODO: fill in
 
     return preflight2(ctx)
 
 
 def preclaim(ctx):
-    nftoken_id = ctx.tx[sf_nftoken_id]
-    if not find_token(ctx.view, ctx.tx[sf_account], nftoken_id):
-        return tecNO_ENTRY
+    # TODO: fill in
 
-    if not get_flags(nftoken_id) & flag_transferable:
-        return tefNFTOKEN_IS_NOT_TRANSFERABLE
-
-    if not ctx.view.read(account_keylet(ctx.tx[sf_account])):
-        return tecNO_DST
+    return tesSUCCESS
 
 
 def do_apply(ctx, _m_prior_balance, _m_source_balance):
@@ -212,17 +173,24 @@ def do_apply(ctx, _m_prior_balance, _m_source_balance):
     return tesSUCCESS
 
 
+ledger_objects = [
+    LedgerObject(
+        object_type=ltNFTOKEN_ESCROW,
+        name="NFTokenEscrow",
+        rpc_name="nftoken_escrow",
+        object_format=[
+            # TODO: fill in
+        ],
+        is_deletion_blocker=True,
+    )
+]
+
 transactors = [
     Transactor(
         name="NFTokenEscrowCreate",
         tx_type=47,
         tx_format=[
-            (sf_destination, soeREQUIRED),
-            (sf_nftoken_id, soeREQUIRED),
-            (sf_cancel_after, soeOPTIONAL),
-            (sf_finish_after, soeOPTIONAL),
-            (sf_destination_tag, soeOPTIONAL),
-            (sf_ticket_sequence, soeOPTIONAL),
+            # TODO: fill in
         ],
         consequences_factory_type=ConsequencesFactoryType.Normal,
         preflight=preflight,
