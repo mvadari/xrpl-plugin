@@ -6,12 +6,14 @@
 #include <ripple/protocol/st.h>
 #include <ripple/protocol/TxFlags.h>
 #include <ripple/protocol/Feature.h>
+#include <ripple/protocol/nft.h>
 #include <ripple/ledger/View.h>
 #include <ripple/ledger/ApplyViewImpl.h>
 #include <ripple/app/main/Application.h>
 #include <ripple/app/tx/TxConsequences.h>
 #include <ripple/app/tx/impl/PreflightContext.h>
 #include <ripple/app/tx/impl/PreclaimContext.h>
+#include <ripple/app/tx/impl/details/NFTokenUtils.h>
 #include <ripple/app/tx/impl/ApplyContext.h>
 #include <ripple/protocol/digest.h>
 #include <map>
@@ -727,6 +729,12 @@ PYBIND11_MODULE(rippled_py, m) {
     py::class_<ripple::STVector256, ripple::STBase> STVector256(sTypeModule, "STVector256", "A serializeable type representing a 256-bit vector.");
 
     py::class_<ripple::STArray, ripple::STBase> STArray(sTypeModule, "STArray", "A serializeable type representing an array of other serialized types.");
+    STArray
+        .def(py::init<>())
+        .def("append", [](ripple::STArray &arr, ripple::STObject& obj) {
+            arr.push_back(std::move(obj));
+        })
+    ;
 
     py::class_<ripple::STObject, std::shared_ptr<ripple::STObject>> STObject(sTypeModule, "STObject", "A serializeable type representing a map of other serialized types.");
     STObject
@@ -743,6 +751,9 @@ PYBIND11_MODULE(rippled_py, m) {
         }, py::return_value_policy::move)
         .def("__getitem__", [](const ripple::STObject &obj, TWSF<ripple::STUInt64> sf) {
             return obj[static_cast<ripple::TypedField<ripple::STUInt64> const&>(sf)];
+        }, py::return_value_policy::move)
+        .def("__getitem__", [](const ripple::STObject &obj, TWSF<ripple::STUInt256> sf) {
+            return obj[static_cast<ripple::TypedField<ripple::STUInt256> const&>(sf)];
         }, py::return_value_policy::move)
         .def("__getitem__", [](const ripple::STObject &obj, TWSF<ripple::STBlob> sf) {
             return obj[static_cast<ripple::TypedField<ripple::STBlob> const&>(sf)];
@@ -762,11 +773,17 @@ PYBIND11_MODULE(rippled_py, m) {
         .def("__setitem__", [](ripple::STObject &obj, TWSF<ripple::STUInt64> sf, std::uint64_t value) {
             obj[static_cast<ripple::TypedField<ripple::STUInt64> const&>(sf)] = value;
         })
+        .def("__setitem__", [](ripple::STObject &obj, TWSF<ripple::STUInt256> sf, ripple::uint256 value) {
+            obj[static_cast<ripple::TypedField<ripple::STUInt256> const&>(sf)] = value;
+        })
         .def("__setitem__", [](ripple::STObject &obj, TWSF<ripple::STBlob> sf, ripple::STBlob::value_type value) {
             obj[static_cast<ripple::TypedField<ripple::STBlob> const&>(sf)] = value;
         })
         .def("__setitem__", [](ripple::STObject &obj, TWSF<ripple::STPluginType> sf, ripple::STPluginType::value_type value) {
             obj[static_cast<ripple::TypedField<ripple::STPluginType> const&>(sf)] = value;
+        })
+        .def("set_field_array", [](ripple::STObject &obj, const WSF& sf, ripple::STArray value) {
+            obj.setFieldArray(sf, value);
         })
         .def("is_field_present",
             [](const ripple::STObject &obj, const WSF &wsf) {
@@ -1037,7 +1054,7 @@ PYBIND11_MODULE(rippled_py, m) {
         .def("dir_remove", py::overload_cast<ripple::Keylet const&, std::uint64_t, ripple::Keylet const&, bool>(&ripple::ApplyView::dirRemove), "Remove an entry from a directory.")
         .def("dir_insert",
             [](ripple::ApplyView &view, ripple::AccountID account, ripple::Keylet keylet) {
-                return view.dirInsert(ripple::keylet::ownerDir(account), keylet, ripple::describeOwnerDir(account));;
+                return view.dirInsert(ripple::keylet::ownerDir(account), keylet, ripple::describeOwnerDir(account));
             },
             "Insert an entry to a directory."
         )
@@ -1179,6 +1196,45 @@ PYBIND11_MODULE(rippled_py, m) {
         .def("parse_base58", py::overload_cast<std::string const&>(&ripple::parseBase58<ripple::Seed>))
         // .def("parse_base58", py::overload_cast<std::string const&>(&ripple::parseBase58<ripple::PublicKey>))
     ;
+
+    py::module_ nftModule = m.def_submodule("nfts", "Utility methods for working with NFTs.");
+    py::class_<ripple::nft::TokenAndPage> TokenAndPage(nftModule, "TokenAndPage", "A helper struct containing the token info and page of an NFT.");
+    TokenAndPage
+        .def_property_readonly("token",
+            [](const ripple::nft::TokenAndPage &tokenAndPage) {
+                return tokenAndPage.token;
+            },
+            "The token."
+        )
+        .def_property_readonly("page",
+            [](const ripple::nft::TokenAndPage &tokenAndPage) {
+                return tokenAndPage.page;
+            },
+            "The page."
+        );
+
+    nftModule
+        .def("find_token", ripple::nft::findToken)
+        .def("find_token_and_page", ripple::nft::findTokenAndPage)
+        .def("get_flags", ripple::nft::getFlags)
+        .def("get_transfer_fee", ripple::nft::getTransferFee)
+        .def("get_serial", ripple::nft::getSerial)
+        .def("get_taxon", ripple::nft::getTaxon)
+        .def("get_issuer", ripple::nft::getIssuer)
+        .def("insert_token", 
+            [](ripple::ApplyView& view, ripple::AccountID& owner, ripple::STObject& nft) {
+                return ripple::nft::insertToken(view, owner, std::move(nft));
+            })
+        .def("remove_token", py::overload_cast<ripple::ApplyView&, ripple::AccountID const&, ripple::uint256 const&>(&ripple::nft::removeToken))
+        .def("remove_token",
+            [](ripple::ApplyView& view, ripple::AccountID const& account, ripple::uint256 const& id, std::shared_ptr<ripple::SLE>& sle) {
+                return ripple::nft::removeToken(view, account, id, std::move(sle));
+            })
+    ;
+    nftModule.attr("flag_burnable") = ripple::nft::flagBurnable;
+    nftModule.attr("flag_only_xrp") = ripple::nft::flagOnlyXRP;
+    nftModule.attr("flag_create_trustlines") = ripple::nft::flagCreateTrustLines;
+    nftModule.attr("flag_transferable") = ripple::nft::flagTransferable;
 
     sfieldModule
         .def("_create_new_sfield_STAccount", &wrappedNewSField<ripple::STAccount>)

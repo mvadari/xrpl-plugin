@@ -184,7 +184,7 @@ ledger_objects = [
 
 invariant_checks = [NoZeroEscrow]
 
-amendment = Amendment("featurePluginTest", True, VoteBehavior.DEFAULT_NO)
+amendment = Amendment("featurePluginTest2", True, VoteBehavior.DEFAULT_NO)
 
 amendments = [amendment]
 

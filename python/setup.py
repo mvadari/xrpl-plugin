@@ -2,15 +2,11 @@ from setuptools import setup
 import os
 import subprocess
 from pathlib import Path
-import sys
 
 # Available at setup time due to pyproject.toml
 from pybind11.setup_helpers import Pybind11Extension  # , build_ext
 from setuptools import find_packages
 from setuptools.command.build_ext import build_ext
-from pybind11 import get_cmake_dir
-
-import sys
 
 # The main interface is through Pybind11Extension.
 # * You can add cxx_std=11/14/17, and then build_ext can be removed.

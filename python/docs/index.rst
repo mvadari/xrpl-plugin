@@ -13,4 +13,5 @@ Contents:
    xrpl_plugin.transactors
    xrpl_plugin.ledger_objects
    xrpl_plugin.keylets
+   xrpl_plugin.nfts
    xrpl_plugin.return_codes
