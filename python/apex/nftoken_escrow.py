@@ -145,8 +145,10 @@ def preclaim(ctx):
     if not get_flags(nftoken_id) & flag_transferable:
         return tefNFTOKEN_IS_NOT_TRANSFERABLE
 
-    if not ctx.view.read(account_keylet(ctx.tx[sf_account])):
-        return tecNO_DST
+    # if not ctx.view.read(account_keylet(ctx.tx[sf_account])):
+    #     return tecNO_DST
+
+    return tesSUCCESS
 
 
 def do_apply(ctx, _m_prior_balance, _m_source_balance):
@@ -167,7 +169,7 @@ def do_apply(ctx, _m_prior_balance, _m_source_balance):
     if not sle:
         return tecINTERNAL
 
-    balance = STAmount(sle[sf_balance]).xrp()
+    balance = sle[sf_balance].xrp()
     reserve = ctx.view().fees.account_reserve(sle[sf_owner_count] + 1)
     if balance < reserve:
         return tecINSUFFICIENT_RESERVE
@@ -208,8 +210,8 @@ def do_apply(ctx, _m_prior_balance, _m_source_balance):
         return tecDIR_FULL
     slep[sf_owner_node] = page
 
-    if (destination := dest_acct) != account:
-        page2 = ctx.view().dir_insert(destination, keylet)
+    if dest_acct != account:
+        page2 = ctx.view().dir_insert(dest_acct, keylet)
         if page2 is None:
             return tecDIR_FULL
         slep[sf_owner_node] = page2

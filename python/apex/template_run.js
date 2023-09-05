@@ -14,7 +14,7 @@ async function submit(tx, seed) {
 
   await client.request({command: 'ledger_accept'})
 
-  return await client.request({command: 'tx', transaction: result.result.tx_json.hash})
+  return client.request({command: 'tx', transaction: result.result.tx_json.hash})
 }
 
 async function test() {
@@ -35,7 +35,6 @@ async function test() {
     Account: "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
     NFTokenTaxon: 0,
     URI: xrpl.convertStringToHex("nft_example"),
-    Flags: 0x00000008,
   }, seed)
   const nftoken_id = response.result.meta.nftoken_id
   console.log(nftoken_id)
@@ -43,11 +42,8 @@ async function test() {
   const response2 = await submit({
     TransactionType: 'NFTokenEscrowCreate',
     Account: "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
-    NFTokenID: nftoken_id,
-    Destination: wallet.address,
-    FinishAfter: 999999999,
+    // TODO: fill in
   }, seed)
-  console.log(response)
   console.log(JSON.stringify(response2.result, null, 4))
 
   await client.disconnect()

@@ -20,17 +20,34 @@ RUN aptitude install -y npm
 
 RUN npm install --global xrpl
 
+WORKDIR /answer
+RUN npm link xrpl
+COPY ./nftoken_escrow.py solution.py
+RUN plugin-build solution.py
+RUN rm NewEscrowCreate.cpp
+RUN echo "./rippled -a --conf rippled.cfg >debug.log & sleep 1 && node run.js; ./rippled -a --conf rippled.cfg stop" > run.sh
+RUN chmod 777 run.sh
+
+RUN ln -s /opt/build/rippled ./rippled
+
+COPY ./rippled_answer.cfg ./rippled.cfg
+COPY ./nftoken_escrow.js run.js
+
 WORKDIR /apex
 RUN npm link xrpl
 COPY ./template.py ./nftoken_escrow.py
 RUN plugin-build nftoken_escrow.py
 RUN rm NewEscrowCreate.cpp
 
-COPY ./nftoken_escrow.py /answer/solution.py
 RUN ln -s /opt/build/rippled ./rippled
 
 COPY ./rippled.cfg .
-COPY ./nftoken_escrow.js ./run.js
+COPY ./template_run.js ./run.js
+COPY ./nftoken_escrow.js /answer/run.js
 
-RUN echo "./rippled -a --conf rippled.cfg >debug.log & sleep 1 && node run.js; pgrep rippled | xargs kill -9" > run.sh
+
+RUN cp /answer/run.sh ./run.sh
 RUN chmod 777 run.sh
+
+
+

@@ -95,7 +95,7 @@ def do_apply(ctx, _m_prior_balance, _m_source_balance):
 
     # commit changes
     adjust_owner_count(ctx.view(), sle, 1, ctx.journal)
-    ctx.view().update(sle)
+    ctx.view().update(sle)  # This is what actually commits the change to the ledger
 
     return tesSUCCESS
 
