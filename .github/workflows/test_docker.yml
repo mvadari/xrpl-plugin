@@ -17,4 +17,4 @@ jobs:
       - name: Stuff
         run: |
           docker pull mvadariripple/xrpl-plugin
-          docker run -it mvadariripple/xrpl-plugin
+          docker run -t mvadariripple/xrpl-plugin
