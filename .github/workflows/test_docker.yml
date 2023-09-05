@@ -1,0 +1,20 @@
+# Simple workflow for deploying static content to GitHub Pages
+name: Test Docker
+
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches: ["check-docker"]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  # Single deploy job since we're just deploying
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Stuff
+        run: |
+          docker pull mvadariripple/xrpl-plugin
+          docker run -it mvadariripple/xrpl-plugin
