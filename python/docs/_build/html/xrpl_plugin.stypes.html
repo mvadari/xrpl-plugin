@@ -50,6 +50,7 @@
 <li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.transactors.html">Transactor Things</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.ledger_objects.html">Ledger Object Things</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.keylets.html">Keylets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.nfts.html">NFT Utility Methods</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.return_codes.html">Return Codes</a></li>
 </ul>
 
@@ -123,6 +124,11 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.stypes.</span></span><span class="sig-name descname"><span class="pre">STArray</span></span><a class="headerlink" href="#xrpl_plugin.stypes.STArray" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#xrpl_plugin.stypes.STBase" title="xrpl_plugin.rippled_py.stypes.STBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">STBase</span></code></a></p>
 <p>A serializeable type representing an array of other serialized types.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.stypes.STArray.append">
+<span class="sig-name descname"><span class="pre">append</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self:</span> <span class="pre">xrpl_plugin.stypes.STArray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0:</span> <span class="pre">ripple::STObject</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#xrpl_plugin.stypes.STArray.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
@@ -186,6 +192,11 @@
 <span class="sig-name descname"><span class="pre">make_field_absent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.stypes.STObject" title="xrpl_plugin.stypes.STObject"><span class="pre">xrpl_plugin.stypes.STObject</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="xrpl_plugin.sfields.html#xrpl_plugin.sfields.SField" title="xrpl_plugin.sfields.SField"><span class="pre">xrpl_plugin.sfields.SField</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#xrpl_plugin.stypes.STObject.make_field_absent" title="Permalink to this definition">¶</a></dt>
 <dd><p>Modifies the object to delete the field.</p>
 </dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.stypes.STObject.set_field_array">
+<span class="sig-name descname"><span class="pre">set_field_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.stypes.STObject" title="xrpl_plugin.stypes.STObject"><span class="pre">xrpl_plugin.stypes.STObject</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="xrpl_plugin.sfields.html#xrpl_plugin.sfields.SField" title="xrpl_plugin.sfields.SField"><span class="pre">xrpl_plugin.sfields.SField</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.stypes.STArray" title="xrpl_plugin.stypes.STArray"><span class="pre">xrpl_plugin.stypes.STArray</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#xrpl_plugin.stypes.STObject.set_field_array" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
