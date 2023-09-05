@@ -63,6 +63,14 @@ from xrpl_plugin.stypes import (
     index_hash,
 )
 
+###############################################################################
+###############################################################################
+# WARNING: This is only for demo purposes
+# This has not been fully tested.
+# It likely has bugs and is therefore not production-ready.
+###############################################################################
+###############################################################################
+
 
 ltNFTOKEN_ESCROW = 0x74
 NFTOKEN_ESCROW_NAMESPACE = ord("t")

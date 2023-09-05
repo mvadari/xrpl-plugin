@@ -15,51 +15,21 @@ from xrpl_plugin.models import (
 )
 from xrpl_plugin.basic_types import (
     VoteBehavior,
-    soeOPTIONAL,
-    soeREQUIRED,
 )
-from xrpl_plugin.nfts import (
-    find_token,
-    get_flags,
-    flag_transferable,
-    find_token_and_page,
-    remove_token,
-)
+
+# from xrpl_plugin.nfts import (
+# )
 from xrpl_plugin.keylets import Keylet, account_keylet
 from xrpl_plugin.return_codes import (
-    tecDIR_FULL,
-    tecINSUFFICIENT_RESERVE,
-    tecINTERNAL,
-    tecNO_DST,
-    tecNO_PERMISSION,
-    temBAD_EXPIRATION,
     temDISABLED,
     tesSUCCESS,
     temINVALID_FLAG,
-    tecNO_ENTRY,
-    tefNFTOKEN_IS_NOT_TRANSFERABLE,
-    is_tes_success,
+    tecINTERNAL,
 )
 from xrpl_plugin.sfields import (
     sf_account,
-    sf_balance,
-    sf_cancel_after,
-    sf_destination_node,
-    sf_destination_tag,
-    sf_owner_count,
-    sf_owner_node,
-    sf_previous_txn_id,
-    sf_previous_txn_lgr_seq,
-    sf_source_tag,
-    sf_ticket_sequence,
-    sf_nftoken_id,
-    sf_destination,
-    sf_finish_after,
-    sf_nftokens,
 )
 from xrpl_plugin.stypes import (
-    STAmount,
-    STArray,
     index_hash,
 )
 
@@ -103,70 +73,27 @@ def preclaim(ctx):
 
 
 def do_apply(ctx, _m_prior_balance, _m_source_balance):
-    close_time = ctx.view().info().parent_close_time
+    # TODO: additional checks when the transaction is applied
 
-    if ctx.tx.is_field_present(sf_cancel_after) and after(
-        close_time, ctx.tx[sf_cancel_after]
-    ):
-        return tecNO_PERMISSION
+    # TODO: get the NFToken from the owner and remove it from their ownership
 
-    if ctx.tx.is_field_present(sf_finish_after) and after(
-        close_time, ctx.tx[sf_finish_after]
-    ):
-        return tecNO_PERMISSION
-
+    # Check account
     account = ctx.tx[sf_account]
     sle = ctx.view().peek(account_keylet(account))
     if not sle:
         return tecINTERNAL
 
-    balance = STAmount(sle[sf_balance]).xrp()
-    reserve = ctx.view().fees.account_reserve(sle[sf_owner_count] + 1)
-    if balance < reserve:
-        return tecINSUFFICIENT_RESERVE
-
-    dest_acct = ctx.tx[sf_destination]
-
-    sled = ctx.view().peek(account_keylet(dest_acct))
-    if not sled:
-        return tecNO_DST
-    # TODO: implement dest tag check
-
-    # TODO: implement deposit auth check
-
-    nftoken_id = ctx.tx[sf_nftoken_id]
-    token_and_page = find_token_and_page(ctx.view(), account, nftoken_id)
-
-    if not token_and_page:
-        return tecINTERNAL
-
-    ret = remove_token(ctx.view(), account, nftoken_id, token_and_page.page)
-    if not is_tes_success(ret):
-        return ret
-
+    # Create the escrow
     keylet = nftoken_escrow_keylet(account, ctx.tx.get_seq_proxy().value())
     slep = make_sle(keylet)
 
-    array = STArray()
-    array.append(token_and_page.token)
+    # TODO: fill in all the info that the NFTokenEscrow ledger object needs in the `slep`
 
-    slep[sf_account] = account
-    slep.set_field_array(sf_nftokens, array)
-    slep[sf_destination] = ctx.tx[sf_destination]
-    slep[sf_finish_after] = ctx.tx[sf_finish_after]
-    ctx.view().insert(slep)
+    # TODO: insert escrow into owner's directory
 
-    page = ctx.view().dir_insert(account, keylet)
-    if page is None:
-        return tecDIR_FULL
-    slep[sf_owner_node] = page
+    # TODO: insert escrow into destination's directory
 
-    if (destination := dest_acct) != account:
-        page2 = ctx.view().dir_insert(destination, keylet)
-        if page2 is None:
-            return tecDIR_FULL
-        slep[sf_owner_node] = page2
-
+    # commit changes
     adjust_owner_count(ctx.view(), sle, 1, ctx.journal)
     ctx.view().update(sle)
 
