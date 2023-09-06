@@ -18,7 +18,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Ledger Object Things" href="xrpl_plugin.ledger_objects.html" />
-    <link rel="prev" title="SFields" href="xrpl_plugin.sfields.html" /> 
+    <link rel="prev" title="Plugin Models" href="xrpl_plugin.models.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -47,6 +47,7 @@
 <li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.basic_types.html">Basic Types</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.stypes.html">Serialized Types</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.sfields.html">SFields</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.models.html">Plugin Models</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Transactor Things</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.ledger_objects.html">Ledger Object Things</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.keylets.html">Keylets</a></li>
@@ -456,6 +457,12 @@
 <dd><p>Returns the close time of the previous ledger.</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.transactors.ReadView.read">
+<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.transactors.ReadView" title="xrpl_plugin.transactors.ReadView"><span class="pre">xrpl_plugin.transactors.ReadView</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="xrpl_plugin.keylets.html#xrpl_plugin.keylets.Keylet" title="xrpl_plugin.keylets.Keylet"><span class="pre">xrpl_plugin.keylets.Keylet</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="xrpl_plugin.stypes.html#xrpl_plugin.stypes.STLedgerEntry" title="xrpl_plugin.stypes.STLedgerEntry"><span class="pre">xrpl_plugin.stypes.STLedgerEntry</span></a></span></span><a class="headerlink" href="#xrpl_plugin.transactors.ReadView.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get an unmodifiable version of a SLE.</p>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="xrpl_plugin.transactors.ReadView.rules">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rules</span></span><a class="headerlink" href="#xrpl_plugin.transactors.ReadView.rules" title="Permalink to this definition">¶</a></dt>
@@ -709,7 +716,7 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="xrpl_plugin.sfields.html" class="btn btn-neutral float-left" title="SFields" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="xrpl_plugin.models.html" class="btn btn-neutral float-left" title="Plugin Models" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="xrpl_plugin.ledger_objects.html" class="btn btn-neutral float-right" title="Ledger Object Things" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

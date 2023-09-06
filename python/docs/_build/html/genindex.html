@@ -44,6 +44,7 @@
 <li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.basic_types.html">Basic Types</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.stypes.html">Serialized Types</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.sfields.html">SFields</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.models.html">Plugin Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.transactors.html">Transactor Things</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.ledger_objects.html">Ledger Object Things</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.keylets.html">Keylets</a></li>
@@ -128,9 +129,11 @@
 </li>
       <li><a href="xrpl_plugin.transactors.html#xrpl_plugin.transactors.Serializer.add_vl">add_vl() (xrpl_plugin.transactors.Serializer method)</a>
 </li>
+      <li><a href="xrpl_plugin.ledger_objects.html#xrpl_plugin.ledger_objects.adjust_owner_count">adjust_owner_count() (in module xrpl_plugin.ledger_objects)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="xrpl_plugin.ledger_objects.html#xrpl_plugin.ledger_objects.adjust_owner_count">adjust_owner_count() (in module xrpl_plugin.ledger_objects)</a>
+      <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.Amendment">Amendment (class in xrpl_plugin.models)</a>
 </li>
       <li><a href="xrpl_plugin.keylets.html#xrpl_plugin.keylets.amendments_keylet">amendments_keylet() (in module xrpl_plugin.keylets)</a>
 </li>
@@ -152,6 +155,8 @@
 </li>
       <li><a href="xrpl_plugin.transactors.html#xrpl_plugin.transactors.ApplyView">ApplyView (class in xrpl_plugin.transactors)</a>
 </li>
+      <li><a href="xrpl_plugin.stypes.parser_errors.html#xrpl_plugin.stypes.parser_errors.array_expected">array_expected() (in module xrpl_plugin.stypes.parser_errors)</a>
+</li>
       <li><a href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.JsonValue.as_string">as_string() (xrpl_plugin.basic_types.JsonValue method)</a>
 </li>
   </ul></td>
@@ -160,14 +165,16 @@
 <h2 id="B">B</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="xrpl_plugin.stypes.parser_errors.html#xrpl_plugin.stypes.parser_errors.bad_type">bad_type() (in module xrpl_plugin.stypes.parser_errors)</a>
+</li>
       <li><a href="xrpl_plugin.transactors.html#xrpl_plugin.transactors.Fees.base">base (xrpl_plugin.transactors.Fees property)</a>
 </li>
       <li><a href="xrpl_plugin.transactors.html#xrpl_plugin.transactors.ApplyContext.base_fee">base_fee (xrpl_plugin.transactors.ApplyContext property)</a>
 </li>
-      <li><a href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.BeastZero">BeastZero (class in xrpl_plugin.basic_types)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.BeastZero">BeastZero (class in xrpl_plugin.basic_types)</a>
+</li>
       <li><a href="xrpl_plugin.transactors.html#xrpl_plugin.transactors.ConsequencesFactoryType.Blocker">Blocker (xrpl_plugin.transactors.ConsequencesFactoryType attribute)</a>
 </li>
       <li><a href="xrpl_plugin.transactors.html#xrpl_plugin.transactors.TxConsequencesCategory.blocker">blocker (xrpl_plugin.transactors.TxConsequencesCategory attribute)</a>
@@ -180,7 +187,17 @@
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.Transactor.calculate_base_fee">calculate_base_fee (xrpl_plugin.models.Transactor attribute)</a>
+</li>
+      <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.Transactor.check_fee">check_fee (xrpl_plugin.models.Transactor attribute)</a>
+</li>
       <li><a href="xrpl_plugin.keylets.html#xrpl_plugin.keylets.check_keylet">check_keylet() (in module xrpl_plugin.keylets)</a>
+</li>
+      <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.Transactor.check_prior_tx_and_last_ledger">check_prior_tx_and_last_ledger (xrpl_plugin.models.Transactor attribute)</a>
+</li>
+      <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.Transactor.check_seq_proxy">check_seq_proxy (xrpl_plugin.models.Transactor attribute)</a>
+</li>
+      <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.Transactor.check_sign">check_sign (xrpl_plugin.models.Transactor attribute)</a>
 </li>
       <li><a href="xrpl_plugin.keylets.html#xrpl_plugin.keylets.child_keylet">child_keylet() (in module xrpl_plugin.keylets)</a>
 </li>
@@ -188,10 +205,16 @@
 </li>
       <li><a href="xrpl_plugin.transactors.html#xrpl_plugin.transactors.LedgerInfo.close_time">close_time (xrpl_plugin.transactors.LedgerInfo property)</a>
 </li>
-      <li><a href="xrpl_plugin.transactors.html#xrpl_plugin.transactors.LedgerInfo.close_time_resolution">close_time_resolution (xrpl_plugin.transactors.LedgerInfo property)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="xrpl_plugin.transactors.html#xrpl_plugin.transactors.LedgerInfo.close_time_resolution">close_time_resolution (xrpl_plugin.transactors.LedgerInfo property)</a>
+</li>
+      <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.TERCode.code">code (xrpl_plugin.models.TERCode attribute)</a>
+</li>
+      <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.TERCode.code_str">code_str (xrpl_plugin.models.TERCode attribute)</a>
+</li>
+      <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.Transactor.consequences_factory_type">consequences_factory_type (xrpl_plugin.models.Transactor attribute)</a>
+</li>
       <li><a href="xrpl_plugin.transactors.html#xrpl_plugin.transactors.ConsequencesFactoryType">ConsequencesFactoryType (class in xrpl_plugin.transactors)</a>
 </li>
       <li><a href="xrpl_plugin.sfields.html#xrpl_plugin.sfields.construct_custom_sfield">construct_custom_sfield() (in module xrpl_plugin.sfields)</a>
@@ -212,15 +235,21 @@
 </li>
       <li><a href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.VoteBehavior.DEFAULT_YES">DEFAULT_YES (xrpl_plugin.basic_types.VoteBehavior attribute)</a>
 </li>
+      <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.LedgerObject.delete_object">delete_object (xrpl_plugin.models.LedgerObject attribute)</a>
+</li>
       <li><a href="xrpl_plugin.transactors.html#xrpl_plugin.transactors.ApplyContext.deliver">deliver() (xrpl_plugin.transactors.ApplyContext method)</a>
 </li>
       <li><a href="xrpl_plugin.keylets.html#xrpl_plugin.keylets.deposit_preauth_keylet">deposit_preauth_keylet() (in module xrpl_plugin.keylets)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.TERCode.description">description (xrpl_plugin.models.TERCode attribute)</a>
+</li>
       <li><a href="xrpl_plugin.transactors.html#xrpl_plugin.transactors.ApplyView.dir_insert">dir_insert() (xrpl_plugin.transactors.ApplyView method)</a>
 </li>
       <li><a href="xrpl_plugin.transactors.html#xrpl_plugin.transactors.ApplyView.dir_remove">dir_remove() (xrpl_plugin.transactors.ApplyView method)</a>
+</li>
+      <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.Transactor.do_apply">do_apply (xrpl_plugin.models.Transactor attribute)</a>
 </li>
       <li><a href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.XRPAmount.drops">drops (xrpl_plugin.basic_types.XRPAmount property)</a>
 
@@ -258,6 +287,8 @@
 </li>
       <li><a href="xrpl_plugin.keylets.html#xrpl_plugin.keylets.fees_keylet">fees_keylet() (in module xrpl_plugin.keylets)</a>
 </li>
+      <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.InnerObject.field">field (xrpl_plugin.models.InnerObject attribute)</a>
+</li>
       <li><a href="xrpl_plugin.sfields.html#xrpl_plugin.sfields.SField.fieldCode">fieldCode (xrpl_plugin.sfields.SField property)</a>
 </li>
       <li><a href="xrpl_plugin.sfields.html#xrpl_plugin.sfields.SField.fieldName">fieldName (xrpl_plugin.sfields.SField property)</a>
@@ -266,9 +297,13 @@
 </li>
       <li><a href="xrpl_plugin.sfields.html#xrpl_plugin.sfields.SField.fieldType">fieldType (xrpl_plugin.sfields.SField property)</a>
 </li>
+      <li><a href="xrpl_plugin.sfields.html#xrpl_plugin.sfields.SField.fieldValue">fieldValue (xrpl_plugin.sfields.SField property)</a>
+</li>
+      <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.InvariantCheck.finalize">finalize() (xrpl_plugin.models.InvariantCheck method)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="xrpl_plugin.sfields.html#xrpl_plugin.sfields.SField.fieldValue">fieldValue (xrpl_plugin.sfields.SField property)</a>
+      <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.InvariantCheck.finalize_actual">finalize_actual() (xrpl_plugin.models.InvariantCheck method)</a>
 </li>
       <li><a href="xrpl_plugin.nfts.html#xrpl_plugin.nfts.find_token">find_token() (in module xrpl_plugin.nfts)</a>
 </li>
@@ -284,12 +319,16 @@
 </li>
       <li><a href="xrpl_plugin.transactors.html#xrpl_plugin.transactors.TxConsequences.following_seq">following_seq() (xrpl_plugin.transactors.TxConsequences method)</a>
 </li>
+      <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.InnerObject.format">format (xrpl_plugin.models.InnerObject attribute)</a>
+</li>
       <li><a href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.AccountID.from_buffer">from_buffer() (xrpl_plugin.basic_types.AccountID method)</a>
 
       <ul>
         <li><a href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.Slice.from_buffer">(xrpl_plugin.basic_types.Slice method)</a>
 </li>
       </ul></li>
+      <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.SType.from_serial_iter">from_serial_iter (xrpl_plugin.models.SType attribute)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -356,17 +395,25 @@
 </li>
       <li><a href="xrpl_plugin.transactors.html#xrpl_plugin.transactors.ReadView.info">info() (xrpl_plugin.transactors.ReadView method)</a>
 </li>
+      <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.InnerObject">InnerObject (class in xrpl_plugin.models)</a>
+</li>
       <li><a href="xrpl_plugin.transactors.html#xrpl_plugin.transactors.ApplyView.insert">insert() (xrpl_plugin.transactors.ApplyView method)</a>
 </li>
       <li><a href="xrpl_plugin.nfts.html#xrpl_plugin.nfts.insert_token">insert_token() (in module xrpl_plugin.nfts)</a>
 </li>
-      <li><a href="xrpl_plugin.stypes.html#xrpl_plugin.stypes.STAmount.iou">iou() (xrpl_plugin.stypes.STAmount method)</a>
+      <li><a href="xrpl_plugin.stypes.parser_errors.html#xrpl_plugin.stypes.parser_errors.invalid_data">invalid_data() (in module xrpl_plugin.stypes.parser_errors)</a>
 </li>
-      <li><a href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.IOUAmount">IOUAmount (class in xrpl_plugin.basic_types)</a>
+      <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.InvariantCheck">InvariantCheck (class in xrpl_plugin.models)</a>
+</li>
+      <li><a href="xrpl_plugin.stypes.html#xrpl_plugin.stypes.STAmount.iou">iou() (xrpl_plugin.stypes.STAmount method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.IOUAmount">IOUAmount (class in xrpl_plugin.basic_types)</a>
+</li>
       <li><a href="xrpl_plugin.transactors.html#xrpl_plugin.transactors.TxConsequences.is_blocker">is_blocker() (xrpl_plugin.transactors.TxConsequences method)</a>
+</li>
+      <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.LedgerObject.is_deletion_blocker">is_deletion_blocker (xrpl_plugin.models.LedgerObject attribute)</a>
 </li>
       <li><a href="xrpl_plugin.stypes.html#xrpl_plugin.stypes.STObject.is_field_present">is_field_present() (xrpl_plugin.stypes.STObject method)</a>
 </li>
@@ -422,6 +469,8 @@
 </li>
       <li><a href="xrpl_plugin.transactors.html#xrpl_plugin.transactors.LedgerInfo">LedgerInfo (class in xrpl_plugin.transactors)</a>
 </li>
+      <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.LedgerObject">LedgerObject (class in xrpl_plugin.models)</a>
+</li>
       <li><a href="xrpl_plugin.ledger_objects.html#xrpl_plugin.ledger_objects.LedgerSpecificFlags">LedgerSpecificFlags (class in xrpl_plugin.ledger_objects)</a>
 </li>
       <li><a href="xrpl_plugin.ledger_objects.html#xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfDefaultRipple">lsfDefaultRipple (xrpl_plugin.ledger_objects.LedgerSpecificFlags attribute)</a>
@@ -464,10 +513,10 @@
 </li>
       <li><a href="xrpl_plugin.ledger_objects.html#xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfNoFreeze">lsfNoFreeze (xrpl_plugin.ledger_objects.LedgerSpecificFlags attribute)</a>
 </li>
-      <li><a href="xrpl_plugin.ledger_objects.html#xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfOneOwnerCount">lsfOneOwnerCount (xrpl_plugin.ledger_objects.LedgerSpecificFlags attribute)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="xrpl_plugin.ledger_objects.html#xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfOneOwnerCount">lsfOneOwnerCount (xrpl_plugin.ledger_objects.LedgerSpecificFlags attribute)</a>
+</li>
       <li><a href="xrpl_plugin.ledger_objects.html#xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfPassive">lsfPassive (xrpl_plugin.ledger_objects.LedgerSpecificFlags attribute)</a>
 </li>
       <li><a href="xrpl_plugin.ledger_objects.html#xrpl_plugin.ledger_objects.LedgerSpecificFlags.lsfPasswordSpent">lsfPasswordSpent (xrpl_plugin.ledger_objects.LedgerSpecificFlags attribute)</a>
@@ -524,7 +573,13 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="xrpl_plugin.stypes.html#xrpl_plugin.stypes.STObject.make_field_absent">make_field_absent() (xrpl_plugin.stypes.STObject method)</a>
 </li>
+      <li><a href="xrpl_plugin.stypes.parser_errors.html#xrpl_plugin.stypes.parser_errors.make_name">make_name() (in module xrpl_plugin.stypes.parser_errors)</a>
+</li>
       <li><a href="xrpl_plugin.ledger_objects.html#xrpl_plugin.ledger_objects.make_sle">make_sle() (in module xrpl_plugin.ledger_objects)</a>
+</li>
+      <li><a href="xrpl_plugin.stypes.parser_errors.html#xrpl_plugin.stypes.parser_errors.make_stplugintype">make_stplugintype() (in module xrpl_plugin.stypes.parser_errors)</a>
+</li>
+      <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.Transactor.make_tx_consequences">make_tx_consequences (xrpl_plugin.models.Transactor attribute)</a>
 </li>
       <li>
     module
@@ -535,6 +590,8 @@
         <li><a href="xrpl_plugin.keylets.html#module-xrpl_plugin.keylets">xrpl_plugin.keylets</a>
 </li>
         <li><a href="xrpl_plugin.ledger_objects.html#module-xrpl_plugin.ledger_objects">xrpl_plugin.ledger_objects</a>
+</li>
+        <li><a href="xrpl_plugin.models.html#module-xrpl_plugin.models">xrpl_plugin.models</a>
 </li>
         <li><a href="xrpl_plugin.nfts.html#module-xrpl_plugin.nfts">xrpl_plugin.nfts</a>
 </li>
@@ -565,6 +622,12 @@
         <li><a href="xrpl_plugin.ledger_objects.html#xrpl_plugin.ledger_objects.LedgerEntryType.name">(xrpl_plugin.ledger_objects.LedgerEntryType property)</a>
 </li>
         <li><a href="xrpl_plugin.ledger_objects.html#xrpl_plugin.ledger_objects.LedgerSpecificFlags.name">(xrpl_plugin.ledger_objects.LedgerSpecificFlags property)</a>
+</li>
+        <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.Amendment.name">(xrpl_plugin.models.Amendment attribute)</a>
+</li>
+        <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.LedgerObject.name">(xrpl_plugin.models.LedgerObject attribute)</a>
+</li>
+        <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.Transactor.name">(xrpl_plugin.models.Transactor attribute)</a>
 </li>
         <li><a href="xrpl_plugin.return_codes.html#xrpl_plugin.return_codes.TECcodes.name">(xrpl_plugin.return_codes.TECcodes property)</a>
 </li>
@@ -601,9 +664,15 @@
 </li>
       <li><a href="xrpl_plugin.keylets.html#xrpl_plugin.keylets.nftpage_min_keylet">nftpage_min_keylet() (in module xrpl_plugin.keylets)</a>
 </li>
+      <li><a href="xrpl_plugin.stypes.parser_errors.html#xrpl_plugin.stypes.parser_errors.non_object_in_array">non_object_in_array() (in module xrpl_plugin.stypes.parser_errors)</a>
+</li>
       <li><a href="xrpl_plugin.transactors.html#xrpl_plugin.transactors.ConsequencesFactoryType.Normal">Normal (xrpl_plugin.transactors.ConsequencesFactoryType attribute)</a>
 </li>
       <li><a href="xrpl_plugin.transactors.html#xrpl_plugin.transactors.TxConsequencesCategory.normal">normal (xrpl_plugin.transactors.TxConsequencesCategory attribute)</a>
+</li>
+      <li><a href="xrpl_plugin.stypes.parser_errors.html#xrpl_plugin.stypes.parser_errors.not_an_array">not_an_array() (in module xrpl_plugin.stypes.parser_errors)</a>
+</li>
+      <li><a href="xrpl_plugin.stypes.parser_errors.html#xrpl_plugin.stypes.parser_errors.not_an_object">not_an_object() (in module xrpl_plugin.stypes.parser_errors)</a>
 </li>
       <li><a href="xrpl_plugin.return_codes.html#xrpl_plugin.return_codes.NotTEC">NotTEC (class in xrpl_plugin.return_codes)</a>
 </li>
@@ -613,6 +682,10 @@
 <h2 id="O">O</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.LedgerObject.object_format">object_format (xrpl_plugin.models.LedgerObject attribute)</a>
+</li>
+      <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.LedgerObject.object_type">object_type (xrpl_plugin.models.LedgerObject attribute)</a>
+</li>
       <li><a href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.VoteBehavior.OBSOLETE">OBSOLETE (xrpl_plugin.basic_types.VoteBehavior attribute)</a>
 </li>
       <li><a href="xrpl_plugin.keylets.html#xrpl_plugin.keylets.offer_keylet">offer_keylet() (in module xrpl_plugin.keylets)</a>
@@ -622,6 +695,8 @@
       <li><a href="xrpl_plugin.transactors.html#xrpl_plugin.transactors.ReadView.open">open() (xrpl_plugin.transactors.ReadView method)</a>
 </li>
       <li><a href="xrpl_plugin.transactors.html#xrpl_plugin.transactors.OpenView">OpenView (class in xrpl_plugin.transactors)</a>
+</li>
+      <li><a href="xrpl_plugin.stypes.parser_errors.html#xrpl_plugin.stypes.parser_errors.out_of_range">out_of_range() (in module xrpl_plugin.stypes.parser_errors)</a>
 </li>
       <li><a href="xrpl_plugin.keylets.html#xrpl_plugin.keylets.owner_dir_keylet">owner_dir_keylet() (in module xrpl_plugin.keylets)</a>
 </li>
@@ -645,17 +720,23 @@
 </li>
       <li><a href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.AccountID.parse_hex">parse_hex() (xrpl_plugin.basic_types.AccountID method)</a>
 </li>
+      <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.SType.parse_value">parse_value (xrpl_plugin.models.SType attribute)</a>
+</li>
       <li><a href="xrpl_plugin.keylets.html#xrpl_plugin.keylets.paychan_keylet">paychan_keylet() (in module xrpl_plugin.keylets)</a>
+</li>
+      <li><a href="xrpl_plugin.transactors.html#xrpl_plugin.transactors.ApplyView.peek">peek() (xrpl_plugin.transactors.ApplyView method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="xrpl_plugin.transactors.html#xrpl_plugin.transactors.ApplyView.peek">peek() (xrpl_plugin.transactors.ApplyView method)</a>
-</li>
       <li><a href="xrpl_plugin.transactors.html#xrpl_plugin.transactors.TxConsequences.potential_spend">potential_spend() (xrpl_plugin.transactors.TxConsequences method)</a>
+</li>
+      <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.Transactor.preclaim">preclaim (xrpl_plugin.models.Transactor attribute)</a>
 </li>
       <li><a href="xrpl_plugin.transactors.html#xrpl_plugin.transactors.ApplyContext.preclaim_result">preclaim_result (xrpl_plugin.transactors.ApplyContext property)</a>
 </li>
       <li><a href="xrpl_plugin.transactors.html#xrpl_plugin.transactors.PreclaimContext">PreclaimContext (class in xrpl_plugin.transactors)</a>
+</li>
+      <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.Transactor.preflight">preflight (xrpl_plugin.models.Transactor attribute)</a>
 </li>
       <li><a href="xrpl_plugin.transactors.html#xrpl_plugin.transactors.preflight1">preflight1() (in module xrpl_plugin.transactors)</a>
 </li>
@@ -664,6 +745,8 @@
       <li><a href="xrpl_plugin.transactors.html#xrpl_plugin.transactors.PreclaimContext.preflight_result">preflight_result (xrpl_plugin.transactors.PreclaimContext property)</a>
 </li>
       <li><a href="xrpl_plugin.transactors.html#xrpl_plugin.transactors.PreflightContext">PreflightContext (class in xrpl_plugin.transactors)</a>
+</li>
+      <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.InvariantCheck.process_data">process_data() (xrpl_plugin.models.InvariantCheck method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -679,6 +762,8 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="xrpl_plugin.transactors.html#xrpl_plugin.transactors.ReadView.read">read() (xrpl_plugin.transactors.ReadView method)</a>
+</li>
       <li><a href="xrpl_plugin.transactors.html#xrpl_plugin.transactors.ReadView">ReadView (class in xrpl_plugin.transactors)</a>
 </li>
       <li><a href="xrpl_plugin.nfts.html#xrpl_plugin.nfts.remove_token">remove_token() (in module xrpl_plugin.nfts)</a>
@@ -687,6 +772,8 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.LedgerObject.rpc_name">rpc_name (xrpl_plugin.models.LedgerObject attribute)</a>
+</li>
       <li><a href="xrpl_plugin.transactors.html#xrpl_plugin.transactors.Rules">Rules (class in xrpl_plugin.transactors)</a>
 </li>
       <li><a href="xrpl_plugin.transactors.html#xrpl_plugin.transactors.PreflightContext.rules">rules (xrpl_plugin.transactors.PreflightContext property)</a>
@@ -749,10 +836,12 @@
 </li>
       <li><a href="xrpl_plugin.keylets.html#xrpl_plugin.keylets.signers_keylet">signers_keylet() (in module xrpl_plugin.keylets)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="xrpl_plugin.stypes.parser_errors.html#xrpl_plugin.stypes.parser_errors.singleton_expected">singleton_expected() (in module xrpl_plugin.stypes.parser_errors)</a>
+</li>
       <li><a href="xrpl_plugin.keylets.html#xrpl_plugin.keylets.skip_keylet">skip_keylet() (in module xrpl_plugin.keylets)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.Slice">Slice (class in xrpl_plugin.basic_types)</a>
 </li>
       <li><a href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.SOEStyle.soeDEFAULT">soeDEFAULT (xrpl_plugin.basic_types.SOEStyle attribute)</a>
@@ -783,6 +872,8 @@
 </li>
       <li><a href="xrpl_plugin.stypes.html#xrpl_plugin.stypes.STPluginType">STPluginType (class in xrpl_plugin.stypes)</a>
 </li>
+      <li><a href="xrpl_plugin.stypes.parser_errors.html#xrpl_plugin.stypes.parser_errors.string_expected">string_expected() (in module xrpl_plugin.stypes.parser_errors)</a>
+</li>
       <li><a href="xrpl_plugin.stypes.html#xrpl_plugin.stypes.STTx">STTx (class in xrpl_plugin.stypes)</a>
 </li>
       <li><a href="xrpl_plugin.stypes.html#xrpl_plugin.stypes.STUInt128">STUInt128 (class in xrpl_plugin.stypes)</a>
@@ -800,6 +891,10 @@
       <li><a href="xrpl_plugin.stypes.html#xrpl_plugin.stypes.STUInt8">STUInt8 (class in xrpl_plugin.stypes)</a>
 </li>
       <li><a href="xrpl_plugin.stypes.html#xrpl_plugin.stypes.STVector256">STVector256 (class in xrpl_plugin.stypes)</a>
+</li>
+      <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.SType">SType (class in xrpl_plugin.models)</a>
+</li>
+      <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.Amendment.supported">supported (xrpl_plugin.models.Amendment attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -969,8 +1064,6 @@
 </li>
       <li><a href="xrpl_plugin.return_codes.html#xrpl_plugin.return_codes.TELcodes.telCAN_NOT_QUEUE_BLOCKS">telCAN_NOT_QUEUE_BLOCKS (xrpl_plugin.return_codes.TELcodes attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="xrpl_plugin.return_codes.html#xrpl_plugin.return_codes.TELcodes.telCAN_NOT_QUEUE_FEE">telCAN_NOT_QUEUE_FEE (xrpl_plugin.return_codes.TELcodes attribute)</a>
 </li>
       <li><a href="xrpl_plugin.return_codes.html#xrpl_plugin.return_codes.TELcodes.telCAN_NOT_QUEUE_FULL">telCAN_NOT_QUEUE_FULL (xrpl_plugin.return_codes.TELcodes attribute)</a>
@@ -981,6 +1074,8 @@
 </li>
       <li><a href="xrpl_plugin.return_codes.html#xrpl_plugin.return_codes.TELcodes.telINSUF_FEE_P">telINSUF_FEE_P (xrpl_plugin.return_codes.TELcodes attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="xrpl_plugin.return_codes.html#xrpl_plugin.return_codes.TELcodes.telLOCAL_ERROR">telLOCAL_ERROR (xrpl_plugin.return_codes.TELcodes attribute)</a>
 </li>
       <li><a href="xrpl_plugin.return_codes.html#xrpl_plugin.return_codes.TELcodes.telNETWORK_ID_MAKES_TX_NON_CANONICAL">telNETWORK_ID_MAKES_TX_NON_CANONICAL (xrpl_plugin.return_codes.TELcodes attribute)</a>
@@ -1059,6 +1154,8 @@
 </li>
       <li><a href="xrpl_plugin.return_codes.html#xrpl_plugin.return_codes.TEMcodes.temMALFORMED">temMALFORMED (xrpl_plugin.return_codes.TEMcodes attribute)</a>
 </li>
+      <li><a href="xrpl_plugin.stypes.parser_errors.html#xrpl_plugin.stypes.parser_errors.template_mismatch">template_mismatch() (in module xrpl_plugin.stypes.parser_errors)</a>
+</li>
       <li><a href="xrpl_plugin.return_codes.html#xrpl_plugin.return_codes.TEMcodes.temREDUNDANT">temREDUNDANT (xrpl_plugin.return_codes.TEMcodes attribute)</a>
 </li>
       <li><a href="xrpl_plugin.return_codes.html#xrpl_plugin.return_codes.TEMcodes.temRIPPLE_EMPTY">temRIPPLE_EMPTY (xrpl_plugin.return_codes.TEMcodes attribute)</a>
@@ -1070,6 +1167,8 @@
       <li><a href="xrpl_plugin.return_codes.html#xrpl_plugin.return_codes.TEMcodes.temUNKNOWN">temUNKNOWN (xrpl_plugin.return_codes.TEMcodes attribute)</a>
 </li>
       <li><a href="xrpl_plugin.return_codes.html#xrpl_plugin.return_codes.TER">TER (class in xrpl_plugin.return_codes)</a>
+</li>
+      <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.TERCode">TERCode (class in xrpl_plugin.models)</a>
 </li>
       <li><a href="xrpl_plugin.return_codes.html#xrpl_plugin.return_codes.TERcodes">TERcodes (class in xrpl_plugin.return_codes)</a>
 </li>
@@ -1113,9 +1212,19 @@
         <li><a href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.Slice.to_buffer">(xrpl_plugin.basic_types.Slice method)</a>
 </li>
       </ul></li>
+      <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.SType.to_json">to_json (xrpl_plugin.models.SType attribute)</a>
+</li>
+      <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.SType.to_serializer">to_serializer (xrpl_plugin.models.SType attribute)</a>
+</li>
+      <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.SType.to_string">to_string (xrpl_plugin.models.SType attribute)</a>
+</li>
       <li><a href="xrpl_plugin.nfts.html#xrpl_plugin.nfts.TokenAndPage.token">token (xrpl_plugin.nfts.TokenAndPage property)</a>
 </li>
       <li><a href="xrpl_plugin.nfts.html#xrpl_plugin.nfts.TokenAndPage">TokenAndPage (class in xrpl_plugin.nfts)</a>
+</li>
+      <li><a href="xrpl_plugin.stypes.parser_errors.html#xrpl_plugin.stypes.parser_errors.too_deep">too_deep() (in module xrpl_plugin.stypes.parser_errors)</a>
+</li>
+      <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.Transactor">Transactor (class in xrpl_plugin.models)</a>
 </li>
       <li><a href="xrpl_plugin.keylets.html#xrpl_plugin.keylets.trustline_keylet">trustline_keylet() (in module xrpl_plugin.keylets)</a>
 </li>
@@ -1129,13 +1238,19 @@
       </ul></li>
       <li><a href="xrpl_plugin.transactors.html#xrpl_plugin.transactors.OpenView.tx_count">tx_count() (xrpl_plugin.transactors.OpenView method)</a>
 </li>
+      <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.Transactor.tx_format">tx_format (xrpl_plugin.models.Transactor attribute)</a>
+</li>
       <li><a href="xrpl_plugin.transactors.html#xrpl_plugin.transactors.LedgerInfo.tx_hash">tx_hash (xrpl_plugin.transactors.LedgerInfo property)</a>
+</li>
+      <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.Transactor.tx_type">tx_type (xrpl_plugin.models.Transactor attribute)</a>
 </li>
       <li><a href="xrpl_plugin.transactors.html#xrpl_plugin.transactors.TxConsequences">TxConsequences (class in xrpl_plugin.transactors)</a>
 </li>
       <li><a href="xrpl_plugin.transactors.html#xrpl_plugin.transactors.TxConsequencesCategory">TxConsequencesCategory (class in xrpl_plugin.transactors)</a>
 </li>
       <li><a href="xrpl_plugin.keylets.html#xrpl_plugin.keylets.Keylet.type">type (xrpl_plugin.keylets.Keylet property)</a>
+</li>
+      <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.SType.type_id">type_id (xrpl_plugin.models.SType attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1147,11 +1262,15 @@
 </li>
       <li><a href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.uint160">uint160 (class in xrpl_plugin.basic_types)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.uint256">uint256 (class in xrpl_plugin.basic_types)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="xrpl_plugin.keylets.html#xrpl_plugin.keylets.unchecked_keylet">unchecked_keylet() (in module xrpl_plugin.keylets)</a>
+</li>
+      <li><a href="xrpl_plugin.stypes.parser_errors.html#xrpl_plugin.stypes.parser_errors.unknown_field">unknown_field() (in module xrpl_plugin.stypes.parser_errors)</a>
+</li>
+      <li><a href="xrpl_plugin.stypes.parser_errors.html#xrpl_plugin.stypes.parser_errors.unknown_type">unknown_type() (in module xrpl_plugin.stypes.parser_errors)</a>
 </li>
       <li><a href="xrpl_plugin.transactors.html#xrpl_plugin.transactors.ApplyView.update">update() (xrpl_plugin.transactors.ApplyView method)</a>
 </li>
@@ -1199,6 +1318,14 @@
 </li>
       <li><a href="xrpl_plugin.transactors.html#xrpl_plugin.transactors.ApplyContext.view">view() (xrpl_plugin.transactors.ApplyContext method)</a>
 </li>
+      <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.InvariantCheck.visit_entry">visit_entry() (xrpl_plugin.models.InvariantCheck method)</a>
+</li>
+      <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.InvariantCheck.visit_entry_actual">visit_entry_actual() (xrpl_plugin.models.InvariantCheck method)</a>
+</li>
+      <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.LedgerObject.visit_entry_xrp_change">visit_entry_xrp_change (xrpl_plugin.models.LedgerObject attribute)</a>
+</li>
+      <li><a href="xrpl_plugin.models.html#xrpl_plugin.models.Amendment.vote">vote (xrpl_plugin.models.Amendment attribute)</a>
+</li>
       <li><a href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.VoteBehavior">VoteBehavior (class in xrpl_plugin.basic_types)</a>
 </li>
   </ul></td>
@@ -1230,6 +1357,13 @@
 
       <ul>
         <li><a href="xrpl_plugin.ledger_objects.html#module-xrpl_plugin.ledger_objects">module</a>
+</li>
+      </ul></li>
+      <li>
+    xrpl_plugin.models
+
+      <ul>
+        <li><a href="xrpl_plugin.models.html#module-xrpl_plugin.models">module</a>
 </li>
       </ul></li>
       <li>

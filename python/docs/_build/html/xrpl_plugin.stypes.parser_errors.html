@@ -16,7 +16,9 @@
         <script src="_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="SFields" href="xrpl_plugin.sfields.html" />
+    <link rel="prev" title="Serialized Types" href="xrpl_plugin.stypes.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -41,10 +43,14 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul>
+              <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.basic_types.html">Basic Types</a></li>
-<li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.stypes.html">Serialized Types</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="xrpl_plugin.stypes.html">Serialized Types</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Parser Error Helpers</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.sfields.html">SFields</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.models.html">Plugin Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.transactors.html">Transactor Things</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.ledger_objects.html">Ledger Object Things</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xrpl_plugin.keylets.html">Keylets</a></li>
@@ -66,6 +72,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="xrpl_plugin.stypes.html">Serialized Types</a></li>
       <li class="breadcrumb-item active">Parser Error Helpers</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/xrpl_plugin.stypes.parser_errors.rst.txt" rel="nofollow"> View page source</a>
@@ -79,12 +86,101 @@
   <section id="module-xrpl_plugin.stypes.parser_errors">
 <span id="parser-error-helpers"></span><h1>Parser Error Helpers<a class="headerlink" href="#module-xrpl_plugin.stypes.parser_errors" title="Permalink to this heading">¶</a></h1>
 <p>Helper functions for throwing parsing errors when creating a new plugin SType.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.stypes.parser_errors.array_expected">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.stypes.parser_errors.</span></span><span class="sig-name descname"><span class="pre">array_expected</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.JsonValue" title="xrpl_plugin.basic_types.JsonValue"><span class="pre">xrpl_plugin.basic_types.JsonValue</span></a></span></span><a class="headerlink" href="#xrpl_plugin.stypes.parser_errors.array_expected" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.stypes.parser_errors.bad_type">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.stypes.parser_errors.</span></span><span class="sig-name descname"><span class="pre">bad_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.JsonValue" title="xrpl_plugin.basic_types.JsonValue"><span class="pre">xrpl_plugin.basic_types.JsonValue</span></a></span></span><a class="headerlink" href="#xrpl_plugin.stypes.parser_errors.bad_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.stypes.parser_errors.invalid_data">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.stypes.parser_errors.</span></span><span class="sig-name descname"><span class="pre">invalid_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#xrpl_plugin.stypes.parser_errors.invalid_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic simple">
+<li><p>invalid_data(arg0: str) -&gt; xrpl_plugin.rippled_py.basic_types.JsonValue</p></li>
+<li><p>invalid_data(arg0: str, arg1: str) -&gt; xrpl_plugin.rippled_py.basic_types.JsonValue</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.stypes.parser_errors.make_name">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.stypes.parser_errors.</span></span><span class="sig-name descname"><span class="pre">make_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#xrpl_plugin.stypes.parser_errors.make_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the name of the object being parsed.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.stypes.parser_errors.make_stplugintype">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.stypes.parser_errors.</span></span><span class="sig-name descname"><span class="pre">make_stplugintype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="xrpl_plugin.sfields.html#xrpl_plugin.sfields.SField" title="xrpl_plugin.sfields.SField"><span class="pre">xrpl_plugin.sfields.SField</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.Buffer" title="xrpl_plugin.basic_types.Buffer"><span class="pre">xrpl_plugin.basic_types.Buffer</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ripple::detail::STVar</span></span></span><a class="headerlink" href="#xrpl_plugin.stypes.parser_errors.make_stplugintype" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.stypes.parser_errors.non_object_in_array">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.stypes.parser_errors.</span></span><span class="sig-name descname"><span class="pre">non_object_in_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.JsonValue" title="xrpl_plugin.basic_types.JsonValue"><span class="pre">xrpl_plugin.basic_types.JsonValue</span></a></span></span><a class="headerlink" href="#xrpl_plugin.stypes.parser_errors.non_object_in_array" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.stypes.parser_errors.not_an_array">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.stypes.parser_errors.</span></span><span class="sig-name descname"><span class="pre">not_an_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.JsonValue" title="xrpl_plugin.basic_types.JsonValue"><span class="pre">xrpl_plugin.basic_types.JsonValue</span></a></span></span><a class="headerlink" href="#xrpl_plugin.stypes.parser_errors.not_an_array" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.stypes.parser_errors.not_an_object">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.stypes.parser_errors.</span></span><span class="sig-name descname"><span class="pre">not_an_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#xrpl_plugin.stypes.parser_errors.not_an_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic simple">
+<li><p>not_an_object(arg0: str) -&gt; xrpl_plugin.rippled_py.basic_types.JsonValue</p></li>
+<li><p>not_an_object(arg0: str, arg1: str) -&gt; xrpl_plugin.rippled_py.basic_types.JsonValue</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.stypes.parser_errors.out_of_range">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.stypes.parser_errors.</span></span><span class="sig-name descname"><span class="pre">out_of_range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.JsonValue" title="xrpl_plugin.basic_types.JsonValue"><span class="pre">xrpl_plugin.basic_types.JsonValue</span></a></span></span><a class="headerlink" href="#xrpl_plugin.stypes.parser_errors.out_of_range" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.stypes.parser_errors.singleton_expected">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.stypes.parser_errors.</span></span><span class="sig-name descname"><span class="pre">singleton_expected</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.JsonValue" title="xrpl_plugin.basic_types.JsonValue"><span class="pre">xrpl_plugin.basic_types.JsonValue</span></a></span></span><a class="headerlink" href="#xrpl_plugin.stypes.parser_errors.singleton_expected" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.stypes.parser_errors.string_expected">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.stypes.parser_errors.</span></span><span class="sig-name descname"><span class="pre">string_expected</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.JsonValue" title="xrpl_plugin.basic_types.JsonValue"><span class="pre">xrpl_plugin.basic_types.JsonValue</span></a></span></span><a class="headerlink" href="#xrpl_plugin.stypes.parser_errors.string_expected" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.stypes.parser_errors.template_mismatch">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.stypes.parser_errors.</span></span><span class="sig-name descname"><span class="pre">template_mismatch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0:</span> <span class="pre">ripple::SField</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.JsonValue" title="xrpl_plugin.basic_types.JsonValue"><span class="pre">xrpl_plugin.basic_types.JsonValue</span></a></span></span><a class="headerlink" href="#xrpl_plugin.stypes.parser_errors.template_mismatch" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.stypes.parser_errors.too_deep">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.stypes.parser_errors.</span></span><span class="sig-name descname"><span class="pre">too_deep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.JsonValue" title="xrpl_plugin.basic_types.JsonValue"><span class="pre">xrpl_plugin.basic_types.JsonValue</span></a></span></span><a class="headerlink" href="#xrpl_plugin.stypes.parser_errors.too_deep" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.stypes.parser_errors.unknown_field">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.stypes.parser_errors.</span></span><span class="sig-name descname"><span class="pre">unknown_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.JsonValue" title="xrpl_plugin.basic_types.JsonValue"><span class="pre">xrpl_plugin.basic_types.JsonValue</span></a></span></span><a class="headerlink" href="#xrpl_plugin.stypes.parser_errors.unknown_field" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="xrpl_plugin.stypes.parser_errors.unknown_type">
+<span class="sig-prename descclassname"><span class="pre">xrpl_plugin.stypes.parser_errors.</span></span><span class="sig-name descname"><span class="pre">unknown_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.JsonValue" title="xrpl_plugin.basic_types.JsonValue"><span class="pre">xrpl_plugin.basic_types.JsonValue</span></a></span></span><a class="headerlink" href="#xrpl_plugin.stypes.parser_errors.unknown_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </section>
 
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="xrpl_plugin.stypes.html" class="btn btn-neutral float-left" title="Serialized Types" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="xrpl_plugin.sfields.html" class="btn btn-neutral float-right" title="SFields" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 

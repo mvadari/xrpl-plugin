@@ -7,9 +7,8 @@ Serialized Types
    :undoc-members:
    :show-inheritance:
 
-.. TODO: fix the parser errors doc page
-.. .. toctree::
-..    :maxdepth: 1
-..    :titlesonly:
+.. toctree::
+   :maxdepth: 1
+   :titlesonly:
 
-..    xrpl_plugin.stypes.parser_errors
+   xrpl_plugin.stypes.parser_errors

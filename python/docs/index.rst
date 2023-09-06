@@ -10,6 +10,7 @@ Contents:
    xrpl_plugin.basic_types
    xrpl_plugin.stypes
    xrpl_plugin.sfields
+   xrpl_plugin.models
    xrpl_plugin.transactors
    xrpl_plugin.ledger_objects
    xrpl_plugin.keylets
