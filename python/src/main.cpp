@@ -1036,6 +1036,7 @@ PYBIND11_MODULE(rippled_py, m) {
         .def("parent_close_time", &ripple::ReadView::parentCloseTime, "Returns the close time of the previous ledger.")
         .def("seq", &ripple::ReadView::seq, "Returns the sequence number of the base ledger.")
         .def("exists", &ripple::ReadView::exists, "Determine if a state item exists.")
+        .def("read", &ripple::ReadView::read, "Get an unmodifiable version of a SLE.")
         ;
     
     py::class_<ripple::OpenView, ripple::ReadView> OpenView(transactorModule, "OpenView", "Writable ledger view that accumulates state and tx changes.");
