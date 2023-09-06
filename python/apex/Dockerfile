@@ -1,6 +1,5 @@
 FROM mvadariripple/xrpl-plugin:latest as build
 
-RUN pip install xrpl-plugin --upgrade -v
 RUN python -c "import xrpl_plugin"
 
 RUN apt-get install -y --no-install-recommends apt-utils && apt-get install curl -y
@@ -48,6 +47,8 @@ COPY ./nftoken_escrow.js /answer/run.js
 
 RUN cp /answer/run.sh ./run.sh
 RUN chmod 777 run.sh
+
+RUN rm -rf ~/.conan/data
 
 
 
