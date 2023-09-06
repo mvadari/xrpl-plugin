@@ -154,30 +154,33 @@ def preclaim(ctx):
 def do_apply(ctx, _m_prior_balance, _m_source_balance):
     close_time = ctx.view().info().parent_close_time
 
+    # Ensure the `CancelAfter` is after the current time
     if ctx.tx.is_field_present(sf_cancel_after) and after(
         close_time, ctx.tx[sf_cancel_after]
     ):
         return tecNO_PERMISSION
 
+    # Ensure the `FinishAfter` is after the current time
     if ctx.tx.is_field_present(sf_finish_after) and after(
         close_time, ctx.tx[sf_finish_after]
     ):
         return tecNO_PERMISSION
 
+    # Fetch the account (double check that the account still exists)
     account = ctx.tx[sf_account]
-    sle = ctx.view().peek(account_keylet(account))
-    if not sle:
+    sleAccount = ctx.view().peek(account_keylet(account))
+    if not sleAccount:
         return tecINTERNAL
 
-    balance = sle[sf_balance].xrp()
-    reserve = ctx.view().fees.account_reserve(sle[sf_owner_count] + 1)
+    balance = sleAccount[sf_balance].xrp()
+    reserve = ctx.view().fees.account_reserve(sleAccount[sf_owner_count] + 1)
     if balance < reserve:
         return tecINSUFFICIENT_RESERVE
 
     dest_acct = ctx.tx[sf_destination]
 
-    sled = ctx.view().peek(account_keylet(dest_acct))
-    if not sled:
+    sleDestination = ctx.view().peek(account_keylet(dest_acct))
+    if not sleDestination:
         return tecNO_DST
     # TODO: implement dest tag check
 
@@ -194,30 +197,30 @@ def do_apply(ctx, _m_prior_balance, _m_source_balance):
         return ret
 
     keylet = nftoken_escrow_keylet(account, ctx.tx.get_seq_proxy().value())
-    slep = make_sle(keylet)
+    sleEscrow = make_sle(keylet)
 
     array = STArray()
     array.append(token_and_page.token)
 
-    slep[sf_account] = account
-    slep.set_field_array(sf_nftokens, array)
-    slep[sf_destination] = ctx.tx[sf_destination]
-    slep[sf_finish_after] = ctx.tx[sf_finish_after]
-    ctx.view().insert(slep)
+    sleEscrow[sf_account] = account
+    sleEscrow.set_field_array(sf_nftokens, array)
+    sleEscrow[sf_destination] = ctx.tx[sf_destination]
+    sleEscrow[sf_finish_after] = ctx.tx[sf_finish_after]
+    ctx.view().insert(sleEscrow)
 
     page = ctx.view().dir_insert(account, keylet)
     if page is None:
         return tecDIR_FULL
-    slep[sf_owner_node] = page
+    sleEscrow[sf_owner_node] = page
 
     if dest_acct != account:
         page2 = ctx.view().dir_insert(dest_acct, keylet)
         if page2 is None:
             return tecDIR_FULL
-        slep[sf_owner_node] = page2
+        sleEscrow[sf_owner_node] = page2
 
-    adjust_owner_count(ctx.view(), sle, 1, ctx.journal)
-    ctx.view().update(sle)
+    adjust_owner_count(ctx.view(), sleAccount, 1, ctx.journal)
+    ctx.view().update(sleAccount)
 
     return tesSUCCESS
 

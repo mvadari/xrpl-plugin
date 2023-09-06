@@ -75,27 +75,37 @@ def preclaim(ctx):
 def do_apply(ctx, _m_prior_balance, _m_source_balance):
     # TODO: additional checks when the transaction is applied
 
-    # TODO: get the NFToken from the owner and remove it from their ownership
-
     # Check account
     account = ctx.tx[sf_account]
-    sle = ctx.view().peek(account_keylet(account))
-    if not sle:
+    sleAccount = ctx.view().peek(account_keylet(account))
+    if not sleAccount:
         return tecINTERNAL
+
+    # 3. check that the account has enough funds to pay the owner reserve
+
+    # 4. get destination + check that the destination exists
+
+    # 5. get NFToken from ID, along with the NFTokenPage it's in
+
+    # 6. remove the NFToken from the page, in preparation for adding it to the escrow
 
     # Create the escrow
     keylet = nftoken_escrow_keylet(account, ctx.tx.get_seq_proxy().value())
-    slep = make_sle(keylet)
+    sleEscrow = make_sle(keylet)
 
-    # TODO: fill in all the info that the NFTokenEscrow ledger object needs in the `slep`
+    # 7. fill in all the info that the NFTokenEscrow ledger object needs in the `sleEscrow`
 
-    # TODO: insert escrow into owner's directory
+    # 8. Insert the `sleEscrow` into the view, so the changes are committed
 
-    # TODO: insert escrow into destination's directory
+    # 9. insert escrow into owner's directory
+
+    # 10. insert escrow into destination's directory (if the destination is different than the account)
 
     # commit changes
-    adjust_owner_count(ctx.view(), sle, 1, ctx.journal)
-    ctx.view().update(sle)  # This is what actually commits the change to the ledger
+    adjust_owner_count(ctx.view(), sleAccount, 1, ctx.journal)
+    ctx.view().update(
+        sleAccount
+    )  # This is what actually commits the change to the SLE to the ledger
 
     return tesSUCCESS
 
@@ -106,7 +116,7 @@ ledger_objects = [
         name="NFTokenEscrow",
         rpc_name="nftoken_escrow",
         object_format=[
-            # TODO: fill in
+            # 1. fill in
         ],
         is_deletion_blocker=True,
     )
@@ -117,7 +127,7 @@ transactors = [
         name="NFTokenEscrowCreate",
         tx_type=47,
         tx_format=[
-            # TODO: fill in
+            # 2. fill in
         ],
         consequences_factory_type=ConsequencesFactoryType.Normal,
         preflight=preflight,
