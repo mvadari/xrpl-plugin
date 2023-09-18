@@ -28,6 +28,7 @@ from xrpl_plugin.basic_types import (
     parse_base58,
     soeOPTIONAL,
     soeREQUIRED,
+    AccountID,
 )
 from xrpl_plugin.keylets import Keylet, account_keylet
 from xrpl_plugin.return_codes import (
@@ -202,6 +203,7 @@ ter_codes = [TERCode(temINVALID_FLAG2, "temINVALID_FLAG2", "Test code")]
 
 
 def preflight(ctx):
+    print("This is a Python plugin")
     if not ctx.rules.enabled(amendment):
         return temDISABLED
 
@@ -247,15 +249,17 @@ def preflight(ctx):
 def do_apply(ctx, _m_prior_balance, _m_source_balance):
     close_time = ctx.view().info().parent_close_time
 
-    if ctx.view().rules().enabled(fix1571):
+    if ctx.view().rules.enabled(fix1571):
         if ctx.tx.is_field_present(sf_cancel_after) and after(
             close_time, ctx.tx[sf_cancel_after]
         ):
+            print("CancelAfter is not after the last ledger close")
             return tecNO_PERMISSION
 
         if ctx.tx.is_field_present(sf_finish_after2) and after(
             close_time, ctx.tx[sf_finish_after2]
         ):
+            print("FinishAfter2 is not after the last ledger close")
             return tecNO_PERMISSION
 
     account = ctx.tx[sf_account]
@@ -264,7 +268,7 @@ def do_apply(ctx, _m_prior_balance, _m_source_balance):
         return tecINTERNAL
 
     balance = STAmount(sle[sf_balance]).xrp()
-    reserve = ctx.view().fees().account_reserve(sle[sf_owner_count] + 1)
+    reserve = ctx.view().fees.account_reserve(sle[sf_owner_count] + 1)
     if balance < reserve:
         return tecINSUFFICIENT_RESERVE
 
