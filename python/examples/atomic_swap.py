@@ -63,7 +63,7 @@ def do_apply(ctx, _mPriorBalance, _mSourceBalance):
     
     # Check reserves
     balance = STAmount(sle[sf_balance]).xrp()
-    reserve = ctx.view().fees.account_reserve(sle[sf_owner_count] + 1)
+    reserve = ctx.view().fees.account_reserve(sle[sf_owner_count])
     if balance < reserve:
         return tecINSUFFICIENT_RESERVE
 
