@@ -682,6 +682,12 @@ PYBIND11_MODULE(rippled_py, m) {
             },
             "Returns True if the STAmount represents an XRP amount."
         )
+        .def("issuer",
+            [](const ripple::STAmount &amt) {
+                return amt.issue();
+            },
+            "Returns the issue of a IOUAmount (if possible)"
+        )
         .def("xrp", &ripple::STAmount::xrp, "Converts the STAmount to an XRPAmount (if possible).")
         .def("iou", &ripple::STAmount::iou, "Converts the STAmount to an IOUAmount (if possible).")
         .def("native", &ripple::STAmount::native, "Returns True if the STAmount represents an XRP amount (the native currency).")
