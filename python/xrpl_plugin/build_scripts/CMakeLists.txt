@@ -14,5 +14,6 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
   xrpl_plugin
   PRIVATE pybind11::embed
 )
+target_compile_options (${PROJECT_NAME} PUBLIC -Wno-return-type-c-linkage)
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".xrplugin")
 install(TARGETS ${PROJECT_NAME})
