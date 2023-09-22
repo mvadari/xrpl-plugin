@@ -203,6 +203,7 @@ ter_codes = [TERCode(temINVALID_FLAG2, "temINVALID_FLAG2", "Test code")]
 
 
 def preflight(ctx):
+    print("This is a Python plugin")
     if not ctx.rules.enabled(amendment):
         return temDISABLED
 
@@ -252,11 +253,13 @@ def do_apply(ctx, _m_prior_balance, _m_source_balance):
         if ctx.tx.is_field_present(sf_cancel_after) and after(
             close_time, ctx.tx[sf_cancel_after]
         ):
+            print("CancelAfter is not after the last ledger close")
             return tecNO_PERMISSION
         print("segunda parte")
         if ctx.tx.is_field_present(sf_finish_after2) and after(
             close_time, ctx.tx[sf_finish_after2]
         ):
+            print("FinishAfter2 is not after the last ledger close")
             return tecNO_PERMISSION
 
     account = ctx.tx[sf_account]
