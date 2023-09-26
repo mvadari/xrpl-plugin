@@ -1002,7 +1002,7 @@ getInnerObjectFormats()
 }}
 """
 
-def snakeToCamelCase(string):
+def snake_to_camel_case(string):
     temp = string.split('_')
     return temp[0].capitalize() + ''.join(ele.title() for ele in temp[1:])
 
@@ -1013,7 +1013,7 @@ def create_files(python_file):
     last_slash = abs_python_file.rfind("/")
     module_name = abs_python_file[(last_slash + 1) : -3]
     # module = importlib.import_module(module_name)
-    tx_name = snakeToCamelCase(module_name)
+    tx_name = snake_to_camel_case(module_name)
     # TODO: add logic to check validity of Python transactors
     # TODO: switch to Jinja
     # TODO: add logic to only generate the methods that exist in Python
