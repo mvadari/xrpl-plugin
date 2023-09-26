@@ -1002,6 +1002,9 @@ getInnerObjectFormats()
 }}
 """
 
+def snakeToCamelCase(string):
+    temp = string.split('_')
+    return temp[0].capitalize() + ''.join(ele.title() for ele in temp[1:])
 
 def create_files(python_file):
     abs_python_file = os.path.abspath(python_file)
@@ -1010,7 +1013,7 @@ def create_files(python_file):
     last_slash = abs_python_file.rfind("/")
     module_name = abs_python_file[(last_slash + 1) : -3]
     # module = importlib.import_module(module_name)
-    tx_name = "NewEscrowCreate"  # module.tx_name
+    tx_name = snakeToCamelCase(module_name)
     # TODO: add logic to check validity of Python transactors
     # TODO: switch to Jinja
     # TODO: add logic to only generate the methods that exist in Python
@@ -1019,7 +1022,6 @@ def create_files(python_file):
         f.write(generate_cpp(tx_name, module_name, python_folder))
 
     return os.path.abspath(f"{tx_name}.cpp"), module_name
-
 
 def build_files(cpp_file, project_name):
     with tempfile.TemporaryDirectory() as build_temp:
