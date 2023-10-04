@@ -17,12 +17,14 @@ from xrpl_plugin.keylets import (
     account_keylet,
     trustline_keylet,
     Keylet,
+    owner_dir_keylet,
 )
 from xrpl_plugin.return_codes import (
     tecINSUFFICIENT_RESERVE,
     tecINTERNAL,
     temBAD_AMOUNT,
     tesSUCCESS,
+    tecDIR_FULL,
 )
 
 from xrpl_plugin.sfields import (
@@ -31,6 +33,7 @@ from xrpl_plugin.sfields import (
     sf_account,
     sf_amount,
     sf_owner_count,
+    sf_owner_node,
 )
 from xrpl_plugin.stypes import (
     STAmount,
@@ -76,10 +79,11 @@ ledger_objects = [
             (sf_amount, soeREQUIRED),
             (sf_token_swap_id, soeREQUIRED),
             (sf_amount_other, soeREQUIRED),
-            (sf_account_other, soeREQUIRED)
+            (sf_account_other, soeREQUIRED),
+            (sf_owner_node, soeREQUIRED),
         ],
         is_deletion_blocker=True,
-        visit_entry_xrp_change=visit_entry_xrp_change_token_swap,
+        # visit_entry_xrp_change=visit_entry_xrp_change_token_swap,
     )
 ]
 
@@ -106,46 +110,45 @@ def do_apply_propose(ctx, _mPriorBalance, _mSourceBalance):
     amount_other = ctx.tx[sf_amount_other]
     account = ctx.tx[sf_account]
     account_other = ctx.tx[sf_account_other]
-    sle = ctx.view().peek(account_keylet(account))
-    sleA_A = ctx.view().peek(trustline_keylet(account, amount.issuer()))
-    sleA_B = ctx.view().peek(trustline_keylet(account, amount_other.issuer()))
-    sleB_B = ctx.view().peek(trustline_keylet(account_other, amount_other.issuer()))
-    sleB_A = ctx.view().peek(trustline_keylet(account_other, amount.issuer()))
+    sle_a = ctx.view().peek(account_keylet(account))
+    slea_a = ctx.view().peek(trustline_keylet(account, amount.issuer()))
+    slea_b = ctx.view().peek(trustline_keylet(account, amount_other.issuer()))
+    sleb_b = ctx.view().peek(trustline_keylet(account_other, amount_other.issuer()))
+    sleb_a = ctx.view().peek(trustline_keylet(account_other, amount.issuer()))
 
     # Check reserves
-    balance = STAmount(sle[sf_balance]).xrp()
-    reserve = ctx.view().fees.account_reserve(sle[sf_owner_count])
+    balance = STAmount(sle_a[sf_balance]).xrp()
+    reserve = ctx.view().fees.account_reserve(sle_a[sf_owner_count])
     if balance < reserve:
         return tecINSUFFICIENT_RESERVE
 
     # Check trustlines exist
-    if not sleA_A or not sleA_B or not sleB_B or not sleB_A:
+    if not slea_a or not slea_b or not sleb_b or not sleb_a:
         return tecINTERNAL
     
-    # TODO: check that it doesn't exists!
-    print("ctx.tx.get_seq_proxy().value()")
-    print(ctx.tx.get_seq_proxy().value())
-    token_swap_keylet = new_token_swap_keylet(account, ctx.tx.get_seq_proxy().value())
-    print("token_swap_keylet")
-    print(token_swap_keylet)
-
-    # TODO: Generate Swap Id
+    # TODO: Check that token swap doesnt already exists!
     
+    token_swap_keylet = new_token_swap_keylet(account, ctx.tx.get_seq_proxy().value())
     slep = make_sle(token_swap_keylet)
     slep[sf_account] = account
-    print("tokenKeylet")
-    print(slep)
+    slep[sf_amount] = amount
+    slep[sf_token_swap_id] = ctx.tx.get_seq_proxy().value()
+    slep[sf_amount_other] = amount_other
+    slep[sf_account_other] = account_other
 
-    # TODO: Insert new Keylet
     ctx.view().insert(slep)
 
-    # adjust_owner_count(ctx.view(), sle, 1, ctx.journal)
+    page = ctx.view().dir_insert(account, token_swap_keylet)
+    if page is None:
+        return tecDIR_FULL
+    slep[sf_owner_node] = page
 
-    # TODO: A lot more
+    adjust_owner_count(ctx.view(), sle_a, 1, ctx.journal)
 
     return tesSUCCESS
 
 def preflight_accept(ctx):
+
     print("Token Swap Accept test preflight...")
 
     # TODO: check rules
@@ -158,51 +161,57 @@ def preflight_accept(ctx):
     return preflight2(ctx)
 
 def do_apply_accept(ctx, _mPriorBalance, _mSourceBalance):
+
     print("Token Swap Accept test doApply...")
 
     amount = ctx.tx[sf_amount]
     amount_other = ctx.tx[sf_amount_other]
     account = ctx.tx[sf_account]
+    token_swap_id = ctx.tx[sf_token_swap_id]
     account_other = ctx.tx[sf_account_other]
-    sle = ctx.view().peek(account_keylet(account))
-    sleA_A = ctx.view().peek(trustline_keylet(account, amount.issuer()))
-    sleA_B = ctx.view().peek(trustline_keylet(account, amount_other.issuer()))
-    sleB_B = ctx.view().peek(trustline_keylet(account_other, amount_other.issuer()))
-    sleB_A = ctx.view().peek(trustline_keylet(account_other, amount.issuer()))
+    sle_a = ctx.view().peek(account_keylet(account))
+    sle_b = ctx.view().peek(account_keylet(account_other))
+    slea_a = ctx.view().peek(trustline_keylet(account, amount.issuer()))
+    slea_b = ctx.view().peek(trustline_keylet(account, amount_other.issuer()))
+    sleb_b = ctx.view().peek(trustline_keylet(account_other, amount_other.issuer()))
+    sleb_a = ctx.view().peek(trustline_keylet(account_other, amount.issuer()))
 
     # Check reserves
-    balance = STAmount(sle[sf_balance]).xrp()
-    reserve = ctx.view().fees.account_reserve(sle[sf_owner_count])
+    balance = STAmount(sle_a[sf_balance]).xrp()
+    reserve = ctx.view().fees.account_reserve(sle_a[sf_owner_count])
+
     if balance < reserve:
         return tecINSUFFICIENT_RESERVE
 
     # Check trustlines exist
-    if not sleA_A or not sleA_B or not sleB_B or not sleB_A:
+    if not slea_a or not slea_b or not sleb_b or not sleb_a:
         return tecINTERNAL
     
-    # TODO: check that it doesn't exists!
-    token_swap_keylet = new_token_swap_keylet(account_other, ctx.tx.get_seq_proxy().value())
-    print("token_swap_keylet")
-    print(token_swap_keylet)
-    sle = ctx.view().peek(token_swap_keylet)
+    token_swap_keylet = new_token_swap_keylet(account_other, token_swap_id)
+    slep = ctx.view().peek(token_swap_keylet)
 
     # Check swap id
-    if not sle:
+    if not slep:
         return temINVALID_TOKEN_SWAP_ID
     
-    # TODO: A lot more
+    # TODO: more checks
     
-    sleA_A[sf_balance] = sleA_A[sf_balance] + amount
-    sleA_B[sf_balance] = sleA_B[sf_balance] - amount_other
-    sleB_B[sf_balance] = sleB_B[sf_balance] + amount_other
-    sleB_A[sf_balance] = sleB_A[sf_balance] - amount
-    ctx.view().update(sleA_A)
-    ctx.view().update(sleA_B)
-    ctx.view().update(sleB_B)
-    ctx.view().update(sleB_A)
+    slea_a[sf_balance] = slea_a[sf_balance] - amount
+    slea_b[sf_balance] = slea_b[sf_balance] + amount_other
+    sleb_b[sf_balance] = sleb_b[sf_balance] - amount_other
+    sleb_a[sf_balance] = sleb_a[sf_balance] + amount
+    ctx.view().update(slea_a)
+    ctx.view().update(slea_b)
+    ctx.view().update(sleb_b)
+    ctx.view().update(sleb_a)
 
-    # TODO: delete token swap object on originating account
-    # adjust_owner_count(ctx.view(), sleB_B, -1, ctx.journal)
+    page = slep[sf_owner_node]
+    # Delete token swap object on originating account
+    ctx.view().dir_remove(owner_dir_keylet(account_other), page, token_swap_keylet, True)
+    ctx.view().erase(slep)
+
+    # Adjust reserve count
+    adjust_owner_count(ctx.view(), sle_b, -1, ctx.journal)
 
     return tesSUCCESS
 
