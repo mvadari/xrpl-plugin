@@ -1,5 +1,5 @@
 > [!WARNING]  
-> This example is not production ready and it is only to demonstrate the concept. 
+> This example is not production ready and it is only for demonstration purposes.
 
 # Token Swap
 
