@@ -255,7 +255,6 @@ def do_apply(ctx, _m_prior_balance, _m_source_balance):
         ):
             print("CancelAfter is not after the last ledger close")
             return tecNO_PERMISSION
-        print("segunda parte")
         if ctx.tx.is_field_present(sf_finish_after2) and after(
             close_time, ctx.tx[sf_finish_after2]
         ):
