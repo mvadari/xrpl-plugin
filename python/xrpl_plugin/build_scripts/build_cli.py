@@ -1028,6 +1028,7 @@ def build_files(cpp_file, project_name):
         conan_build_dir = os.path.join(conan_source_dir, "build", "generators")
         cmake_args = []
         build_args = []
+
         if not os.path.exists(conan_build_dir):
             subprocess.run(
                 [

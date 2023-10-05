@@ -92,15 +92,24 @@ amendment = Amendment("featureTokenSwap", True, VoteBehavior.DEFAULT_NO)
 amendments = [amendment]
 
 def preflight_propose(ctx):
-    print("Token Swap Create test preflight...")
 
-    # TODO: check rules
-    # TODO: more checks
+    print("Token Swap Create test preflight...")
 
     amount = ctx.tx[sf_amount]
     amountOther = ctx.tx[sf_amount_other]
+    account = ctx.tx[sf_account]
+    sle_a = ctx.view().peek(account_keylet(account))
     if amount.is_xrp() or amountOther.is_xrp():
         return temBAD_AMOUNT
+        
+    # Check reserves
+    balance = STAmount(sle_a[sf_balance]).xrp()
+    reserve = ctx.view().fees.account_reserve(sle_a[sf_owner_count])
+    if balance < reserve:
+        return tecINSUFFICIENT_RESERVE
+    
+    # TODO: more checks
+    
     return preflight2(ctx)
 
 def do_apply_propose(ctx, _mPriorBalance, _mSourceBalance):
@@ -116,17 +125,9 @@ def do_apply_propose(ctx, _mPriorBalance, _mSourceBalance):
     sleb_b = ctx.view().peek(trustline_keylet(account_other, amount_other.issuer()))
     sleb_a = ctx.view().peek(trustline_keylet(account_other, amount.issuer()))
 
-    # Check reserves
-    balance = STAmount(sle_a[sf_balance]).xrp()
-    reserve = ctx.view().fees.account_reserve(sle_a[sf_owner_count])
-    if balance < reserve:
-        return tecINSUFFICIENT_RESERVE
-
     # Check trustlines exist
     if not slea_a or not slea_b or not sleb_b or not sleb_a:
         return tecINTERNAL
-    
-    # TODO: Check that token swap doesnt already exists!
     
     token_swap_keylet = new_token_swap_keylet(account, ctx.tx.get_seq_proxy().value())
     slep = make_sle(token_swap_keylet)
@@ -151,13 +152,13 @@ def preflight_accept(ctx):
 
     print("Token Swap Accept test preflight...")
 
-    # TODO: check rules
-    # TODO: more checks
-
     amount = ctx.tx[sf_amount]
     amountOther = ctx.tx[sf_amount_other]
     if amount.is_xrp() or amountOther.is_xrp():
         return temBAD_AMOUNT
+    
+    # TODO: more checks
+    
     return preflight2(ctx)
 
 def do_apply_accept(ctx, _mPriorBalance, _mSourceBalance):
