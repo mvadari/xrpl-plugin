@@ -37,7 +37,7 @@ template <class T> struct TWSF : WSF {
 };
 
 template <typename T>
-int getSTId() { return 0; }
+int getSTId() { return ripple::STI_UNKNOWN; }
 
 template <>
 int getSTId<ripple::SF_UINT8>() { return ripple::STI_UINT8; }
