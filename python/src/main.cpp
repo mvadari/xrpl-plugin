@@ -1269,6 +1269,12 @@ PYBIND11_MODULE(rippled_py, m) {
 
     // SFields
 
+    sfieldModule.attr("sf_invalid") = WSF{(void *)&ripple::sfInvalid};
+    sfieldModule.attr("sf_generic") = WSF{(void *)&ripple::sfGeneric};
+    sfieldModule.attr("sf_ledger_entry") = WSF{(void *)&ripple::sfLedgerEntry};
+    sfieldModule.attr("sf_transaction") = WSF{(void *)&ripple::sfTransaction};
+    sfieldModule.attr("sf_validation") = WSF{(void *)&ripple::sfValidation};
+    sfieldModule.attr("sf_metadata") = WSF{(void *)&ripple::sfMetadata};
     sfieldModule.attr("sf_close_resolution") = TWSF<ripple::STUInt8>{(void *)&ripple::sfCloseResolution};
     sfieldModule.attr("sf_method") = TWSF<ripple::STUInt8>{(void *)&ripple::sfMethod};
     sfieldModule.attr("sf_transaction_result") = TWSF<ripple::STUInt8>{(void *)&ripple::sfTransactionResult};
@@ -1279,11 +1285,13 @@ PYBIND11_MODULE(rippled_py, m) {
     sfieldModule.attr("sf_transaction_type") = TWSF<ripple::STUInt16>{(void *)&ripple::sfTransactionType};
     sfieldModule.attr("sf_signer_weight") = TWSF<ripple::STUInt16>{(void *)&ripple::sfSignerWeight};
     sfieldModule.attr("sf_transfer_fee") = TWSF<ripple::STUInt16>{(void *)&ripple::sfTransferFee};
+    sfieldModule.attr("sf_trading_fee") = TWSF<ripple::STUInt16>{(void *)&ripple::sfTradingFee};
     sfieldModule.attr("sf_version") = TWSF<ripple::STUInt16>{(void *)&ripple::sfVersion};
     sfieldModule.attr("sf_hook_state_change_count") = TWSF<ripple::STUInt16>{(void *)&ripple::sfHookStateChangeCount};
     sfieldModule.attr("sf_hook_emit_count") = TWSF<ripple::STUInt16>{(void *)&ripple::sfHookEmitCount};
     sfieldModule.attr("sf_hook_execution_index") = TWSF<ripple::STUInt16>{(void *)&ripple::sfHookExecutionIndex};
     sfieldModule.attr("sf_hook_api_version") = TWSF<ripple::STUInt16>{(void *)&ripple::sfHookApiVersion};
+    sfieldModule.attr("sf_discounted_fee") = TWSF<ripple::STUInt16>{(void *)&ripple::sfDiscountedFee};
     sfieldModule.attr("sf_network_id") = TWSF<ripple::STUInt32>{(void *)&ripple::sfNetworkID};
     sfieldModule.attr("sf_flags") = TWSF<ripple::STUInt32>{(void *)&ripple::sfFlags};
     sfieldModule.attr("sf_source_tag") = TWSF<ripple::STUInt32>{(void *)&ripple::sfSourceTag};
@@ -1329,6 +1337,7 @@ PYBIND11_MODULE(rippled_py, m) {
     sfieldModule.attr("sf_burned_nftokens") = TWSF<ripple::STUInt32>{(void *)&ripple::sfBurnedNFTokens};
     sfieldModule.attr("sf_hook_state_count") = TWSF<ripple::STUInt32>{(void *)&ripple::sfHookStateCount};
     sfieldModule.attr("sf_emit_generation") = TWSF<ripple::STUInt32>{(void *)&ripple::sfEmitGeneration};
+    sfieldModule.attr("sf_vote_weight") = TWSF<ripple::STUInt32>{(void *)&ripple::sfVoteWeight};
     sfieldModule.attr("sf_first_nftoken_sequence") = TWSF<ripple::STUInt32>{(void *)&ripple::sfFirstNFTokenSequence};
     sfieldModule.attr("sf_index_next") = TWSF<ripple::STUInt64>{(void *)&ripple::sfIndexNext};
     sfieldModule.attr("sf_index_previous") = TWSF<ripple::STUInt64>{(void *)&ripple::sfIndexPrevious};
@@ -1365,6 +1374,7 @@ PYBIND11_MODULE(rippled_py, m) {
     sfieldModule.attr("sf_emit_parent_txn_id") = TWSF<ripple::STUInt256>{(void *)&ripple::sfEmitParentTxnID};
     sfieldModule.attr("sf_emit_nonce") = TWSF<ripple::STUInt256>{(void *)&ripple::sfEmitNonce};
     sfieldModule.attr("sf_emit_hook_hash") = TWSF<ripple::STUInt256>{(void *)&ripple::sfEmitHookHash};
+    sfieldModule.attr("sf_amm_id") = TWSF<ripple::STUInt256>{(void *)&ripple::sfAMMID};
     sfieldModule.attr("sf_book_directory") = TWSF<ripple::STUInt256>{(void *)&ripple::sfBookDirectory};
     sfieldModule.attr("sf_invoice_id") = TWSF<ripple::STUInt256>{(void *)&ripple::sfInvoiceID};
     sfieldModule.attr("sf_nickname") = TWSF<ripple::STUInt256>{(void *)&ripple::sfNickname};
@@ -1392,10 +1402,18 @@ PYBIND11_MODULE(rippled_py, m) {
     sfieldModule.attr("sf_fee") = TWSF<ripple::STAmount>{(void *)&ripple::sfFee};
     sfieldModule.attr("sf_send_max") = TWSF<ripple::STAmount>{(void *)&ripple::sfSendMax};
     sfieldModule.attr("sf_deliver_min") = TWSF<ripple::STAmount>{(void *)&ripple::sfDeliverMin};
+    sfieldModule.attr("sf_amount2") = TWSF<ripple::STAmount>{(void *)&ripple::sfAmount2};
+    sfieldModule.attr("sf_e_price") = TWSF<ripple::STAmount>{(void *)&ripple::sfEPrice};
+    sfieldModule.attr("sf_bid_min") = TWSF<ripple::STAmount>{(void *)&ripple::sfBidMin};
+    sfieldModule.attr("sf_bid_max") = TWSF<ripple::STAmount>{(void *)&ripple::sfBidMax};
+    sfieldModule.attr("sf_price") = TWSF<ripple::STAmount>{(void *)&ripple::sfPrice};
+    sfieldModule.attr("sf_lp_token_balance") = TWSF<ripple::STAmount>{(void *)&ripple::sfLPTokenBalance};
     sfieldModule.attr("sf_minimum_offer") = TWSF<ripple::STAmount>{(void *)&ripple::sfMinimumOffer};
     sfieldModule.attr("sf_ripple_escrow") = TWSF<ripple::STAmount>{(void *)&ripple::sfRippleEscrow};
     sfieldModule.attr("sf_delivered_amount") = TWSF<ripple::STAmount>{(void *)&ripple::sfDeliveredAmount};
     sfieldModule.attr("sf_nftoken_broker_fee") = TWSF<ripple::STAmount>{(void *)&ripple::sfNFTokenBrokerFee};
+    sfieldModule.attr("sf_lp_token_out") = TWSF<ripple::STAmount>{(void *)&ripple::sfLPTokenOut};
+    sfieldModule.attr("sf_lp_token_in") = TWSF<ripple::STAmount>{(void *)&ripple::sfLPTokenIn};
     sfieldModule.attr("sf_base_fee_drops") = TWSF<ripple::STAmount>{(void *)&ripple::sfBaseFeeDrops};
     sfieldModule.attr("sf_reserve_base_drops") = TWSF<ripple::STAmount>{(void *)&ripple::sfReserveBaseDrops};
     sfieldModule.attr("sf_reserve_increment_drops") = TWSF<ripple::STAmount>{(void *)&ripple::sfReserveIncrementDrops};
@@ -1434,6 +1452,8 @@ PYBIND11_MODULE(rippled_py, m) {
     sfieldModule.attr("sf_emit_callback") = TWSF<ripple::STAccount>{(void *)&ripple::sfEmitCallback};
     sfieldModule.attr("sf_hook_account") = TWSF<ripple::STAccount>{(void *)&ripple::sfHookAccount};
     sfieldModule.attr("sf_paths") = WSF{(void *)&ripple::sfPaths};
+    sfieldModule.attr("sf_asset") = TWSF<ripple::STIssue>{(void *)&ripple::sfAsset};
+    sfieldModule.attr("sf_asset2") = TWSF<ripple::STIssue>{(void *)&ripple::sfAsset2};
     sfieldModule.attr("sf_indexes") = TWSF<ripple::STVector256>{(void *)&ripple::sfIndexes};
     sfieldModule.attr("sf_hashes") = TWSF<ripple::STVector256>{(void *)&ripple::sfHashes};
     sfieldModule.attr("sf_amendments") = TWSF<ripple::STVector256>{(void *)&ripple::sfAmendments};
@@ -1451,6 +1471,9 @@ PYBIND11_MODULE(rippled_py, m) {
     sfieldModule.attr("sf_nftoken") = WSF{(void *)&ripple::sfNFToken};
     sfieldModule.attr("sf_emit_details") = WSF{(void *)&ripple::sfEmitDetails};
     sfieldModule.attr("sf_hook") = WSF{(void *)&ripple::sfHook};
+    sfieldModule.attr("sf_vote_entry") = WSF{(void *)&ripple::sfVoteEntry};
+    sfieldModule.attr("sf_auction_slot") = WSF{(void *)&ripple::sfAuctionSlot};
+    sfieldModule.attr("sf_auth_account") = WSF{(void *)&ripple::sfAuthAccount};
     sfieldModule.attr("sf_signer") = WSF{(void *)&ripple::sfSigner};
     sfieldModule.attr("sf_majority") = WSF{(void *)&ripple::sfMajority};
     sfieldModule.attr("sf_disabled_validator") = WSF{(void *)&ripple::sfDisabledValidator};
@@ -1468,6 +1491,8 @@ PYBIND11_MODULE(rippled_py, m) {
     sfieldModule.attr("sf_memos") = WSF{(void *)&ripple::sfMemos};
     sfieldModule.attr("sf_nftokens") = WSF{(void *)&ripple::sfNFTokens};
     sfieldModule.attr("sf_hooks") = WSF{(void *)&ripple::sfHooks};
+    sfieldModule.attr("sf_vote_slots") = WSF{(void *)&ripple::sfVoteSlots};
+    sfieldModule.attr("sf_auth_accounts") = WSF{(void *)&ripple::sfAuthAccounts};
     sfieldModule.attr("sf_majorities") = WSF{(void *)&ripple::sfMajorities};
     sfieldModule.attr("sf_disabled_validators") = WSF{(void *)&ripple::sfDisabledValidators};
     sfieldModule.attr("sf_hook_executions") = WSF{(void *)&ripple::sfHookExecutions};
