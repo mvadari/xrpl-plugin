@@ -1002,6 +1002,18 @@ getInnerObjectFormats()
 }}
 """
 
+def updateProgress(progress):
+    bar_length = 30
+    sys.stdout.write("\r")
+    sys.stdout.write("Building: |{:{}}| {:>3}% Completed"
+        .format(
+            "█"*int(progress/(100.0/bar_length)),
+            bar_length,
+            int(progress)
+        )
+    )
+    sys.stdout.flush()
+
 def snake_to_camel_case(string):
     temp = string.split('_')
     return temp[0].capitalize() + ''.join(ele.title() for ele in temp[1:])
@@ -1027,6 +1039,7 @@ def build_files(cpp_file, project_name):
     with tempfile.TemporaryDirectory() as build_temp:
         build_source_dir = os.path.dirname(__file__)
         conan_source_dir = build_source_dir
+        output_dir = os.getcwd() + os.sep
         conan_build_dir = os.path.join(conan_source_dir, "build", "generators")
         cmake_args = []
         build_args = []
@@ -1047,7 +1060,7 @@ def build_files(cpp_file, project_name):
             )
         conan_cmake_file = os.path.join(conan_build_dir, "conan_toolchain.cmake")
         cmake_args += [
-            f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={os.getcwd()}{os.sep}",
+            f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={output_dir}",
             f"-DPROJECT_NAME={project_name}",
             f"-DSOURCE_FILE={cpp_file}",
             f"-DCMAKE_TOOLCHAIN_FILE:FILEPATH={conan_cmake_file}",
@@ -1058,14 +1071,24 @@ def build_files(cpp_file, project_name):
             ["cmake", build_source_dir] + cmake_args,
             cwd=build_temp,
             check=True,
-            stdout=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
         )
-        subprocess.run(
+
+        p = subprocess.Popen(
             ["cmake", "--build", "."] + build_args,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
             cwd=build_temp,
-            check=True,
-            stdout=subprocess.DEVNULL,
         )
+
+        for line in iter(p.stdout.readline, b''):
+            l = line.decode("utf-8")
+            progress = int(l[l.find("[")+1:l.find("]")].replace("%", ""))
+            updateProgress(progress)
+        p.stdout.close()
+        p.wait()
+        print("\r Plugin generated: " + output_dir + project_name + ".xrplugin")
 
 
 def build():
