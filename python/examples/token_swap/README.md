@@ -12,8 +12,8 @@ In this example, the swap is a 2-step process:
 1. `UserA` and `UserB` agree on a swap by which `UserA` will give x `A` tokens to `UserB` and `UserB` will give y `B` tokens to `UserA`.
 2. `UserA` initiates the trade on the ledger with the pre agreed conditions via a `TokenSwapPropose` transaction.
 This creates a `TokenSwap` object in the ledger with a `TokenSwapId`.
-3. `UserB` validates the trade and accepts it (if the conditions are the pre agreed ones) by sending a `TokwnSwapAccept` transaction with the given `TokenSwapId`.
-4. If `TokwnSwapAccept` transaction is successful, the swap will be executed atomically.
+3. `UserB` validates the trade and accepts it (if the conditions are the pre agreed ones) by sending a `TokenSwapAccept` transaction with the given `TokenSwapId`.
+4. If `TokenSwapAccept` transaction is successful, the swap will be executed atomically.
 
 ## Overview
 
