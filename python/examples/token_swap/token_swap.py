@@ -83,7 +83,7 @@ ledger_objects = [
             (sf_owner_node, soeREQUIRED),
         ],
         is_deletion_blocker=True,
-        # visit_entry_xrp_change=visit_entry_xrp_change_token_swap,
+        visit_entry_xrp_change=visit_entry_xrp_change_token_swap,
     )
 ]
 
