@@ -1097,6 +1097,10 @@ PYBIND11_MODULE(rippled_py, m) {
         .def_readonly("rules", &ripple::PreflightContext::rules, "The current governing rules of the network.")
         .def_readonly("flags", &ripple::PreflightContext::flags, "The flags on the transaction.")
         .def_readonly("j", &ripple::PreflightContext::j, "The journal logger.")
+        .def_property_readonly("view",
+            [](const ripple::ApplyContext &ctx) -> const ripple::ApplyView& {
+                return ctx.view();
+            }, py::return_value_policy::reference, "Get an readonly view into the current state of the ledger.");
     ;
     
     py::class_<ripple::PreclaimContext> PreclaimContext(transactorModule, "PreclaimContext", "State information when preclaiming a transaction.");
