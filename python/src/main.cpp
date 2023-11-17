@@ -317,7 +317,7 @@ PYBIND11_MODULE(rippled_py, m) {
         .value("tecKILLED", ripple::TECcodes::tecKILLED)
         .value("tecHAS_OBLIGATIONS", ripple::TECcodes::tecHAS_OBLIGATIONS)
         .value("tecTOO_SOON", ripple::TECcodes::tecTOO_SOON)
-        .value("tecHOOK_ERROR", ripple::TECcodes::tecHOOK_ERROR)
+        .value("tecHOOK_REJECTED", ripple::TECcodes::tecHOOK_REJECTED)
         .value("tecMAX_SEQUENCE_REACHED", ripple::TECcodes::tecMAX_SEQUENCE_REACHED)
         .value("tecNO_SUITABLE_NFTOKEN_PAGE", ripple::TECcodes::tecNO_SUITABLE_NFTOKEN_PAGE)
         .value("tecNFTOKEN_BUY_SELL_MISMATCH", ripple::TECcodes::tecNFTOKEN_BUY_SELL_MISMATCH)
@@ -469,6 +469,7 @@ PYBIND11_MODULE(rippled_py, m) {
         ;
     py::class_<TWSF<ripple::STAccount>, WSF> TWSF_STAccount(sfieldModule, "SF_ACCOUNT", "An SField representing an Account type.");
     py::class_<TWSF<ripple::STAmount>, WSF> TWSF_STAmount(sfieldModule, "SF_AMOUNT", "An SField representing an Amount type.");
+    py::class_<TWSF<ripple::STIssue>, WSF> TWSF_STIssue(sfieldModule, "SF_ISSUE", "An SField representing an Issue type.");
     py::class_<TWSF<ripple::STUInt8>, WSF> TWSF_STUInt8(sfieldModule, "SF_UINT8", "An SField representing a uint8 type.");
     py::class_<TWSF<ripple::STUInt16>, WSF> TWSF_STUInt16(sfieldModule, "SF_UINT16", "An SField representing a uint16 type.");
     py::class_<TWSF<ripple::STUInt32>, WSF> TWSF_STUInt32(sfieldModule, "SF_UINT32", "An SField representing a uint32 type.");
@@ -479,6 +480,7 @@ PYBIND11_MODULE(rippled_py, m) {
     py::class_<TWSF<ripple::STBlob>, WSF> TWSF_STBlob(sfieldModule, "SF_VL", "An SField representing a variable length type.");
     py::class_<TWSF<ripple::STPluginType>, WSF> TWSF_STPluginType(sfieldModule, "SF_PLUGINTYPE", "An SField representing a type that has been imported via a plugin.");
     py::class_<TWSF<ripple::STVector256>, WSF> TWSF_STVector256(sfieldModule, "SF_VECTOR256", "An SField representing a 256-bit vector type.");
+    py::class_<TWSF<ripple::STXChainBridge>, WSF> TWSF_STXChainBridge(sfieldModule, "SF_XCHAINBRIDGE", "An SField representing an XChainBridge type.");
 
     py::module_ basicsModule = m.def_submodule("basic_types", "Basic/fundamental types.");
 

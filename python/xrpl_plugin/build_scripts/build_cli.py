@@ -1002,21 +1002,22 @@ getInnerObjectFormats()
 }}
 """
 
+
 def updateProgress(progress):
     bar_length = 30
     sys.stdout.write("\r")
-    sys.stdout.write("Building: |{:{}}| {:>3}% Completed"
-        .format(
-            "█"*int(progress/(100.0/bar_length)),
-            bar_length,
-            int(progress)
+    sys.stdout.write(
+        "Building: |{:{}}| {:>3}% Completed".format(
+            "█" * int(progress / (100.0 / bar_length)), bar_length, int(progress)
         )
     )
     sys.stdout.flush()
 
+
 def snake_to_camel_case(string):
-    temp = string.split('_')
-    return temp[0].capitalize() + ''.join(ele.title() for ele in temp[1:])
+    temp = string.split("_")
+    return temp[0].capitalize() + "".join(ele.title() for ele in temp[1:])
+
 
 def create_files(python_file):
     abs_python_file = os.path.abspath(python_file)
@@ -1034,6 +1035,7 @@ def create_files(python_file):
         f.write(generate_cpp(tx_name, module_name, python_folder))
 
     return os.path.abspath(f"{tx_name}.cpp"), module_name
+
 
 def build_files(cpp_file, project_name):
     with tempfile.TemporaryDirectory() as build_temp:
@@ -1082,9 +1084,15 @@ def build_files(cpp_file, project_name):
             cwd=build_temp,
         )
 
-        for line in iter(p.stdout.readline, b''):
-            l = line.decode("utf-8")
-            progress = int(l[l.find("[")+1:l.find("]")].replace("%", ""))
+        for line in iter(p.stdout.readline, b""):
+            decoded = line.decode("utf-8")
+            progress = decoded[decoded.find("[") + 1 : decoded.find("]")].replace(
+                "%", ""
+            )
+            try:
+                progress = int(progress)
+            except ValueError:
+                progress = 0
             updateProgress(progress)
         p.stdout.close()
         p.wait()
