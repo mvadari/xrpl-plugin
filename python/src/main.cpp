@@ -1278,6 +1278,7 @@ PYBIND11_MODULE(rippled_py, m) {
     sfieldModule.attr("sf_close_resolution") = TWSF<ripple::STUInt8>{(void *)&ripple::sfCloseResolution};
     sfieldModule.attr("sf_method") = TWSF<ripple::STUInt8>{(void *)&ripple::sfMethod};
     sfieldModule.attr("sf_transaction_result") = TWSF<ripple::STUInt8>{(void *)&ripple::sfTransactionResult};
+    sfieldModule.attr("sf_was_locking_chain_send") = TWSF<ripple::STUInt8>{(void *)&ripple::sfWasLockingChainSend};
     sfieldModule.attr("sf_tick_size") = TWSF<ripple::STUInt8>{(void *)&ripple::sfTickSize};
     sfieldModule.attr("sf_unl_modify_disabling") = TWSF<ripple::STUInt8>{(void *)&ripple::sfUNLModifyDisabling};
     sfieldModule.attr("sf_hook_result") = TWSF<ripple::STUInt8>{(void *)&ripple::sfHookResult};
@@ -1356,6 +1357,9 @@ PYBIND11_MODULE(rippled_py, m) {
     sfieldModule.attr("sf_hook_instruction_count") = TWSF<ripple::STUInt64>{(void *)&ripple::sfHookInstructionCount};
     sfieldModule.attr("sf_hook_return_code") = TWSF<ripple::STUInt64>{(void *)&ripple::sfHookReturnCode};
     sfieldModule.attr("sf_reference_count") = TWSF<ripple::STUInt64>{(void *)&ripple::sfReferenceCount};
+    sfieldModule.attr("sf_xchain_claim_id") = TWSF<ripple::STUInt64>{(void *)&ripple::sfXChainClaimID};
+    sfieldModule.attr("sf_xchain_account_create_count") = TWSF<ripple::STUInt64>{(void *)&ripple::sfXChainAccountCreateCount};
+    sfieldModule.attr("sf_xchain_account_claim_count") = TWSF<ripple::STUInt64>{(void *)&ripple::sfXChainAccountClaimCount};
     sfieldModule.attr("sf_email_hash") = TWSF<ripple::STUInt128>{(void *)&ripple::sfEmailHash};
     sfieldModule.attr("sf_taker_pays_currency") = TWSF<ripple::STUInt160>{(void *)&ripple::sfTakerPaysCurrency};
     sfieldModule.attr("sf_taker_pays_issuer") = TWSF<ripple::STUInt160>{(void *)&ripple::sfTakerPaysIssuer};
@@ -1417,6 +1421,8 @@ PYBIND11_MODULE(rippled_py, m) {
     sfieldModule.attr("sf_base_fee_drops") = TWSF<ripple::STAmount>{(void *)&ripple::sfBaseFeeDrops};
     sfieldModule.attr("sf_reserve_base_drops") = TWSF<ripple::STAmount>{(void *)&ripple::sfReserveBaseDrops};
     sfieldModule.attr("sf_reserve_increment_drops") = TWSF<ripple::STAmount>{(void *)&ripple::sfReserveIncrementDrops};
+    sfieldModule.attr("sf_signature_reward") = TWSF<ripple::STAmount>{(void *)&ripple::sfSignatureReward};
+    sfieldModule.attr("sf_min_account_create_amount") = TWSF<ripple::STAmount>{(void *)&ripple::sfMinAccountCreateAmount};
     sfieldModule.attr("sf_public_key") = TWSF<ripple::STBlob>{(void *)&ripple::sfPublicKey};
     sfieldModule.attr("sf_message_key") = TWSF<ripple::STBlob>{(void *)&ripple::sfMessageKey};
     sfieldModule.attr("sf_signing_pub_key") = TWSF<ripple::STBlob>{(void *)&ripple::sfSigningPubKey};
@@ -1431,6 +1437,8 @@ PYBIND11_MODULE(rippled_py, m) {
     sfieldModule.attr("sf_memo_type") = TWSF<ripple::STBlob>{(void *)&ripple::sfMemoType};
     sfieldModule.attr("sf_memo_data") = TWSF<ripple::STBlob>{(void *)&ripple::sfMemoData};
     sfieldModule.attr("sf_memo_format") = TWSF<ripple::STBlob>{(void *)&ripple::sfMemoFormat};
+    sfieldModule.attr("sf_did_document") = TWSF<ripple::STBlob>{(void *)&ripple::sfDIDDocument};
+    sfieldModule.attr("sf_data") = TWSF<ripple::STBlob>{(void *)&ripple::sfData};
     sfieldModule.attr("sf_fulfillment") = TWSF<ripple::STBlob>{(void *)&ripple::sfFulfillment};
     sfieldModule.attr("sf_condition") = TWSF<ripple::STBlob>{(void *)&ripple::sfCondition};
     sfieldModule.attr("sf_master_signature") = TWSF<ripple::STBlob>{(void *)&ripple::sfMasterSignature};
@@ -1451,9 +1459,18 @@ PYBIND11_MODULE(rippled_py, m) {
     sfieldModule.attr("sf_nftoken_minter") = TWSF<ripple::STAccount>{(void *)&ripple::sfNFTokenMinter};
     sfieldModule.attr("sf_emit_callback") = TWSF<ripple::STAccount>{(void *)&ripple::sfEmitCallback};
     sfieldModule.attr("sf_hook_account") = TWSF<ripple::STAccount>{(void *)&ripple::sfHookAccount};
+    sfieldModule.attr("sf_other_chain_source") = TWSF<ripple::STAccount>{(void *)&ripple::sfOtherChainSource};
+    sfieldModule.attr("sf_other_chain_destination") = TWSF<ripple::STAccount>{(void *)&ripple::sfOtherChainDestination};
+    sfieldModule.attr("sf_attestation_signer_account") = TWSF<ripple::STAccount>{(void *)&ripple::sfAttestationSignerAccount};
+    sfieldModule.attr("sf_attestation_reward_account") = TWSF<ripple::STAccount>{(void *)&ripple::sfAttestationRewardAccount};
+    sfieldModule.attr("sf_locking_chain_door") = TWSF<ripple::STAccount>{(void *)&ripple::sfLockingChainDoor};
+    sfieldModule.attr("sf_issuing_chain_door") = TWSF<ripple::STAccount>{(void *)&ripple::sfIssuingChainDoor};
     sfieldModule.attr("sf_paths") = WSF{(void *)&ripple::sfPaths};
     sfieldModule.attr("sf_asset") = TWSF<ripple::STIssue>{(void *)&ripple::sfAsset};
     sfieldModule.attr("sf_asset2") = TWSF<ripple::STIssue>{(void *)&ripple::sfAsset2};
+    sfieldModule.attr("sf_locking_chain_issue") = TWSF<ripple::STIssue>{(void *)&ripple::sfLockingChainIssue};
+    sfieldModule.attr("sf_issuing_chain_issue") = TWSF<ripple::STIssue>{(void *)&ripple::sfIssuingChainIssue};
+    sfieldModule.attr("sf_xchain_bridge") = TWSF<ripple::STXChainBridge>{(void *)&ripple::sfXChainBridge};
     sfieldModule.attr("sf_indexes") = TWSF<ripple::STVector256>{(void *)&ripple::sfIndexes};
     sfieldModule.attr("sf_hashes") = TWSF<ripple::STVector256>{(void *)&ripple::sfHashes};
     sfieldModule.attr("sf_amendments") = TWSF<ripple::STVector256>{(void *)&ripple::sfAmendments};
@@ -1482,6 +1499,10 @@ PYBIND11_MODULE(rippled_py, m) {
     sfieldModule.attr("sf_hook_definition") = WSF{(void *)&ripple::sfHookDefinition};
     sfieldModule.attr("sf_hook_parameter") = WSF{(void *)&ripple::sfHookParameter};
     sfieldModule.attr("sf_hook_grant") = WSF{(void *)&ripple::sfHookGrant};
+    sfieldModule.attr("sf_xchain_claim_proof_sig") = WSF{(void *)&ripple::sfXChainClaimProofSig};
+    sfieldModule.attr("sf_xchain_create_account_proof_sig") = WSF{(void *)&ripple::sfXChainCreateAccountProofSig};
+    sfieldModule.attr("sf_xchain_claim_attestation_collection_element") = WSF{(void *)&ripple::sfXChainClaimAttestationCollectionElement};
+    sfieldModule.attr("sf_xchain_create_account_attestation_collection_element") = WSF{(void *)&ripple::sfXChainCreateAccountAttestationCollectionElement};
     sfieldModule.attr("sf_signers") = WSF{(void *)&ripple::sfSigners};
     sfieldModule.attr("sf_signer_entries") = WSF{(void *)&ripple::sfSignerEntries};
     sfieldModule.attr("sf_template") = WSF{(void *)&ripple::sfTemplate};
@@ -1498,6 +1519,8 @@ PYBIND11_MODULE(rippled_py, m) {
     sfieldModule.attr("sf_hook_executions") = WSF{(void *)&ripple::sfHookExecutions};
     sfieldModule.attr("sf_hook_parameters") = WSF{(void *)&ripple::sfHookParameters};
     sfieldModule.attr("sf_hook_grants") = WSF{(void *)&ripple::sfHookGrants};
+    sfieldModule.attr("sf_xchain_claim_attestations") = WSF{(void *)&ripple::sfXChainClaimAttestations};
+    sfieldModule.attr("sf_xchain_create_account_attestations") = WSF{(void *)&ripple::sfXChainCreateAccountAttestations};
 
     // Amendments
     transactorModule.attr("fixMasterKeyAsRegularKey") = ripple::fixMasterKeyAsRegularKey;
