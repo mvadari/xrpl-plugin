@@ -735,6 +735,8 @@ PYBIND11_MODULE(rippled_py, m) {
     py::class_<ripple::STPathSet, ripple::STBase> STPathSet(sTypeModule, "STPathSet", "A serializeable type representing a path set in a cross-currency payment.");
     py::class_<ripple::STPluginType, ripple::STBase> STPluginType(sTypeModule, "STPluginType", "A serializeable type that is imported at runtime via a plugin.");
     py::class_<ripple::STVector256, ripple::STBase> STVector256(sTypeModule, "STVector256", "A serializeable type representing a 256-bit vector.");
+    py::class_<ripple::STIssue, ripple::STBase> STIssue(sTypeModule, "STIssue", "A serializeable type representing an issued currency.");
+    py::class_<ripple::STXChainBridge, ripple::STBase> STXChainBridge(sTypeModule, "STXChainBridge", "A serializeable type representing a cross-chain bridge.");
 
     py::class_<ripple::STArray, ripple::STBase> STArray(sTypeModule, "STArray", "A serializeable type representing an array of other serialized types.");
     STArray
