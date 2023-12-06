@@ -1,5 +1,7 @@
 # Python Plugins
 
+This folder contains everything needed to build and run a Python plugin (other than the rippled code).
+
 ## Build & Run
 
 ```bash
@@ -27,53 +29,61 @@ The plugin exposes the code in [main.cpp](./src/main.cpp) as python bindings.
 Then we can use in our plugin the following:
 
 - **models** (classes):
-    - Transactor
-    - SType (it has a parse_value method)
-    - TERCode
-    - LedgerObject
-    - InvariantCheck
-    - InnerObject
+
+  - Transactor
+  - SType (it has a parse_value method)
+  - TERCode
+  - LedgerObject
+  - InvariantCheck
+  - InnerObject
 
 - **sfields** (ST fields, serialized fields that can be included in transactions and ledger objects):
-    - SF_ACCOUNT
-    - SF_AMOUNT
-    - SF_UINT8
-    - ...
+
+  - SF_ACCOUNT
+  - SF_AMOUNT
+  - SF_UINT8
+  - ...
 
 - **stypes** (all STObjects, serialized types):
-    - STAmount
-    - STObject
-    - STArray
-    - ...
+
+  - STAmount
+  - STObject
+  - STArray
+  - ...
 
 - **return_codes** (Existing TER return codes):
-    - tesSUCCESS
-    - temMALFORMED
-    - ...
+
+  - tesSUCCESS
+  - temMALFORMED
+  - ...
 
 - **basic_types** (basic/fundamental types):
-    - AccountID
-    - XRPAmount
-    - Seed
-    - IOUAmount
-    - ...
+
+  - AccountID
+  - XRPAmount
+  - Seed
+  - IOUAmount
+  - ...
 
 - **keylets** (as per definition above):
-    - account_keylet
-    - escrow_keylet
-    - trustline_keylet
-    - offer_keylet
-    - ...
+
+  - account_keylet
+  - escrow_keylet
+  - trustline_keylet
+  - offer_keylet
+  - ...
 
 - **ledger_objects** (for ledger object manipulation):
-    - LedgerEntryType
-    - LedgerSpecificFlags
+
+  - LedgerEntryType
+  - LedgerSpecificFlags
 
 - **transactors** (contexts and other classes used in transaction processing):
-    - Rules
-    - Fees
-    - TimePoint
-    - LedgerInfo
+
+  - Rules
+  - Fees
+  - TimePoint
+  - LedgerInfo
 
 - **build** (for the build process)
 - **nfts** (utility methods for working with NFTs)
