@@ -76,7 +76,7 @@ sf_fake_element = create_new_sfield(STObject, "FakeElement", 17)
 STI_ACCOUNT2 = 28
 
 
-def parse_account2(field, json_name, field_name, _name, value):
+def parse_account2(_field, json_name, field_name, _name, value):
     if not value.is_string():
         return bad_type(json_name, field_name)
     str_value = value.as_string()
