@@ -317,7 +317,6 @@ PYBIND11_MODULE(rippled_py, m) {
         .value("tecKILLED", ripple::TECcodes::tecKILLED)
         .value("tecHAS_OBLIGATIONS", ripple::TECcodes::tecHAS_OBLIGATIONS)
         .value("tecTOO_SOON", ripple::TECcodes::tecTOO_SOON)
-        .value("tecHOOK_REJECTED", ripple::TECcodes::tecHOOK_REJECTED)
         .value("tecMAX_SEQUENCE_REACHED", ripple::TECcodes::tecMAX_SEQUENCE_REACHED)
         .value("tecNO_SUITABLE_NFTOKEN_PAGE", ripple::TECcodes::tecNO_SUITABLE_NFTOKEN_PAGE)
         .value("tecNFTOKEN_BUY_SELL_MISMATCH", ripple::TECcodes::tecNFTOKEN_BUY_SELL_MISMATCH)

@@ -1,7 +1,7 @@
 [submodule "external/rippled"]
 	path = external/rippled
 	url = https://github.com/mvadari/rippled.git
-	branch = plugin
+	branch = plugins
 [submodule "external/v8-cmake"]
 	path = external/v8-cmake
 	url = https://github.com/bnoordhuis/v8-cmake.git
