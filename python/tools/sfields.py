@@ -1,5 +1,8 @@
 import sys
 import re
+import os
+
+_MAIN_CPP_FILEPATH = os.path.abspath(os.path.join(__file__, "../../src/main.cpp"))
 
 if len(sys.argv) != 2:
     print("Usage: python " + sys.argv[0] + " path/to/rippled/src/ripple/")
@@ -11,12 +14,24 @@ def read_file(filename):
         return f.read()
 
 
+def read_wrapper_file():
+    with open(_MAIN_CPP_FILEPATH) as f:
+        return f.read()
+
+
 sfield_h_filename = sys.argv[1] + "/protocol/SField.h"
 sfield_h = read_file(sfield_h_filename)
 
 sfield_hits = re.findall(
     r"^extern (SF[A-Za-z_0-9]+) const (sf[A-Za-z0-9]+);$", sfield_h, re.MULTILINE
 )
+
+main_cpp = read_wrapper_file()
+main_cpp_replace = re.findall(
+    r"(?:^    sfieldModule.attr\(\"sf_[a-z0-9_]+\"\) = T?WSF(?:<ripple::ST[A-Za-z0-9]+>)?{\(void \*\)&ripple::sf[A-Za-z0-9]+};$\n)+",
+    main_cpp,
+    re.MULTILINE,
+)[0]
 
 _CAMEL_CASE_LEADING_LOWER = "^[^A-Z]+"
 _CAMEL_CASE_ABBREVIATION = "[A-Z]+(?![^A-Z])"
@@ -57,18 +72,14 @@ def get_type(sf_type):
     return "ST" + sf_type[3].upper() + sf_type[4:].lower()
 
 
+result = ""
 for hit in sfield_hits:
     if "SField" in hit[0]:
-        print(
-            f'    sfieldModule.attr("{camel_to_snake_case(hit[1])}") = WSF{{(void *)&ripple::{hit[1]}}};'
-        )
+        result += f'    sfieldModule.attr("{camel_to_snake_case(hit[1])}") = WSF{{(void *)&ripple::{hit[1]}}};\n'
     else:
         stype = get_type(hit[0])
-        print(
-            f'    sfieldModule.attr("{camel_to_snake_case(hit[1])}") = TWSF<ripple::{stype}>{{(void *)&ripple::{hit[1]}}};'
-        )
+        result += f'    sfieldModule.attr("{camel_to_snake_case(hit[1])}") = TWSF<ripple::{stype}>{{(void *)&ripple::{hit[1]}}};\n'
 
-
-# TODO: actually edit the file
-# Regex to replace:
-# (?:^    sfieldModule.attr\("sf_[a-z0-9_]+"\) = T?WSF(?:<ripple::ST[A-Za-z0-9]+>)?{\(void \*\)&ripple::sf[A-Za-z0-9]+};$)+
+final_file = main_cpp.replace(main_cpp_replace, result)
+with open(_MAIN_CPP_FILEPATH, "w") as f:
+    f.write(final_file)
