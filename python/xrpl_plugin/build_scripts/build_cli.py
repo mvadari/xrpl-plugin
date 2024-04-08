@@ -13,6 +13,7 @@ def generate_cpp(tx_name, module_name, python_folder):
 #include <ripple/ledger/View.h>
 #include <ripple/plugin/exports.h>
 #include <ripple/protocol/Feature.h>
+#include <ripple/protocol/InnerObjectFormats.h>
 #include <ripple/protocol/TER.h>
 #include <ripple/protocol/TxFlags.h>
 #include <ripple/protocol/st.h>
@@ -947,7 +948,7 @@ InnerObjectExport
 mutateInnerObject(InnerObjectExportInternal const& innerObject)
 {{
     return InnerObjectExport{{
-        innerObject.code,
+        static_cast<uint16_t>(innerObject.code),
         innerObject.name.c_str(),
         {{const_cast<SOElementExport *>(innerObject.format.data()), static_cast<int>(innerObject.format.size())}},
     }};
@@ -1000,10 +1001,12 @@ getInnerObjectFormats()
     std::transform(innerObjects.begin(), innerObjects.end(), std::back_inserter(output), mutateInnerObject);
     return {{const_cast<InnerObjectExport *>(output.data()), static_cast<int>(output.size())}};
 }}
+
+INITIALIZE_PLUGIN()
 """
 
 
-def updateProgress(progress):
+def update_progress(progress):
     bar_length = 30
     sys.stdout.write("\r")
     sys.stdout.write(
@@ -1041,7 +1044,8 @@ def build_files(cpp_file, project_name):
     with tempfile.TemporaryDirectory() as build_temp:
         build_source_dir = os.path.dirname(__file__)
         conan_source_dir = build_source_dir
-        output_dir = os.getcwd() + os.sep
+        # build_temp = os.getcwd()
+        output_dir = os.getcwd()
         conan_build_dir = os.path.join(conan_source_dir, "build", "generators")
         cmake_args = []
         build_args = []
@@ -1093,10 +1097,10 @@ def build_files(cpp_file, project_name):
                 progress = int(progress)
             except ValueError:
                 progress = 0
-            updateProgress(progress)
+            update_progress(progress)
         p.stdout.close()
         p.wait()
-        print("\r Plugin generated: " + output_dir + project_name + ".xrplugin")
+        print(f"\nPlugin generated: {output_dir}/{project_name}.xrplugin")
 
 
 def build():
