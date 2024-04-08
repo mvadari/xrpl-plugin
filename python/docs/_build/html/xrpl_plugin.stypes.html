@@ -110,6 +110,12 @@
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="xrpl_plugin.stypes.STAmount.issuer">
+<span class="sig-name descname"><span class="pre">issuer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.stypes.STAmount" title="xrpl_plugin.stypes.STAmount"><span class="pre">xrpl_plugin.stypes.STAmount</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="xrpl_plugin.basic_types.html#xrpl_plugin.basic_types.Issue" title="xrpl_plugin.basic_types.Issue"><span class="pre">xrpl_plugin.basic_types.Issue</span></a></span></span><a class="headerlink" href="#xrpl_plugin.stypes.STAmount.issuer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the issue of a IOUAmount (if possible)</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="xrpl_plugin.stypes.STAmount.native">
 <span class="sig-name descname"><span class="pre">native</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#xrpl_plugin.stypes.STAmount" title="xrpl_plugin.stypes.STAmount"><span class="pre">xrpl_plugin.stypes.STAmount</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#xrpl_plugin.stypes.STAmount.native" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns True if the STAmount represents an XRP amount (the native currency).</p>
@@ -153,6 +159,13 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.stypes.</span></span><span class="sig-name descname"><span class="pre">STBlob</span></span><a class="headerlink" href="#xrpl_plugin.stypes.STBlob" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#xrpl_plugin.stypes.STBase" title="xrpl_plugin.rippled_py.stypes.STBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">STBase</span></code></a></p>
 <p>A serializeable type representing a variable-length element.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.stypes.STIssue">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.stypes.</span></span><span class="sig-name descname"><span class="pre">STIssue</span></span><a class="headerlink" href="#xrpl_plugin.stypes.STIssue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#xrpl_plugin.stypes.STBase" title="xrpl_plugin.rippled_py.stypes.STBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">STBase</span></code></a></p>
+<p>A serializeable type representing an issued currency.</p>
 </dd></dl>
 
 <dl class="py class">
@@ -291,6 +304,13 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.stypes.</span></span><span class="sig-name descname"><span class="pre">STVector256</span></span><a class="headerlink" href="#xrpl_plugin.stypes.STVector256" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#xrpl_plugin.stypes.STBase" title="xrpl_plugin.rippled_py.stypes.STBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">STBase</span></code></a></p>
 <p>A serializeable type representing a 256-bit vector.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="xrpl_plugin.stypes.STXChainBridge">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">xrpl_plugin.stypes.</span></span><span class="sig-name descname"><span class="pre">STXChainBridge</span></span><a class="headerlink" href="#xrpl_plugin.stypes.STXChainBridge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#xrpl_plugin.stypes.STBase" title="xrpl_plugin.rippled_py.stypes.STBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">STBase</span></code></a></p>
+<p>A serializeable type representing a cross-chain bridge.</p>
 </dd></dl>
 
 <dl class="py function">
