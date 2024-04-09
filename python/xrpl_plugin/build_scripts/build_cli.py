@@ -1107,6 +1107,8 @@ def build_files(cpp_file, project_name):
            
         p.stdout.close()
         p.wait()
+        if p.returncode != 0:
+            print("Return code: ", p.returncode)
 
 def build():
     cpp_file_fullpath, module_name = create_files(sys.argv[1])
