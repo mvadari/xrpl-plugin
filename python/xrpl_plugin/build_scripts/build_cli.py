@@ -22,6 +22,7 @@ def generate_cpp(tx_name, module_name, python_folder):
 
 #include <pybind11/embed.h> // everything needed for embedding
 #include <pybind11/stl.h>
+#include <pybind11/functional.h>
 
 namespace py = pybind11;
 using namespace pybind11::literals; // to bring in the `_a` literal
@@ -531,14 +532,12 @@ getSFields()
         }}
         auto sfields = pluginImport.attr("sfields").cast<std::vector<py::object>>();
         std::sort(sfields.begin(), sfields.end(), sFieldSorter);
-        for (py::object& variable: sfields)
+        for (py::object& sfield: sfields)
         {{
-            WSF wrappedSField = variable.cast<WSF>();
-            SField const& sfield = static_cast<SField const&>(wrappedSField);
             temp.emplace_back(SFieldExport{{
-                sfield.fieldType,
-                sfield.fieldValue,
-                sfield.jsonName}});
+                sfield.attr("fieldType").cast<int>(),
+                sfield.attr("fieldValue").cast<int>(),
+                sfield.attr("fieldName").cast<std::string>().c_str()}});
         }}
         return temp;
     }}();
@@ -1002,7 +1001,49 @@ getInnerObjectFormats()
     return {{const_cast<InnerObjectExport *>(output.data()), static_cast<int>(output.size())}};
 }}
 
-INITIALIZE_PLUGIN()
+typedef void (*initializePluginPointersPtr)(
+    std::map<std::uint16_t, ripple::PluginTxFormat>*,
+    std::map<std::uint16_t, ripple::PluginLedgerFormat>*,
+    std::map<std::uint16_t, ripple::PluginInnerObjectFormat>*,
+    std::map<int, ripple::SField const*>*,
+    std::vector<int>*,
+    std::map<int, ripple::STypeFunctions>*,
+    std::map<int, ripple::parsePluginValuePtr>*,
+    std::vector<ripple::TERExport>*);
+
+extern "C" void setPluginPointers(
+    std::map<std::uint16_t, PluginTxFormat>* pluginTxFormatPtr,
+    std::map<std::uint16_t, PluginLedgerFormat>* pluginObjectsMapPtr,
+    std::map<std::uint16_t, PluginInnerObjectFormat>*
+        pluginInnerObjectFormatsPtr,
+    std::map<int, SField const*>* knownCodeToFieldPtr,
+    std::vector<int>* pluginSFieldCodesPtr,
+    std::map<int, STypeFunctions>* pluginSTypesPtr,
+    std::map<int, parsePluginValuePtr>* pluginLeafParserMapPtr,
+    std::vector<TERExport>* pluginTERcodes)
+{{
+    registerTxFormats(pluginTxFormatPtr);
+    registerLedgerObjects(pluginObjectsMapPtr);
+    registerPluginInnerObjectFormats(pluginInnerObjectFormatsPtr);
+    registerSFields(knownCodeToFieldPtr, pluginSFieldCodesPtr);
+    registerSTypes(pluginSTypesPtr);
+    registerLeafTypes(pluginLeafParserMapPtr);
+    registerPluginTERs(pluginTERcodes);
+
+    CustomScopedInterpreter guard{{}}; // start the interpreter and keep it alive
+    py::module_::import("sys").attr("path").attr("append")("{python_folder}");
+    py::module_ module = py::module_::import("{module_name}");
+    auto initializePtr = module.attr("initializePluginPointers");
+    initializePtr(
+        pluginTxFormatPtr,
+        pluginObjectsMapPtr,
+        pluginInnerObjectFormatsPtr,
+        knownCodeToFieldPtr,
+        pluginSFieldCodesPtr,
+        pluginSTypesPtr,
+        pluginLeafParserMapPtr,
+        pluginTERcodes);
+}}
 """
 
 
@@ -1081,28 +1122,41 @@ def build_files(cpp_file, project_name):
             stderr=subprocess.STDOUT,
         )
 
-        p = subprocess.Popen(
+        subprocess.run(
             ["cmake", "--build", "."] + build_args,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
             cwd=build_temp,
+            check=True,
+            stdout=subprocess.DEVNULL,
         )
 
-        for line in iter(p.stdout.readline, b""):
-            decoded = line.decode("utf-8")
-            progress = decoded[decoded.find("[") + 1 : decoded.find("]")].replace(
-                "%", ""
-            )
-            try:
-                progress = int(progress)
-            except ValueError:
-                progress = 0
-            update_progress(progress)
-        p.stdout.close()
-        p.wait()
+        # p = subprocess.Popen(
+        #     ["cmake", "--build", "."] + build_args,
+        #     stdout=subprocess.PIPE,
+        #     stderr=subprocess.STDOUT,
+        #     cwd=build_temp,
+        # )
+
+        # for line in iter(p.stdout.readline, b""):
+        #     decoded = line.decode("utf-8")
+        #     progress = decoded[decoded.find("[") + 1 : decoded.find("]")].replace(
+        #         "%", ""
+        #     )
+        #     try:
+        #         progress = int(progress)
+        #     except ValueError:
+        #         progress = 0
+        #     update_progress(progress)
+        # p.stdout.close()
+        # p.wait()
         print(f"\nPlugin generated: {output_dir}/{project_name}.xrplugin")
 
 
 def build():
     cpp_file_fullpath, module_name = create_files(sys.argv[1])
     build_files(cpp_file_fullpath, module_name)
+
+
+# This is included just for dev purposes
+# It should not be used in prod
+if __name__ == "__main__":
+    build()
