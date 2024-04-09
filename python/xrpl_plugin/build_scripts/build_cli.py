@@ -1042,66 +1042,71 @@ def create_files(python_file):
 
 def build_files(cpp_file, project_name):
     with tempfile.TemporaryDirectory() as build_temp:
-        build_source_dir = os.path.dirname(__file__)
-        conan_source_dir = build_source_dir
-        # build_temp = os.getcwd()
-        output_dir = os.getcwd()
-        conan_build_dir = os.path.join(conan_source_dir, "build", "generators")
-        cmake_args = []
-        build_args = []
-        if not os.path.exists(conan_build_dir):
+
+        try:
+            build_source_dir = os.path.dirname(__file__)
+            conan_source_dir = build_source_dir
+            output_dir = os.getcwd() + os.sep
+            conan_build_dir = os.path.join(conan_source_dir, "build", "generators")
+            cmake_args = []
+            build_args = []
+            if not os.path.exists(conan_build_dir):
+                subprocess.run(
+                    [
+                        "conan",
+                        "install",
+                        conan_source_dir,
+                        "--build",
+                        "missing",
+                        "--settings",
+                        "build_type=Debug",
+                    ],
+                    check=True,
+                    cwd=build_temp,
+                    stdout=subprocess.DEVNULL,
+                )
+            conan_cmake_file = os.path.join(conan_build_dir, "conan_toolchain.cmake")
+            cmake_args += [
+                f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={output_dir}",
+                f"-DPROJECT_NAME={project_name}",
+                f"-DSOURCE_FILE={cpp_file}",
+                f"-DCMAKE_TOOLCHAIN_FILE:FILEPATH={conan_cmake_file}",
+                "-DCMAKE_BUILD_TYPE=Debug",
+                "-DBUILD_SHARED_LIBS=ON",
+            ]
             subprocess.run(
-                [
-                    "conan",
-                    "install",
-                    conan_source_dir,
-                    "--build",
-                    "missing",
-                    "--settings",
-                    "build_type=Debug",
-                ],
-                check=True,
+                ["cmake", build_source_dir] + cmake_args,
                 cwd=build_temp,
-                stdout=subprocess.DEVNULL,
+                check=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
             )
-        conan_cmake_file = os.path.join(conan_build_dir, "conan_toolchain.cmake")
-        cmake_args += [
-            f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={output_dir}",
-            f"-DPROJECT_NAME={project_name}",
-            f"-DSOURCE_FILE={cpp_file}",
-            f"-DCMAKE_TOOLCHAIN_FILE:FILEPATH={conan_cmake_file}",
-            "-DCMAKE_BUILD_TYPE=Debug",
-            "-DBUILD_SHARED_LIBS=ON",
-        ]
-        subprocess.run(
-            ["cmake", build_source_dir] + cmake_args,
-            cwd=build_temp,
-            check=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-        )
 
-        p = subprocess.Popen(
-            ["cmake", "--build", "."] + build_args,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            cwd=build_temp,
-        )
-
-        for line in iter(p.stdout.readline, b""):
-            decoded = line.decode("utf-8")
-            progress = decoded[decoded.find("[") + 1 : decoded.find("]")].replace(
-                "%", ""
+            p = subprocess.Popen(
+                ["cmake", "--build", "."] + build_args,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                cwd=build_temp,
             )
-            try:
-                progress = int(progress)
-            except ValueError:
-                progress = 0
-            update_progress(progress)
+
+            for line in iter(p.stdout.readline, b""):
+                decoded = line.decode("utf-8")
+                if decoded.lower().find("error:") > -1:
+                    raise Exception(decoded)
+                else:
+                    progress = decoded[decoded.find("[") + 1 : decoded.find("]")].replace(
+                        "%", ""
+                    )
+                    if progress.strip().isdigit():
+                        progress = int(progress)
+                        update_progress(progress)
+            
+            print("\r Plugin generated: " + output_dir + project_name + ".xrplugin")
+        except Exception as e:
+            print("\r An exception occurred: ", e)
+           
         p.stdout.close()
         p.wait()
-        print(f"\nPlugin generated: {output_dir}/{project_name}.xrplugin")
-
 
 def build():
     cpp_file_fullpath, module_name = create_files(sys.argv[1])
