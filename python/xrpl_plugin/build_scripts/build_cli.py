@@ -326,11 +326,9 @@ getTransactors()
             for (py::object transactor: pythonFormat)
             {{
                 py::tuple tup = transactor.cast<py::tuple>();
-                WSF sfield = tup[0].cast<WSF>();
-                SOEStyle varType = tup[1].cast<SOEStyle>();
                 format.emplace_back(SOElementExport{{
-                    static_cast<SField const&>(sfield).getCode(),
-                    varType}});
+                    tup[0].attr("fieldCode").cast<int>(),
+                    tup[1].cast<SOEStyle>()}});
             }}
 
             auto exportedTx = TransactorExportInternal{{
@@ -483,11 +481,9 @@ getLedgerObjects()
             for (py::object variable: pythonObjectFormat)
             {{
                 py::tuple tup = variable.cast<py::tuple>();
-                WSF sfield = tup[0].cast<WSF>();
-                SOEStyle varType = tup[1].cast<SOEStyle>();
                 objectFormat.emplace_back(SOElementExport{{
-                    static_cast<SField const&>(sfield).getCode(),
-                    varType}});
+                    tup[0].attr("fieldCode").cast<int>(),
+                    tup[1].cast<SOEStyle>()}});
             }}
             temp.emplace_back(LedgerObjectExportInternal{{
                 objectType,
@@ -510,20 +506,28 @@ getLedgerObjects()
 // SFields
 // ----------------------------------------------------------------------------
 
-static struct
+struct SFieldExportInternal {{
+    int typeId;
+    int fieldValue;
+    std::string txtName;
+}};
+
+SFieldExport
+mutateSField(SFieldExportInternal const& field)
 {{
-    bool operator()(py::object a, py::object b) const {{ 
-        return a.attr("fieldNum").cast<int>() < b.attr("fieldNum").cast<int>();
-    }}
+    return SFieldExport{{
+        field.typeId,
+        field.fieldValue,
+        field.txtName.c_str(),
+    }};
 }}
-sFieldSorter;
 
 extern "C"
 Container<SFieldExport>
 getSFields()
 {{
-    static std::vector<SFieldExport> const sFields = []{{
-        std::vector<SFieldExport> temp = {{}};
+    static std::vector<SFieldExportInternal> const sFields = []{{
+        std::vector<SFieldExportInternal> temp = {{}};
         CustomScopedInterpreter guard{{}}; // start the interpreter and keep it alive
         py::module_::import("sys").attr("path").attr("append")("{python_folder}");
         py::module pluginImport = py::module_::import("{module_name}");
@@ -531,17 +535,22 @@ getSFields()
             return temp;
         }}
         auto sfields = pluginImport.attr("sfields").cast<std::vector<py::object>>();
-        std::sort(sfields.begin(), sfields.end(), sFieldSorter);
         for (py::object& sfield: sfields)
         {{
-            temp.emplace_back(SFieldExport{{
+            temp.emplace_back(SFieldExportInternal{{
                 sfield.attr("fieldType").cast<int>(),
                 sfield.attr("fieldValue").cast<int>(),
-                sfield.attr("fieldName").cast<std::string>().c_str()}});
+                sfield.attr("fieldName").cast<std::string>()}});
         }}
         return temp;
     }}();
-    return {{const_cast<SFieldExport *>(sFields.data()), static_cast<int>(sFields.size())}};
+    for (int i=0; i<sFields.size();i++){{
+        auto const field = sFields[i];
+    }}
+    static std::vector<SFieldExport> output;
+    output.reserve(sFields.size());
+    std::transform(sFields.begin(), sFields.end(), std::back_inserter(output), mutateSField);
+    return {{const_cast<SFieldExport *>(output.data()), static_cast<int>(output.size())}};
 }}
 
 // ----------------------------------------------------------------------------
@@ -975,19 +984,14 @@ getInnerObjectFormats()
             for (py::object innerObject: pythonFormat)
             {{
                 py::tuple tup = innerObject.cast<py::tuple>();
-                WSF sfield = tup[0].cast<WSF>();
-                SOEStyle varType = tup[1].cast<SOEStyle>();
                 format.emplace_back(SOElementExport{{
-                    static_cast<SField const&>(sfield).getCode(),
-                    varType}});
+                    tup[0].attr("fieldCode").cast<int>(),
+                    tup[1].cast<SOEStyle>()}});
             }}
 
-            WSF wrappedField = innerObject.attr("field").cast<WSF>();
-            SField const& field = static_cast<SField const&>(wrappedField);
-
             auto exportedTx = InnerObjectExportInternal{{
-                field.getCode(),
-                std::string(field.jsonName.c_str()),
+                innerObject.attr("field").attr("fieldCode").cast<int>(),
+                innerObject.attr("field").attr("fieldName").cast<std::string>(),
                 format,
             }};
 
@@ -1010,6 +1014,16 @@ typedef void (*initializePluginPointersPtr)(
     std::map<int, ripple::STypeFunctions>*,
     std::map<int, ripple::parsePluginValuePtr>*,
     std::vector<ripple::TERExport>*);
+
+using init_ptr = std::function<void(
+    std::map<std::uint16_t, ripple::PluginTxFormat>*,
+    std::map<std::uint16_t, ripple::PluginLedgerFormat>*,
+    std::map<std::uint16_t, ripple::PluginInnerObjectFormat>*,
+    std::map<int, ripple::SField const*>*,
+    std::vector<int>*,
+    std::map<int, ripple::STypeFunctions>*,
+    std::map<int, ripple::parsePluginValuePtr>*,
+    std::vector<ripple::TERExport>*)>;
 
 extern "C" void setPluginPointers(
     std::map<std::uint16_t, PluginTxFormat>* pluginTxFormatPtr,
@@ -1035,14 +1049,14 @@ extern "C" void setPluginPointers(
     py::module_ module = py::module_::import("{module_name}");
     auto initializePtr = module.attr("initializePluginPointers");
     initializePtr(
-        pluginTxFormatPtr,
-        pluginObjectsMapPtr,
-        pluginInnerObjectFormatsPtr,
-        knownCodeToFieldPtr,
-        pluginSFieldCodesPtr,
-        pluginSTypesPtr,
-        pluginLeafParserMapPtr,
-        pluginTERcodes);
+        (void *)pluginTxFormatPtr,
+        (void *)pluginObjectsMapPtr,
+        (void *)pluginInnerObjectFormatsPtr,
+        (void *)knownCodeToFieldPtr,
+        (void *)pluginSFieldCodesPtr,
+        (void *)pluginSTypesPtr,
+        (void *)pluginLeafParserMapPtr,
+        (void *)pluginTERcodes);
 }}
 """
 

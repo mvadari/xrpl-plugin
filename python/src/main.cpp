@@ -26,7 +26,7 @@
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 
 ripple::SField const&
-newUntypedSField(const int fieldValue, char const* fieldName)
+newUntypedSField(const int fieldValue, std::string fieldName)
 {
     if (ripple::SField const& field = ripple::SField::getField(fieldName); field != ripple::sfInvalid)
     {
@@ -43,7 +43,7 @@ struct WSF {
   const int tid_;
   operator ripple::SField const &() const {
     if (f_ == nullptr) {
-        ripple::SField const& sfield = newUntypedSField(fieldValue_, fieldName_.c_str());
+        ripple::SField const& sfield = newUntypedSField(fieldValue_, fieldName_);
         f_ = (void *)&sfield;
     }
     return *static_cast<ripple::SField *>(f_);
@@ -53,7 +53,7 @@ struct WSF {
 template <class T> struct TWSF : WSF {
   operator ripple::TypedField<T> const &() const {
     if (f_ == nullptr) {
-        ripple::TypedField<T> const& sfield = ripple::newSField<ripple::TypedField<T>>(fieldValue_, fieldName_.c_str());
+        ripple::TypedField<T> const& sfield = ripple::newSField<ripple::TypedField<T>>(fieldValue_, fieldName_);
         f_ = (void *)&sfield;
     }
     return *static_cast<ripple::TypedField<T> *>(f_);
@@ -72,11 +72,11 @@ struct CustomTWSF : TWSF<ripple::STPluginType> {
 
 template <class T>
 TWSF<T>
-wrappedNewSField(const int fieldValue, std::string const fieldName)
+wrappedNewSField(const int fieldValue, const char* fieldName)
 {
     // ripple::TypedField<T> const& sfield = ripple::newSField<ripple::TypedField<T>>(fieldValue, fieldName.c_str());
     // return TWSF<T>{(void *)&sfield};
-    return TWSF<T>{nullptr, fieldValue, fieldName, ripple::getSTId<T>()};
+    return TWSF<T>{nullptr, fieldValue, std::string(fieldName), ripple::getSTId<ripple::TypedField<T>>()};
 }
 
 // used only for STArray and STObject
@@ -94,7 +94,7 @@ constructCustomWrappedSField(int tid, const char* fn, int fv)
 {
     // ripple::SF_PLUGINTYPE const& sfield = ripple::constructCustomSField(tid, fv, fn);
     // return TWSF<ripple::STPluginType>{(void *)&sfield};
-    return CustomTWSF{nullptr, fv,std::string(fn), tid};
+    return CustomTWSF{nullptr, fv, std::string(fn), tid};
 }
 
 template <class... Args>
@@ -105,22 +105,24 @@ indexHash(std::uint16_t space, Args const&... args)
 }
 
 extern "C" void initializePluginPointers(
-    std::map<std::uint16_t, ripple::PluginTxFormat>* pluginTxFormatPtr,
-    std::map<std::uint16_t, ripple::PluginLedgerFormat>* pluginObjectsMapPtr,
-    std::map<std::uint16_t, ripple::PluginInnerObjectFormat>* pluginInnerObjectFormatsPtr,
-    std::map<int, ripple::SField const*>* knownCodeToFieldPtr,
-    std::vector<int>* pluginSFieldCodesPtr,
-    std::map<int, ripple::STypeFunctions>* pluginSTypesPtr,
-    std::map<int, ripple::parsePluginValuePtr>* pluginLeafParserMapPtr,
-    std::vector<ripple::TERExport>* pluginTERcodes)
+    void* pluginTxFormatPtr,
+    void* pluginObjectsMapPtr,
+    void* pluginInnerObjectFormatsPtr,
+    void* knownCodeToFieldPtr,
+    void* pluginSFieldCodesPtr,
+    void* pluginSTypesPtr,
+    void*pluginLeafParserMapPtr,
+    void* pluginTERcodes)
 {
-    ripple::registerTxFormats(pluginTxFormatPtr);
-    ripple::registerLedgerObjects(pluginObjectsMapPtr);
-    ripple::registerPluginInnerObjectFormats(pluginInnerObjectFormatsPtr);
-    ripple::registerSFields(knownCodeToFieldPtr, pluginSFieldCodesPtr);
-    ripple::registerSTypes(pluginSTypesPtr);
-    ripple::registerLeafTypes(pluginLeafParserMapPtr);
-    ripple::registerPluginTERs(pluginTERcodes);
+    ripple::registerTxFormats(static_cast<std::map<std::uint16_t, ripple::PluginTxFormat>*>(pluginTxFormatPtr));
+    ripple::registerLedgerObjects(static_cast<std::map<std::uint16_t, ripple::PluginLedgerFormat>*>(pluginObjectsMapPtr));
+    ripple::registerPluginInnerObjectFormats(static_cast<std::map<std::uint16_t, ripple::PluginInnerObjectFormat>*>(pluginInnerObjectFormatsPtr));
+    ripple::registerSFields(
+        static_cast<std::map<int, ripple::SField const*>*>(knownCodeToFieldPtr),
+        static_cast<std::vector<int>*>(pluginSFieldCodesPtr));
+    ripple::registerSTypes(static_cast<std::map<int, ripple::STypeFunctions>*>(pluginSTypesPtr));
+    ripple::registerLeafTypes(static_cast<std::map<int, ripple::parsePluginValuePtr>* >(pluginLeafParserMapPtr));
+    ripple::registerPluginTERs(static_cast<std::vector<ripple::TERExport>*>(pluginTERcodes));
 }
 
 namespace py = pybind11;
@@ -133,12 +135,12 @@ PYBIND11_MODULE(rippled_py, m) {
     options.disable_enum_members_docstring();
 
     m.def("initializePluginPointers", &initializePluginPointers, "Initialize the plugin pointers.");
-    py::class_<ripple::PluginTxFormat> PluginTxFormat(m, "PluginTxFormat");
-    py::class_<ripple::PluginLedgerFormat> PluginLedgerFormat(m, "PluginLedgerFormat");
-    py::class_<ripple::PluginInnerObjectFormat> PluginInnerObjectFormat(m, "PluginInnerObjectFormat");
-    py::class_<ripple::STypeFunctions> STypeFunctions(m, "STypeFunctions");
-    py::class_<ripple::parsePluginValuePtr> parsePluginValuePtr(m, "parsePluginValuePtr");
-    py::class_<ripple::TERExport> TERExport(m, "TERExport");
+    // py::class_<ripple::PluginTxFormat> PluginTxFormat(m, "PluginTxFormat");
+    // py::class_<ripple::PluginLedgerFormat> PluginLedgerFormat(m, "PluginLedgerFormat");
+    // py::class_<ripple::PluginInnerObjectFormat> PluginInnerObjectFormat(m, "PluginInnerObjectFormat");
+    // py::class_<ripple::STypeFunctions> STypeFunctions(m, "STypeFunctions");
+    // py::class_<ripple::parsePluginValuePtr> parsePluginValuePtr(m, "parsePluginValuePtr");
+    // py::class_<ripple::TERExport> TERExport(m, "TERExport");
 
     /*
     * Enums
@@ -408,7 +410,8 @@ PYBIND11_MODULE(rippled_py, m) {
     PythonWSF
         .def_property_readonly("fieldCode",
             [](const WSF &wsf) {
-                return static_cast<ripple::SField const&>(wsf).fieldCode;
+                std::cout << wsf.tid_ << wsf.fieldValue_ << ((wsf.tid_ << 16) | wsf.fieldValue_) << std::endl;
+                return (wsf.tid_ << 16) | wsf.fieldValue_;
             },
             "(fieldType<<16)|fieldValue"
         )
