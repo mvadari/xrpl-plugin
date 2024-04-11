@@ -74,8 +74,6 @@ template <class T>
 TWSF<T>
 wrappedNewSField(const int fieldValue, const char* fieldName)
 {
-    // ripple::TypedField<T> const& sfield = ripple::newSField<ripple::TypedField<T>>(fieldValue, fieldName.c_str());
-    // return TWSF<T>{(void *)&sfield};
     return TWSF<T>{nullptr, fieldValue, std::string(fieldName), ripple::getSTId<ripple::TypedField<T>>()};
 }
 
@@ -84,16 +82,12 @@ template <class T>
 WSF
 wrappedNewUntypedSField(const int fieldValue, std::string const fieldName)
 {
-    // ripple::SField const& sfield = ripple::newUntypedSField<T>(fieldValue, fieldName.c_str());
-    // return WSF{(void *)&sfield};
     return WSF{nullptr, fieldValue, fieldName, ripple::getSTId<T>()};
 }
 
 TWSF<ripple::STPluginType>
 constructCustomWrappedSField(int tid, const char* fn, int fv)
 {
-    // ripple::SF_PLUGINTYPE const& sfield = ripple::constructCustomSField(tid, fv, fn);
-    // return TWSF<ripple::STPluginType>{(void *)&sfield};
     return CustomTWSF{nullptr, fv, std::string(fn), tid};
 }
 

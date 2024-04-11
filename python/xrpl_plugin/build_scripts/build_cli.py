@@ -1046,8 +1046,7 @@ extern "C" void setPluginPointers(
 
     CustomScopedInterpreter guard{{}}; // start the interpreter and keep it alive
     py::module_::import("sys").attr("path").attr("append")("{python_folder}");
-    py::module_ module = py::module_::import("{module_name}");
-    auto initializePtr = module.attr("initializePluginPointers");
+    auto initializePtr = py::module_::import("xrpl_plugin").attr("rippled_py").attr("initializePluginPointers");
     initializePtr(
         (void *)pluginTxFormatPtr,
         (void *)pluginObjectsMapPtr,

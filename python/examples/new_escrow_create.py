@@ -67,7 +67,6 @@ from xrpl_plugin.stypes import (
     STUInt32,
     index_hash,
 )
-from xrpl_plugin.rippled_py import initializePluginPointers
 
 sf_finish_after2 = create_new_sfield(STUInt32, "FinishAfter2", 53)
 sf_fake_array = create_new_sfield(STArray, "FakeArray", 13)
