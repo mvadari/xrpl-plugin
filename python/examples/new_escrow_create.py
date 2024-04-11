@@ -121,7 +121,7 @@ stypes = [
 sfields = [sf_finish_after2, sf_destination2]  # , sf_fake_array, sf_fake_element]
 
 
-ltNEW_ESCROW = 0x74
+ltNEW_ESCROW = 0x89
 NEW_ESCROW_NAMESPACE = ord("t")
 
 

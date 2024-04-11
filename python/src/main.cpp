@@ -410,8 +410,7 @@ PYBIND11_MODULE(rippled_py, m) {
     PythonWSF
         .def_property_readonly("fieldCode",
             [](const WSF &wsf) {
-                std::cout << wsf.tid_ << wsf.fieldValue_ << ((wsf.tid_ << 16) | wsf.fieldValue_) << std::endl;
-                return (wsf.tid_ << 16) | wsf.fieldValue_;
+                return wsf.tid_ ? (wsf.tid_ << 16) | wsf.fieldValue_ : static_cast<ripple::SField const&>(wsf).fieldCode;
             },
             "(fieldType<<16)|fieldValue"
         )
@@ -422,25 +421,25 @@ PYBIND11_MODULE(rippled_py, m) {
         )
         .def_property_readonly("fieldName",
             [](const WSF &wsf) {
-                return wsf.fieldName_;
+                return wsf.tid_ ? wsf.fieldName_ : static_cast<ripple::SField const&>(wsf).fieldName;
             },
             "The name of the field."
         )
         .def_property_readonly("fieldType",
             [](const WSF &wsf) {
-                return wsf.tid_;
+                return wsf.tid_ ? wsf.tid_ : static_cast<ripple::SField const&>(wsf).fieldType;
             },
             "The SType of the field."
         )
         .def_property_readonly("fieldValue",
             [](const WSF &wsf) {
-                return wsf.fieldValue_;
+                return wsf.tid_ ? wsf.fieldValue_ : static_cast<ripple::SField const&>(wsf).fieldValue;
             },
             "The unique value of the field for that SType."
         )
         .def("__repr__",
             [](const WSF &wsf) {
-                return "sf" + wsf.fieldName_;
+                return "sf" + (wsf.tid_ ? wsf.fieldName_ : static_cast<ripple::SField const&>(wsf).fieldName);
             }
         )
         ;

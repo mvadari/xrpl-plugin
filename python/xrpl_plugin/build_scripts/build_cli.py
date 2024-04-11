@@ -374,7 +374,7 @@ struct LedgerObjectExportInternal {{
 }};
 
 LedgerObjectExport
-mutate(LedgerObjectExportInternal const& obj)
+mutateLedgerObjects(LedgerObjectExportInternal const& obj)
 {{
     return LedgerObjectExport{{
         obj.type,
@@ -470,6 +470,7 @@ getLedgerObjects()
             return temp;
         }}
         auto objects = module.attr("ledger_objects").cast<std::vector<py::object>>();
+        py::print(objects);
         for (int i = 0; i < objects.size(); i++)
         {{
             py::object object = objects[i];
@@ -481,6 +482,8 @@ getLedgerObjects()
             for (py::object variable: pythonObjectFormat)
             {{
                 py::tuple tup = variable.cast<py::tuple>();
+                py::print(variable);
+                std::cout << "SField: " << tup[0].attr("fieldName").cast<std::string>() << tup[0].attr("fieldCode").cast<int>() << std::endl;
                 objectFormat.emplace_back(SOElementExport{{
                     tup[0].attr("fieldCode").cast<int>(),
                     tup[1].cast<SOEStyle>()}});
@@ -498,7 +501,7 @@ getLedgerObjects()
     }}();
     static std::vector<LedgerObjectExport> output;
     output.reserve(objects.size());
-    std::transform(objects.begin(), objects.end(), std::back_inserter(output), mutate);
+    std::transform(objects.begin(), objects.end(), std::back_inserter(output), mutateLedgerObjects);
     return {{const_cast<LedgerObjectExport *>(output.data()), static_cast<int>(output.size())}};
 }}
 
