@@ -544,9 +544,6 @@ getSFields()
         }}
         return temp;
     }}();
-    for (int i=0; i<sFields.size();i++){{
-        auto const field = sFields[i];
-    }}
     static std::vector<SFieldExport> output;
     output.reserve(sFields.size());
     std::transform(sFields.begin(), sFields.end(), std::back_inserter(output), mutateSField);
@@ -1135,32 +1132,25 @@ def build_files(cpp_file, project_name):
             stderr=subprocess.STDOUT,
         )
 
-        subprocess.run(
+        p = subprocess.Popen(
             ["cmake", "--build", "."] + build_args,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
             cwd=build_temp,
-            check=True,
-            stdout=subprocess.DEVNULL,
         )
 
-        # p = subprocess.Popen(
-        #     ["cmake", "--build", "."] + build_args,
-        #     stdout=subprocess.PIPE,
-        #     stderr=subprocess.STDOUT,
-        #     cwd=build_temp,
-        # )
-
-        # for line in iter(p.stdout.readline, b""):
-        #     decoded = line.decode("utf-8")
-        #     progress = decoded[decoded.find("[") + 1 : decoded.find("]")].replace(
-        #         "%", ""
-        #     )
-        #     try:
-        #         progress = int(progress)
-        #     except ValueError:
-        #         progress = 0
-        #     update_progress(progress)
-        # p.stdout.close()
-        # p.wait()
+        for line in iter(p.stdout.readline, b""):
+            decoded = line.decode("utf-8")
+            progress = decoded[decoded.find("[") + 1 : decoded.find("]")].replace(
+                "%", ""
+            )
+            try:
+                progress = int(progress)
+            except ValueError:
+                progress = 0
+            update_progress(progress)
+        p.stdout.close()
+        p.wait()
         print(f"\nPlugin generated: {output_dir}/{project_name}.xrplugin")
 
 
@@ -1171,5 +1161,5 @@ def build():
 
 # This is included just for dev purposes
 # It should not be used in prod
-if __name__ == "__main__":
-    build()
+# if __name__ == "__main__":
+#     build()
