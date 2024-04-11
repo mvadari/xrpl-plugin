@@ -128,13 +128,9 @@ PYBIND11_MODULE(rippled_py, m) {
     py::options options;
     options.disable_enum_members_docstring();
 
-    m.def("initializePluginPointers", &initializePluginPointers, "Initialize the plugin pointers.");
-    // py::class_<ripple::PluginTxFormat> PluginTxFormat(m, "PluginTxFormat");
-    // py::class_<ripple::PluginLedgerFormat> PluginLedgerFormat(m, "PluginLedgerFormat");
-    // py::class_<ripple::PluginInnerObjectFormat> PluginInnerObjectFormat(m, "PluginInnerObjectFormat");
-    // py::class_<ripple::STypeFunctions> STypeFunctions(m, "STypeFunctions");
-    // py::class_<ripple::parsePluginValuePtr> parsePluginValuePtr(m, "parsePluginValuePtr");
-    // py::class_<ripple::TERExport> TERExport(m, "TERExport");
+    // This function is left uncommented on purpose
+    // It should not be touched in Python code
+    m.def("initializePluginPointers", &initializePluginPointers);
 
     /*
     * Enums
