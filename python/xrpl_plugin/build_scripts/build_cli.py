@@ -470,7 +470,6 @@ getLedgerObjects()
             return temp;
         }}
         auto objects = module.attr("ledger_objects").cast<std::vector<py::object>>();
-        py::print(objects);
         for (int i = 0; i < objects.size(); i++)
         {{
             py::object object = objects[i];
@@ -482,8 +481,6 @@ getLedgerObjects()
             for (py::object variable: pythonObjectFormat)
             {{
                 py::tuple tup = variable.cast<py::tuple>();
-                py::print(variable);
-                std::cout << "SField: " << tup[0].attr("fieldName").cast<std::string>() << tup[0].attr("fieldCode").cast<int>() << std::endl;
                 objectFormat.emplace_back(SOElementExport{{
                     tup[0].attr("fieldCode").cast<int>(),
                     tup[1].cast<SOEStyle>()}});

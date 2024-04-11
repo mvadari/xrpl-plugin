@@ -69,8 +69,6 @@ from xrpl_plugin.stypes import (
 )
 from xrpl_plugin.rippled_py import initializePluginPointers
 
-print("YOOO")
-
 sf_finish_after2 = create_new_sfield(STUInt32, "FinishAfter2", 53)
 # sf_fake_array = create_new_sfield(STArray, "FakeArray", 13)
 # sf_fake_element = create_new_sfield(STObject, "FakeElement", 17)
