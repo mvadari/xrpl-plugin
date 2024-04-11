@@ -1159,7 +1159,8 @@ def build():
     build_files(cpp_file_fullpath, module_name)
 
 
-# This is included just for dev purposes
+# This is included just for dev purposes, to avoid needing to reinstall the
+# whole package whenever this script is updated during library development
 # It should not be used in prod
 # if __name__ == "__main__":
 #     build()
