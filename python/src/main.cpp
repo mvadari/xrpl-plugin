@@ -16,6 +16,8 @@
 #include <ripple/app/tx/impl/details/NFTokenUtils.h>
 #include <ripple/app/tx/impl/ApplyContext.h>
 #include <ripple/protocol/digest.h>
+#include <ripple/plugin/createSFields.h>
+#include <ripple/protocol/InnerObjectFormats.h>
 #include <map>
 #include <iostream>
 #include <string>
@@ -23,130 +25,70 @@
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 
+ripple::SField const&
+newUntypedSField(const int fieldValue, std::string fieldName)
+{
+    if (ripple::SField const& field = ripple::SField::getField(fieldName); field != ripple::sfInvalid)
+    {
+        return field;
+    }
+    throw std::runtime_error(
+        "SField " + std::string(fieldName) + " doesn't exist.");
+}
+
 struct WSF {
-  void *f_;
+  mutable void *f_;
+  const int fieldValue_;
+  std::string const fieldName_;
+  const int tid_;
   operator ripple::SField const &() const {
+    if (f_ == nullptr) {
+        ripple::SField const& sfield = newUntypedSField(fieldValue_, fieldName_);
+        f_ = (void *)&sfield;
+    }
     return *static_cast<ripple::SField *>(f_);
   };
 };
 
 template <class T> struct TWSF : WSF {
   operator ripple::TypedField<T> const &() const {
+    if (f_ == nullptr) {
+        ripple::TypedField<T> const& sfield = ripple::newSField<ripple::TypedField<T>>(fieldValue_, fieldName_);
+        f_ = (void *)&sfield;
+    }
     return *static_cast<ripple::TypedField<T> *>(f_);
   };
 };
 
-template <typename T>
-int getSTId() { return ripple::STI_UNKNOWN; }
-
-template <>
-int getSTId<ripple::SF_UINT8>() { return ripple::STI_UINT8; }
-
-template <>
-int getSTId<ripple::SF_UINT16>() { return ripple::STI_UINT16; }
-
-template <>
-int getSTId<ripple::SF_UINT32>() { return ripple::STI_UINT32; }
-
-template <>
-int getSTId<ripple::SF_UINT64>() { return ripple::STI_UINT64; }
-
-template <>
-int getSTId<ripple::SF_UINT128>() { return ripple::STI_UINT128; }
-
-template <>
-int getSTId<ripple::SF_UINT256>() { return ripple::STI_UINT256; }
-
-template <>
-int getSTId<ripple::SF_UINT160>() { return ripple::STI_UINT160; }
-
-template <>
-int getSTId<ripple::SF_AMOUNT>() { return ripple::STI_AMOUNT; }
-
-template <>
-int getSTId<ripple::SF_VL>() { return ripple::STI_VL; }
-
-template <> 
-int getSTId<ripple::SF_ACCOUNT>() { return ripple::STI_ACCOUNT; }
-
-template <> 
-int getSTId<ripple::STObject>() { return ripple::STI_OBJECT; }
-
-template <> 
-int getSTId<ripple::STArray>() { return ripple::STI_ARRAY; }
-
-template <>
-int getSTId<ripple::SF_VECTOR256>() { return ripple::STI_VECTOR256; }
-
-template <>
-int getSTId<ripple::SF_UINT96>() { return ripple::STI_UINT96; }
-
-template <>
-int getSTId<ripple::SF_UINT192>() { return ripple::STI_UINT192; }
-
-template <>
-int getSTId<ripple::SF_UINT384>() { return ripple::STI_UINT384; }
-
-template <>
-int getSTId<ripple::SF_UINT512>() { return ripple::STI_UINT512; }
-
-template <>
-int getSTId<ripple::SF_ISSUE>() { return ripple::STI_ISSUE; }
-
-template <class T>
-T const&
-newSField(const int fieldValue, char const* fieldName)
-{
-    int const typeId = getSTId<T>();
-    if (typeId == ripple::STI_ARRAY || typeId == ripple::STI_OBJECT)
-    {
-        // TODO: merge `newSField` and `newUntypedSField` for a seamless experience
-        throw std::runtime_error("Must use `newUntypedSField` for arrays and objects");
+struct CustomTWSF : TWSF<ripple::STPluginType> {
+  operator ripple::TypedField<ripple::STPluginType> const &() const {
+    if (f_ == nullptr) {
+        ripple::SF_PLUGINTYPE const& sfield = ripple::constructCustomSField(tid_, fieldValue_, fieldName_.c_str());
+        f_ = (void *)&sfield;
     }
-    if (ripple::SField const& field = ripple::SField::getField(fieldName); field != ripple::sfInvalid)
-        return static_cast<T const&>(field);
-    T const* newSField = new T(typeId, fieldValue, fieldName);
-    return *newSField;
-}
-
-template <class T>
-ripple::SField const&
-newUntypedSField(const int fieldValue, char const* fieldName)
-{
-    if (ripple::SField const& field = ripple::SField::getField(fieldName); field != ripple::sfInvalid)
-        return field;
-    ripple::SField const* newSField = new ripple::SField(getSTId<T>(), fieldValue, fieldName);
-    return *newSField;
-}
+    return *static_cast<ripple::TypedField<ripple::STPluginType> *>(f_);
+  };
+};
 
 template <class T>
 TWSF<T>
-wrappedNewSField(const int fieldValue, std::string const fieldName)
+wrappedNewSField(const int fieldValue, const char* fieldName)
 {
-    ripple::TypedField<T> const& sfield = newSField<ripple::TypedField<T>>(fieldValue, fieldName.c_str());
-    return TWSF<T>{(void *)&sfield};
+    return TWSF<T>{nullptr, fieldValue, std::string(fieldName), ripple::getSTId<ripple::TypedField<T>>()};
 }
 
+// used only for STArray and STObject
 template <class T>
 WSF
 wrappedNewUntypedSField(const int fieldValue, std::string const fieldName)
 {
-    ripple::SField const& sfield = newUntypedSField<T>(fieldValue, fieldName.c_str());
-    return WSF{(void *)&sfield};
-}
-
-ripple::SF_PLUGINTYPE const&
-constructCustomSField(int tid, int fv, const char* fn) {
-    if (ripple::SField const& field = ripple::SField::getField(ripple::field_code(tid, fv)); field != ripple::sfInvalid)
-        return reinterpret_cast<ripple::SF_PLUGINTYPE const&>(field);
-    return *(new ripple::SF_PLUGINTYPE(tid, fv, fn));
+    return WSF{nullptr, fieldValue, fieldName, ripple::getSTId<T>()};
 }
 
 TWSF<ripple::STPluginType>
 constructCustomWrappedSField(int tid, const char* fn, int fv)
 {
-    ripple::SF_PLUGINTYPE const& sfield = constructCustomSField(tid, fv, fn);
-    return TWSF<ripple::STPluginType>{(void *)&sfield};
+    return CustomTWSF{nullptr, fv, std::string(fn), tid};
 }
 
 template <class... Args>
@@ -154,6 +96,27 @@ static ripple::uint256
 indexHash(std::uint16_t space, Args const&... args)
 {
     return ripple::sha512Half(space, args...);
+}
+
+extern "C" void initializePluginPointers(
+    void* pluginTxFormatPtr,
+    void* pluginObjectsMapPtr,
+    void* pluginInnerObjectFormatsPtr,
+    void* knownCodeToFieldPtr,
+    void* pluginSFieldCodesPtr,
+    void* pluginSTypesPtr,
+    void*pluginLeafParserMapPtr,
+    void* pluginTERcodes)
+{
+    ripple::registerTxFormats(static_cast<std::map<std::uint16_t, ripple::PluginTxFormat>*>(pluginTxFormatPtr));
+    ripple::registerLedgerObjects(static_cast<std::map<std::uint16_t, ripple::PluginLedgerFormat>*>(pluginObjectsMapPtr));
+    ripple::registerPluginInnerObjectFormats(static_cast<std::map<std::uint16_t, ripple::PluginInnerObjectFormat>*>(pluginInnerObjectFormatsPtr));
+    ripple::registerSFields(
+        static_cast<std::map<int, ripple::SField const*>*>(knownCodeToFieldPtr),
+        static_cast<std::vector<int>*>(pluginSFieldCodesPtr));
+    ripple::registerSTypes(static_cast<std::map<int, ripple::STypeFunctions>*>(pluginSTypesPtr));
+    ripple::registerLeafTypes(static_cast<std::map<int, ripple::parsePluginValuePtr>* >(pluginLeafParserMapPtr));
+    ripple::registerPluginTERs(static_cast<std::vector<ripple::TERExport>*>(pluginTERcodes));
 }
 
 namespace py = pybind11;
@@ -164,6 +127,10 @@ PYBIND11_MODULE(rippled_py, m) {
 
     py::options options;
     options.disable_enum_members_docstring();
+
+    // This function is left uncommented on purpose
+    // It should not be touched in Python code
+    m.def("initializePluginPointers", &initializePluginPointers);
 
     /*
     * Enums
@@ -433,7 +400,7 @@ PYBIND11_MODULE(rippled_py, m) {
     PythonWSF
         .def_property_readonly("fieldCode",
             [](const WSF &wsf) {
-                return static_cast<ripple::SField const&>(wsf).fieldCode;
+                return wsf.tid_ ? (wsf.tid_ << 16) | wsf.fieldValue_ : static_cast<ripple::SField const&>(wsf).fieldCode;
             },
             "(fieldType<<16)|fieldValue"
         )
@@ -444,31 +411,31 @@ PYBIND11_MODULE(rippled_py, m) {
         )
         .def_property_readonly("fieldName",
             [](const WSF &wsf) {
-                return static_cast<ripple::SField const&>(wsf).fieldName;
+                return wsf.tid_ ? wsf.fieldName_ : static_cast<ripple::SField const&>(wsf).fieldName;
             },
             "The name of the field."
         )
         .def_property_readonly("fieldType",
             [](const WSF &wsf) {
-                return static_cast<ripple::SField const&>(wsf).fieldType;
+                return wsf.tid_ ? wsf.tid_ : static_cast<ripple::SField const&>(wsf).fieldType;
             },
             "The SType of the field."
         )
         .def_property_readonly("fieldValue",
             [](const WSF &wsf) {
-                return static_cast<ripple::SField const&>(wsf).fieldValue;
+                return wsf.tid_ ? wsf.fieldValue_ : static_cast<ripple::SField const&>(wsf).fieldValue;
             },
             "The unique value of the field for that SType."
         )
         .def("__repr__",
             [](const WSF &wsf) {
-                return "sf" + static_cast<ripple::SField const&>(wsf).getName();
+                return "sf" + (wsf.tid_ ? wsf.fieldName_ : static_cast<ripple::SField const&>(wsf).fieldName);
             }
         )
         ;
     py::class_<TWSF<ripple::STAccount>, WSF> TWSF_STAccount(sfieldModule, "SF_ACCOUNT", "An SField representing an Account type.");
     py::class_<TWSF<ripple::STAmount>, WSF> TWSF_STAmount(sfieldModule, "SF_AMOUNT", "An SField representing an Amount type.");
-    py::class_<TWSF<ripple::STCurrency>, WSF> TWSF_STCurrency(sfieldModule, "SF_ISSUE", "An SField representing a Currency type.");
+    py::class_<TWSF<ripple::STCurrency>, WSF> TWSF_STCurrency(sfieldModule, "SF_CURRENCY", "An SField representing a Currency type.");
     py::class_<TWSF<ripple::STIssue>, WSF> TWSF_STIssue(sfieldModule, "SF_ISSUE", "An SField representing an Issue type.");
     py::class_<TWSF<ripple::STUInt8>, WSF> TWSF_STUInt8(sfieldModule, "SF_UINT8", "An SField representing a uint8 type.");
     py::class_<TWSF<ripple::STUInt16>, WSF> TWSF_STUInt16(sfieldModule, "SF_UINT16", "An SField representing a uint16 type.");
@@ -737,6 +704,7 @@ PYBIND11_MODULE(rippled_py, m) {
     py::class_<ripple::STVector256, ripple::STBase> STVector256(sTypeModule, "STVector256", "A serializeable type representing a 256-bit vector.");
     py::class_<ripple::STIssue, ripple::STBase> STIssue(sTypeModule, "STIssue", "A serializeable type representing an issued currency.");
     py::class_<ripple::STXChainBridge, ripple::STBase> STXChainBridge(sTypeModule, "STXChainBridge", "A serializeable type representing a cross-chain bridge.");
+    py::class_<ripple::STCurrency, ripple::STBase> STCurrency(sTypeModule, "STCurrency", "A serializeable type representing a currency.");
 
     py::class_<ripple::STArray, ripple::STBase> STArray(sTypeModule, "STArray", "A serializeable type representing an array of other serialized types.");
     STArray
@@ -1260,7 +1228,8 @@ PYBIND11_MODULE(rippled_py, m) {
         .def("_create_new_sfield_STBlob", &wrappedNewSField<ripple::STBlob>)
         .def("_create_new_sfield_STPluginType", &wrappedNewSField<ripple::STPluginType>)
         .def("_create_new_sfield_STVector256", &wrappedNewSField<ripple::STVector256>)
-        .def("_create_new_sfield_STPluginType", &wrappedNewSField<ripple::STPluginType>)
+        .def("_create_new_sfield_STIssue", &wrappedNewSField<ripple::STIssue>)
+        .def("_create_new_sfield_STCurrency", &wrappedNewSField<ripple::STCurrency>)
         .def("_create_new_sfield_STArray", &wrappedNewUntypedSField<ripple::STArray>)
         .def("_create_new_sfield_STObject", &wrappedNewUntypedSField<ripple::STObject>)
         .def("construct_custom_sfield", &constructCustomWrappedSField)
