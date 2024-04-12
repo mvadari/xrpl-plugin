@@ -37,11 +37,11 @@ jobs:
       - name: Lint
         run: |
           cd python
-          python flake8 xrpl_plugin examples --darglint-ignore-regex="^_(.*)"
+          flake8 xrpl_plugin examples --darglint-ignore-regex="^_(.*)"
 
       - name: Type-check
         run: |
-          python mypy --strict --implicit-reexport xrpl_plugin examples
+          mypy --strict --implicit-reexport xrpl_plugin examples
 
   unit-test:
     name: Unit test
