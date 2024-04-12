@@ -1,0 +1,64 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+env:
+  POETRY_VERSION: 1.4.2
+
+jobs:
+  lint-and-type-check:
+    name: Lint and type-check
+    runs-on: ubuntu-latest
+
+    env:
+      PYTHON_VERSION: "3.8"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Display Python version
+        run: |
+          python -c "import sys; print(sys.version)"
+
+      - name: Lint
+        run: |
+          cd python
+          python flake8 xrpl_plugin examples --darglint-ignore-regex="^_(.*)"
+
+      - name: Type-check
+        run: |
+          python mypy --strict --implicit-reexport xrpl_plugin examples
+
+  unit-test:
+    name: Unit test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Display Python version
+        run: |
+          python -c "import sys; print(sys.version)"
+
+      - name: Install package
+        run: |
+          pip install ./python
