@@ -22,7 +22,6 @@ def generate_cpp(tx_name, module_name, python_folder):
 
 #include <pybind11/embed.h> // everything needed for embedding
 #include <pybind11/stl.h>
-#include <pybind11/functional.h>
 
 namespace py = pybind11;
 using namespace pybind11::literals; // to bring in the `_a` literal
@@ -374,7 +373,7 @@ struct LedgerObjectExportInternal {{
 }};
 
 LedgerObjectExport
-mutateLedgerObjects(LedgerObjectExportInternal const& obj)
+mutateLedgerObject(LedgerObjectExportInternal const& obj)
 {{
     return LedgerObjectExport{{
         obj.type,
@@ -498,7 +497,7 @@ getLedgerObjects()
     }}();
     static std::vector<LedgerObjectExport> output;
     output.reserve(objects.size());
-    std::transform(objects.begin(), objects.end(), std::back_inserter(output), mutateLedgerObjects);
+    std::transform(objects.begin(), objects.end(), std::back_inserter(output), mutateLedgerObject);
     return {{const_cast<LedgerObjectExport *>(output.data()), static_cast<int>(output.size())}};
 }}
 
@@ -769,7 +768,7 @@ struct TERExportInternal {{
 }};
 
 TERExport
-mutateTERcodes(TERExportInternal const& TERcode)
+mutateTERcode(TERExportInternal const& TERcode)
 {{
     return TERExport{{
         TERcode.code,
@@ -802,7 +801,7 @@ getTERcodes()
     }}();
     static std::vector<TERExport> output;
     output.reserve(codes.size());
-    std::transform(codes.begin(), codes.end(), std::back_inserter(output), mutateTERcodes);
+    std::transform(codes.begin(), codes.end(), std::back_inserter(output), mutateTERcode);
     return {{const_cast<TERExport *>(output.data()), static_cast<int>(output.size())}};
 }}
 
@@ -1135,7 +1134,6 @@ def build_files(cpp_file, project_name):
         p = subprocess.Popen(
             ["cmake", "--build", "."] + build_args,
             stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
             cwd=build_temp,
         )
 
@@ -1151,7 +1149,8 @@ def build_files(cpp_file, project_name):
             update_progress(progress)
         p.stdout.close()
         p.wait()
-        print(f"\nPlugin generated: {output_dir}/{project_name}.xrplugin")
+        if p.returncode != 0:
+            print(f"\nPlugin generated: {output_dir}/{project_name}.xrplugin")
 
 
 def build():
