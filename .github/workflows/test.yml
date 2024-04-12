@@ -30,6 +30,10 @@ jobs:
         run: |
           python -c "import sys; print(sys.version)"
 
+      - name: Install linter packages
+        run: |
+          pip install flake8 mypy
+
       - name: Lint
         run: |
           cd python
