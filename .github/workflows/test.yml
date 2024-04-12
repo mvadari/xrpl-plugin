@@ -44,7 +44,7 @@ jobs:
       - name: Lint
         run: |
           cd python
-          flake8 xrpl_plugin examples --darglint-ignore-regex="^_(.*)"
+          flake8 xrpl_plugin examples
 
       - name: Type-check
         run: |
