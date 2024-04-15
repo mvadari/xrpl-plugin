@@ -57,7 +57,6 @@ from xrpl_plugin.sfields import (
     sf_previous_txn_id,
     sf_previous_txn_lgr_seq,
     sf_source_tag,
-    sf_ticket_sequence,
     construct_custom_sfield,
     create_new_sfield,
 )
@@ -76,7 +75,7 @@ sf_fake_element = create_new_sfield(STObject, "FakeElement", 17)
 STI_ACCOUNT2 = 28
 
 
-def parse_account2(field, json_name, field_name, _name, value):
+def parse_account2(_field, json_name, field_name, _name, value):
     if not value.is_string():
         return bad_type(json_name, field_name)
     str_value = value.as_string()
@@ -119,7 +118,7 @@ stypes = [
 sfields = [sf_finish_after2, sf_destination2, sf_fake_array, sf_fake_element]
 
 
-ltNEW_ESCROW = 0x74
+ltNEW_ESCROW = 0x89
 NEW_ESCROW_NAMESPACE = ord("t")
 
 
@@ -314,7 +313,7 @@ def do_apply(ctx, _m_prior_balance, _m_source_balance):
 transactors = [
     Transactor(
         name="NewEscrowCreate",
-        tx_type=47,
+        tx_type=98,
         tx_format=[
             (sf_destination2, soeREQUIRED),
             (sf_amount, soeREQUIRED),
@@ -322,7 +321,6 @@ transactors = [
             (sf_cancel_after, soeOPTIONAL),
             (sf_finish_after2, soeOPTIONAL),
             (sf_destination_tag, soeOPTIONAL),
-            (sf_ticket_sequence, soeOPTIONAL),
             (sf_fake_array, soeOPTIONAL),
         ],
         consequences_factory_type=ConsequencesFactoryType.Normal,

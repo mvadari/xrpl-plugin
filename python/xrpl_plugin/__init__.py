@@ -1,6 +1,5 @@
-"""The main Python package."""
+"""A package to implement XRPL plugins in Python."""
 
-from .build_scripts import build
 from xrpl_plugin import basic_types
 from xrpl_plugin import models
 from xrpl_plugin import nfts
@@ -10,6 +9,7 @@ from xrpl_plugin import return_codes
 from xrpl_plugin import keylets
 from xrpl_plugin import ledger_objects
 from xrpl_plugin import transactors
+from .build_scripts import build
 
 __all__ = [
     "models",

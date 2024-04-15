@@ -13,6 +13,7 @@ def generate_cpp(tx_name, module_name, python_folder):
 #include <ripple/ledger/View.h>
 #include <ripple/plugin/exports.h>
 #include <ripple/protocol/Feature.h>
+#include <ripple/protocol/InnerObjectFormats.h>
 #include <ripple/protocol/TER.h>
 #include <ripple/protocol/TxFlags.h>
 #include <ripple/protocol/st.h>
@@ -324,11 +325,9 @@ getTransactors()
             for (py::object transactor: pythonFormat)
             {{
                 py::tuple tup = transactor.cast<py::tuple>();
-                WSF sfield = tup[0].cast<WSF>();
-                SOEStyle varType = tup[1].cast<SOEStyle>();
                 format.emplace_back(SOElementExport{{
-                    static_cast<SField const&>(sfield).getCode(),
-                    varType}});
+                    tup[0].attr("fieldCode").cast<int>(),
+                    tup[1].cast<SOEStyle>()}});
             }}
 
             auto exportedTx = TransactorExportInternal{{
@@ -374,7 +373,7 @@ struct LedgerObjectExportInternal {{
 }};
 
 LedgerObjectExport
-mutate(LedgerObjectExportInternal const& obj)
+mutateLedgerObject(LedgerObjectExportInternal const& obj)
 {{
     return LedgerObjectExport{{
         obj.type,
@@ -481,11 +480,9 @@ getLedgerObjects()
             for (py::object variable: pythonObjectFormat)
             {{
                 py::tuple tup = variable.cast<py::tuple>();
-                WSF sfield = tup[0].cast<WSF>();
-                SOEStyle varType = tup[1].cast<SOEStyle>();
                 objectFormat.emplace_back(SOElementExport{{
-                    static_cast<SField const&>(sfield).getCode(),
-                    varType}});
+                    tup[0].attr("fieldCode").cast<int>(),
+                    tup[1].cast<SOEStyle>()}});
             }}
             temp.emplace_back(LedgerObjectExportInternal{{
                 objectType,
@@ -500,7 +497,7 @@ getLedgerObjects()
     }}();
     static std::vector<LedgerObjectExport> output;
     output.reserve(objects.size());
-    std::transform(objects.begin(), objects.end(), std::back_inserter(output), mutate);
+    std::transform(objects.begin(), objects.end(), std::back_inserter(output), mutateLedgerObject);
     return {{const_cast<LedgerObjectExport *>(output.data()), static_cast<int>(output.size())}};
 }}
 
@@ -508,20 +505,28 @@ getLedgerObjects()
 // SFields
 // ----------------------------------------------------------------------------
 
-static struct
+struct SFieldExportInternal {{
+    int typeId;
+    int fieldValue;
+    std::string txtName;
+}};
+
+SFieldExport
+mutateSField(SFieldExportInternal const& field)
 {{
-    bool operator()(py::object a, py::object b) const {{ 
-        return a.attr("fieldNum").cast<int>() < b.attr("fieldNum").cast<int>();
-    }}
+    return SFieldExport{{
+        field.typeId,
+        field.fieldValue,
+        field.txtName.c_str(),
+    }};
 }}
-sFieldSorter;
 
 extern "C"
 Container<SFieldExport>
 getSFields()
 {{
-    static std::vector<SFieldExport> const sFields = []{{
-        std::vector<SFieldExport> temp = {{}};
+    static std::vector<SFieldExportInternal> const sFields = []{{
+        std::vector<SFieldExportInternal> temp = {{}};
         CustomScopedInterpreter guard{{}}; // start the interpreter and keep it alive
         py::module_::import("sys").attr("path").attr("append")("{python_folder}");
         py::module pluginImport = py::module_::import("{module_name}");
@@ -529,19 +534,19 @@ getSFields()
             return temp;
         }}
         auto sfields = pluginImport.attr("sfields").cast<std::vector<py::object>>();
-        std::sort(sfields.begin(), sfields.end(), sFieldSorter);
-        for (py::object& variable: sfields)
+        for (py::object& sfield: sfields)
         {{
-            WSF wrappedSField = variable.cast<WSF>();
-            SField const& sfield = static_cast<SField const&>(wrappedSField);
-            temp.emplace_back(SFieldExport{{
-                sfield.fieldType,
-                sfield.fieldValue,
-                sfield.jsonName}});
+            temp.emplace_back(SFieldExportInternal{{
+                sfield.attr("fieldType").cast<int>(),
+                sfield.attr("fieldValue").cast<int>(),
+                sfield.attr("fieldName").cast<std::string>()}});
         }}
         return temp;
     }}();
-    return {{const_cast<SFieldExport *>(sFields.data()), static_cast<int>(sFields.size())}};
+    static std::vector<SFieldExport> output;
+    output.reserve(sFields.size());
+    std::transform(sFields.begin(), sFields.end(), std::back_inserter(output), mutateSField);
+    return {{const_cast<SFieldExport *>(output.data()), static_cast<int>(output.size())}};
 }}
 
 // ----------------------------------------------------------------------------
@@ -763,7 +768,7 @@ struct TERExportInternal {{
 }};
 
 TERExport
-mutateTERcodes(TERExportInternal const& TERcode)
+mutateTERcode(TERExportInternal const& TERcode)
 {{
     return TERExport{{
         TERcode.code,
@@ -796,7 +801,7 @@ getTERcodes()
     }}();
     static std::vector<TERExport> output;
     output.reserve(codes.size());
-    std::transform(codes.begin(), codes.end(), std::back_inserter(output), mutateTERcodes);
+    std::transform(codes.begin(), codes.end(), std::back_inserter(output), mutateTERcode);
     return {{const_cast<TERExport *>(output.data()), static_cast<int>(output.size())}};
 }}
 
@@ -947,7 +952,7 @@ InnerObjectExport
 mutateInnerObject(InnerObjectExportInternal const& innerObject)
 {{
     return InnerObjectExport{{
-        innerObject.code,
+        static_cast<uint16_t>(innerObject.code),
         innerObject.name.c_str(),
         {{const_cast<SOElementExport *>(innerObject.format.data()), static_cast<int>(innerObject.format.size())}},
     }};
@@ -975,19 +980,14 @@ getInnerObjectFormats()
             for (py::object innerObject: pythonFormat)
             {{
                 py::tuple tup = innerObject.cast<py::tuple>();
-                WSF sfield = tup[0].cast<WSF>();
-                SOEStyle varType = tup[1].cast<SOEStyle>();
                 format.emplace_back(SOElementExport{{
-                    static_cast<SField const&>(sfield).getCode(),
-                    varType}});
+                    tup[0].attr("fieldCode").cast<int>(),
+                    tup[1].cast<SOEStyle>()}});
             }}
 
-            WSF wrappedField = innerObject.attr("field").cast<WSF>();
-            SField const& field = static_cast<SField const&>(wrappedField);
-
             auto exportedTx = InnerObjectExportInternal{{
-                field.getCode(),
-                std::string(field.jsonName.c_str()),
+                innerObject.attr("field").attr("fieldCode").cast<int>(),
+                innerObject.attr("field").attr("fieldName").cast<std::string>(),
                 format,
             }};
 
@@ -1000,11 +1000,77 @@ getInnerObjectFormats()
     std::transform(innerObjects.begin(), innerObjects.end(), std::back_inserter(output), mutateInnerObject);
     return {{const_cast<InnerObjectExport *>(output.data()), static_cast<int>(output.size())}};
 }}
+
+typedef void (*initializePluginPointersPtr)(
+    std::map<std::uint16_t, ripple::PluginTxFormat>*,
+    std::map<std::uint16_t, ripple::PluginLedgerFormat>*,
+    std::map<std::uint16_t, ripple::PluginInnerObjectFormat>*,
+    std::map<int, ripple::SField const*>*,
+    std::vector<int>*,
+    std::map<int, ripple::STypeFunctions>*,
+    std::map<int, ripple::parsePluginValuePtr>*,
+    std::vector<ripple::TERExport>*);
+
+using init_ptr = std::function<void(
+    std::map<std::uint16_t, ripple::PluginTxFormat>*,
+    std::map<std::uint16_t, ripple::PluginLedgerFormat>*,
+    std::map<std::uint16_t, ripple::PluginInnerObjectFormat>*,
+    std::map<int, ripple::SField const*>*,
+    std::vector<int>*,
+    std::map<int, ripple::STypeFunctions>*,
+    std::map<int, ripple::parsePluginValuePtr>*,
+    std::vector<ripple::TERExport>*)>;
+
+extern "C" void setPluginPointers(
+    std::map<std::uint16_t, PluginTxFormat>* pluginTxFormatPtr,
+    std::map<std::uint16_t, PluginLedgerFormat>* pluginObjectsMapPtr,
+    std::map<std::uint16_t, PluginInnerObjectFormat>*
+        pluginInnerObjectFormatsPtr,
+    std::map<int, SField const*>* knownCodeToFieldPtr,
+    std::vector<int>* pluginSFieldCodesPtr,
+    std::map<int, STypeFunctions>* pluginSTypesPtr,
+    std::map<int, parsePluginValuePtr>* pluginLeafParserMapPtr,
+    std::vector<TERExport>* pluginTERcodes)
+{{
+    registerTxFormats(pluginTxFormatPtr);
+    registerLedgerObjects(pluginObjectsMapPtr);
+    registerPluginInnerObjectFormats(pluginInnerObjectFormatsPtr);
+    registerSFields(knownCodeToFieldPtr, pluginSFieldCodesPtr);
+    registerSTypes(pluginSTypesPtr);
+    registerLeafTypes(pluginLeafParserMapPtr);
+    registerPluginTERs(pluginTERcodes);
+
+    CustomScopedInterpreter guard{{}}; // start the interpreter and keep it alive
+    py::module_::import("sys").attr("path").attr("append")("{python_folder}");
+    auto initializePtr = py::module_::import("xrpl_plugin").attr("rippled_py").attr("initializePluginPointers");
+    initializePtr(
+        (void *)pluginTxFormatPtr,
+        (void *)pluginObjectsMapPtr,
+        (void *)pluginInnerObjectFormatsPtr,
+        (void *)knownCodeToFieldPtr,
+        (void *)pluginSFieldCodesPtr,
+        (void *)pluginSTypesPtr,
+        (void *)pluginLeafParserMapPtr,
+        (void *)pluginTERcodes);
+}}
 """
 
+
+def update_progress(progress):
+    bar_length = 30
+    sys.stdout.write("\r")
+    sys.stdout.write(
+        "Building: |{:{}}| {:>3}% Completed".format(
+            "█" * int(progress / (100.0 / bar_length)), bar_length, int(progress)
+        )
+    )
+    sys.stdout.flush()
+
+
 def snake_to_camel_case(string):
-    temp = string.split('_')
-    return temp[0].capitalize() + ''.join(ele.title() for ele in temp[1:])
+    temp = string.split("_")
+    return temp[0].capitalize() + "".join(ele.title() for ele in temp[1:])
+
 
 def create_files(python_file):
     abs_python_file = os.path.abspath(python_file)
@@ -1023,10 +1089,13 @@ def create_files(python_file):
 
     return os.path.abspath(f"{tx_name}.cpp"), module_name
 
+
 def build_files(cpp_file, project_name):
     with tempfile.TemporaryDirectory() as build_temp:
         build_source_dir = os.path.dirname(__file__)
         conan_source_dir = build_source_dir
+        # build_temp = os.getcwd()
+        output_dir = os.getcwd()
         conan_build_dir = os.path.join(conan_source_dir, "build", "generators")
         cmake_args = []
         build_args = []
@@ -1047,7 +1116,7 @@ def build_files(cpp_file, project_name):
             )
         conan_cmake_file = os.path.join(conan_build_dir, "conan_toolchain.cmake")
         cmake_args += [
-            f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={os.getcwd()}{os.sep}",
+            f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={output_dir}",
             f"-DPROJECT_NAME={project_name}",
             f"-DSOURCE_FILE={cpp_file}",
             f"-DCMAKE_TOOLCHAIN_FILE:FILEPATH={conan_cmake_file}",
@@ -1058,16 +1127,39 @@ def build_files(cpp_file, project_name):
             ["cmake", build_source_dir] + cmake_args,
             cwd=build_temp,
             check=True,
-            stdout=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
         )
-        subprocess.run(
+
+        p = subprocess.Popen(
             ["cmake", "--build", "."] + build_args,
+            stdout=subprocess.PIPE,
             cwd=build_temp,
-            check=True,
-            stdout=subprocess.DEVNULL,
         )
+
+        for line in iter(p.stdout.readline, b""):
+            decoded = line.decode("utf-8")
+            progress = decoded[decoded.find("[") + 1 : decoded.find("]")].replace(
+                "%", ""
+            )
+            try:
+                progress = int(progress)
+            except ValueError:
+                progress = 0
+            update_progress(progress)
+        p.stdout.close()
+        p.wait()
+        if p.returncode != 0:
+            print(f"\nPlugin generated: {output_dir}/{project_name}.xrplugin")
 
 
 def build():
     cpp_file_fullpath, module_name = create_files(sys.argv[1])
     build_files(cpp_file_fullpath, module_name)
+
+
+# This is included just for dev purposes, to avoid needing to reinstall the
+# whole package whenever this script is updated during library development
+# It should not be used in prod
+# if __name__ == "__main__":
+#     build()

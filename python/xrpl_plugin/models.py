@@ -35,6 +35,10 @@ from xrpl_plugin.return_codes import TER, NotTEC
 
 @dataclass(frozen=True)
 class Transactor:
+    """
+    A model representing a plugin transactor.
+    """
+
     name: str
     tx_type: int
     tx_format: List[Tuple[SField, SOEStyle]]
@@ -52,6 +56,10 @@ class Transactor:
 
 @dataclass(frozen=True)
 class SType:
+    """
+    A model representing a plugin Serialized Type.
+    """
+
     type_id: int
     parse_value: Callable[
         [SField, str, str, SField, JsonValue], Union[Buffer, JsonValue]
@@ -64,6 +72,10 @@ class SType:
 
 @dataclass(frozen=True)
 class Amendment:
+    """
+    A model representing a plugin amendment.
+    """
+
     name: str
     supported: bool
     vote: VoteBehavior
@@ -71,12 +83,24 @@ class Amendment:
 
 @dataclass(frozen=True)
 class TERCode:
+    """
+    A model representing a plugin TER code (a transaction return code).
+    """
+
     code: int
     code_str: str
     description: str
 
 
 class InvariantCheck(ABC):
+    """
+    A model representing a plugin invariant check.
+
+    Invariant checks are run after a transaction has been processed to ensure
+    that the transaction didn't accidentally do something it wasn't allowed to
+    do, like create more XRP.
+    """
+
     def process_data(self, data):
         if data is None:
             return
@@ -105,6 +129,10 @@ class InvariantCheck(ABC):
 
 @dataclass(frozen=True)
 class LedgerObject:
+    """
+    A model representing a plugin ledger object.
+    """
+
     object_type: int
     name: str
     rpc_name: str

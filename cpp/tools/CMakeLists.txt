@@ -16,3 +16,12 @@ target_link_libraries(stype_debugger PUBLIC
   xrpl_plugin
 )
 install(TARGETS stype_debugger)
+
+add_executable(plugin_debugger)
+target_sources(plugin_debugger PRIVATE 
+  DebugOutput.cpp
+)
+target_link_libraries(plugin_debugger PUBLIC
+  xrpl_plugin
+)
+install(TARGETS plugin_debugger)

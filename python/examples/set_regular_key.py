@@ -1,3 +1,7 @@
+"""
+This file contains a Python implementation of `SetRegularKey`.
+"""
+
 from xrpl_plugin.transactors import (
     ConsequencesFactoryType,
     fixMasterKeyAsRegularKey,
@@ -15,9 +19,11 @@ from xrpl_plugin.return_codes import (
     temINVALID_FLAG,
     tesSUCCESS,
 )
-from xrpl_plugin.sfields import sf_account, sf_regular_key, sf_ticket_sequence
+from xrpl_plugin.sfields import sf_account, sf_regular_key
 
 
+# Checks that are done without access to ledger state, just the transaction
+# These checks can be performed on the submission node without broadcasting
 def preflight(ctx):
     print("This is a Python plugin")
     if (preflight1ret := preflight1(ctx)) != tesSUCCESS:
@@ -56,9 +62,11 @@ def do_apply(ctx, _mPriorBalance, _mSourceBalance):
 
 transactors = [
     Transactor(
-        name="DummyTx",
-        tx_type=50,
-        tx_format=[(sf_regular_key, soeOPTIONAL), (sf_ticket_sequence, soeOPTIONAL)],
+        name="SetRegularKey2",
+        tx_type=97,
+        tx_format=[
+            (sf_regular_key, soeOPTIONAL),
+        ],
         consequences_factory_type=ConsequencesFactoryType.Normal,
         preflight=preflight,
         do_apply=do_apply,

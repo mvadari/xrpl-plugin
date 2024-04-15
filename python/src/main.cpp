@@ -16,6 +16,8 @@
 #include <ripple/app/tx/impl/details/NFTokenUtils.h>
 #include <ripple/app/tx/impl/ApplyContext.h>
 #include <ripple/protocol/digest.h>
+#include <ripple/plugin/createSFields.h>
+#include <ripple/protocol/InnerObjectFormats.h>
 #include <map>
 #include <iostream>
 #include <string>
@@ -23,130 +25,70 @@
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 
+ripple::SField const&
+newUntypedSField(const int fieldValue, std::string fieldName)
+{
+    if (ripple::SField const& field = ripple::SField::getField(fieldName); field != ripple::sfInvalid)
+    {
+        return field;
+    }
+    throw std::runtime_error(
+        "SField " + std::string(fieldName) + " doesn't exist.");
+}
+
 struct WSF {
-  void *f_;
+  mutable void *f_;
+  const int fieldValue_;
+  std::string const fieldName_;
+  const int tid_;
   operator ripple::SField const &() const {
+    if (f_ == nullptr) {
+        ripple::SField const& sfield = newUntypedSField(fieldValue_, fieldName_);
+        f_ = (void *)&sfield;
+    }
     return *static_cast<ripple::SField *>(f_);
   };
 };
 
 template <class T> struct TWSF : WSF {
   operator ripple::TypedField<T> const &() const {
+    if (f_ == nullptr) {
+        ripple::TypedField<T> const& sfield = ripple::newSField<ripple::TypedField<T>>(fieldValue_, fieldName_);
+        f_ = (void *)&sfield;
+    }
     return *static_cast<ripple::TypedField<T> *>(f_);
   };
 };
 
-template <typename T>
-int getSTId() { return 0; }
-
-template <>
-int getSTId<ripple::SF_UINT8>() { return ripple::STI_UINT8; }
-
-template <>
-int getSTId<ripple::SF_UINT16>() { return ripple::STI_UINT16; }
-
-template <>
-int getSTId<ripple::SF_UINT32>() { return ripple::STI_UINT32; }
-
-template <>
-int getSTId<ripple::SF_UINT64>() { return ripple::STI_UINT64; }
-
-template <>
-int getSTId<ripple::SF_UINT128>() { return ripple::STI_UINT128; }
-
-template <>
-int getSTId<ripple::SF_UINT256>() { return ripple::STI_UINT256; }
-
-template <>
-int getSTId<ripple::SF_UINT160>() { return ripple::STI_UINT160; }
-
-template <>
-int getSTId<ripple::SF_AMOUNT>() { return ripple::STI_AMOUNT; }
-
-template <>
-int getSTId<ripple::SF_VL>() { return ripple::STI_VL; }
-
-template <> 
-int getSTId<ripple::SF_ACCOUNT>() { return ripple::STI_ACCOUNT; }
-
-template <> 
-int getSTId<ripple::STObject>() { return ripple::STI_OBJECT; }
-
-template <> 
-int getSTId<ripple::STArray>() { return ripple::STI_ARRAY; }
-
-template <>
-int getSTId<ripple::SF_VECTOR256>() { return ripple::STI_VECTOR256; }
-
-template <>
-int getSTId<ripple::SF_UINT96>() { return ripple::STI_UINT96; }
-
-template <>
-int getSTId<ripple::SF_UINT192>() { return ripple::STI_UINT192; }
-
-template <>
-int getSTId<ripple::SF_UINT384>() { return ripple::STI_UINT384; }
-
-template <>
-int getSTId<ripple::SF_UINT512>() { return ripple::STI_UINT512; }
-
-template <>
-int getSTId<ripple::SF_ISSUE>() { return ripple::STI_ISSUE; }
-
-template <class T>
-T const&
-newSField(const int fieldValue, char const* fieldName)
-{
-    int const typeId = getSTId<T>();
-    if (typeId == ripple::STI_ARRAY || typeId == ripple::STI_OBJECT)
-    {
-        // TODO: merge `newSField` and `newUntypedSField` for a seamless experience
-        throw std::runtime_error("Must use `newUntypedSField` for arrays and objects");
+struct CustomTWSF : TWSF<ripple::STPluginType> {
+  operator ripple::TypedField<ripple::STPluginType> const &() const {
+    if (f_ == nullptr) {
+        ripple::SF_PLUGINTYPE const& sfield = ripple::constructCustomSField(tid_, fieldValue_, fieldName_.c_str());
+        f_ = (void *)&sfield;
     }
-    if (ripple::SField const& field = ripple::SField::getField(fieldName); field != ripple::sfInvalid)
-        return static_cast<T const&>(field);
-    T const* newSField = new T(typeId, fieldValue, fieldName);
-    return *newSField;
-}
-
-template <class T>
-ripple::SField const&
-newUntypedSField(const int fieldValue, char const* fieldName)
-{
-    if (ripple::SField const& field = ripple::SField::getField(fieldName); field != ripple::sfInvalid)
-        return field;
-    ripple::SField const* newSField = new ripple::SField(getSTId<T>(), fieldValue, fieldName);
-    return *newSField;
-}
+    return *static_cast<ripple::TypedField<ripple::STPluginType> *>(f_);
+  };
+};
 
 template <class T>
 TWSF<T>
-wrappedNewSField(const int fieldValue, std::string const fieldName)
+wrappedNewSField(const int fieldValue, const char* fieldName)
 {
-    ripple::TypedField<T> const& sfield = newSField<ripple::TypedField<T>>(fieldValue, fieldName.c_str());
-    return TWSF<T>{(void *)&sfield};
+    return TWSF<T>{nullptr, fieldValue, std::string(fieldName), ripple::getSTId<ripple::TypedField<T>>()};
 }
 
+// used only for STArray and STObject
 template <class T>
 WSF
 wrappedNewUntypedSField(const int fieldValue, std::string const fieldName)
 {
-    ripple::SField const& sfield = newUntypedSField<T>(fieldValue, fieldName.c_str());
-    return WSF{(void *)&sfield};
-}
-
-ripple::SF_PLUGINTYPE const&
-constructCustomSField(int tid, int fv, const char* fn) {
-    if (ripple::SField const& field = ripple::SField::getField(ripple::field_code(tid, fv)); field != ripple::sfInvalid)
-        return reinterpret_cast<ripple::SF_PLUGINTYPE const&>(field);
-    return *(new ripple::SF_PLUGINTYPE(tid, fv, fn));
+    return WSF{nullptr, fieldValue, fieldName, ripple::getSTId<T>()};
 }
 
 TWSF<ripple::STPluginType>
 constructCustomWrappedSField(int tid, const char* fn, int fv)
 {
-    ripple::SF_PLUGINTYPE const& sfield = constructCustomSField(tid, fv, fn);
-    return TWSF<ripple::STPluginType>{(void *)&sfield};
+    return CustomTWSF{nullptr, fv, std::string(fn), tid};
 }
 
 template <class... Args>
@@ -154,6 +96,27 @@ static ripple::uint256
 indexHash(std::uint16_t space, Args const&... args)
 {
     return ripple::sha512Half(space, args...);
+}
+
+extern "C" void initializePluginPointers(
+    void* pluginTxFormatPtr,
+    void* pluginObjectsMapPtr,
+    void* pluginInnerObjectFormatsPtr,
+    void* knownCodeToFieldPtr,
+    void* pluginSFieldCodesPtr,
+    void* pluginSTypesPtr,
+    void*pluginLeafParserMapPtr,
+    void* pluginTERcodes)
+{
+    ripple::registerTxFormats(static_cast<std::map<std::uint16_t, ripple::PluginTxFormat>*>(pluginTxFormatPtr));
+    ripple::registerLedgerObjects(static_cast<std::map<std::uint16_t, ripple::PluginLedgerFormat>*>(pluginObjectsMapPtr));
+    ripple::registerPluginInnerObjectFormats(static_cast<std::map<std::uint16_t, ripple::PluginInnerObjectFormat>*>(pluginInnerObjectFormatsPtr));
+    ripple::registerSFields(
+        static_cast<std::map<int, ripple::SField const*>*>(knownCodeToFieldPtr),
+        static_cast<std::vector<int>*>(pluginSFieldCodesPtr));
+    ripple::registerSTypes(static_cast<std::map<int, ripple::STypeFunctions>*>(pluginSTypesPtr));
+    ripple::registerLeafTypes(static_cast<std::map<int, ripple::parsePluginValuePtr>* >(pluginLeafParserMapPtr));
+    ripple::registerPluginTERs(static_cast<std::vector<ripple::TERExport>*>(pluginTERcodes));
 }
 
 namespace py = pybind11;
@@ -164,6 +127,10 @@ PYBIND11_MODULE(rippled_py, m) {
 
     py::options options;
     options.disable_enum_members_docstring();
+
+    // This function is left uncommented on purpose
+    // It should not be touched in Python code
+    m.def("initializePluginPointers", &initializePluginPointers);
 
     /*
     * Enums
@@ -317,7 +284,6 @@ PYBIND11_MODULE(rippled_py, m) {
         .value("tecKILLED", ripple::TECcodes::tecKILLED)
         .value("tecHAS_OBLIGATIONS", ripple::TECcodes::tecHAS_OBLIGATIONS)
         .value("tecTOO_SOON", ripple::TECcodes::tecTOO_SOON)
-        .value("tecHOOK_ERROR", ripple::TECcodes::tecHOOK_ERROR)
         .value("tecMAX_SEQUENCE_REACHED", ripple::TECcodes::tecMAX_SEQUENCE_REACHED)
         .value("tecNO_SUITABLE_NFTOKEN_PAGE", ripple::TECcodes::tecNO_SUITABLE_NFTOKEN_PAGE)
         .value("tecNFTOKEN_BUY_SELL_MISMATCH", ripple::TECcodes::tecNFTOKEN_BUY_SELL_MISMATCH)
@@ -434,7 +400,7 @@ PYBIND11_MODULE(rippled_py, m) {
     PythonWSF
         .def_property_readonly("fieldCode",
             [](const WSF &wsf) {
-                return static_cast<ripple::SField const&>(wsf).fieldCode;
+                return wsf.tid_ ? (wsf.tid_ << 16) | wsf.fieldValue_ : static_cast<ripple::SField const&>(wsf).fieldCode;
             },
             "(fieldType<<16)|fieldValue"
         )
@@ -445,30 +411,32 @@ PYBIND11_MODULE(rippled_py, m) {
         )
         .def_property_readonly("fieldName",
             [](const WSF &wsf) {
-                return static_cast<ripple::SField const&>(wsf).fieldName;
+                return wsf.tid_ ? wsf.fieldName_ : static_cast<ripple::SField const&>(wsf).fieldName;
             },
             "The name of the field."
         )
         .def_property_readonly("fieldType",
             [](const WSF &wsf) {
-                return static_cast<ripple::SField const&>(wsf).fieldType;
+                return wsf.tid_ ? wsf.tid_ : static_cast<ripple::SField const&>(wsf).fieldType;
             },
             "The SType of the field."
         )
         .def_property_readonly("fieldValue",
             [](const WSF &wsf) {
-                return static_cast<ripple::SField const&>(wsf).fieldValue;
+                return wsf.tid_ ? wsf.fieldValue_ : static_cast<ripple::SField const&>(wsf).fieldValue;
             },
             "The unique value of the field for that SType."
         )
         .def("__repr__",
             [](const WSF &wsf) {
-                return "sf" + static_cast<ripple::SField const&>(wsf).getName();
+                return "sf" + (wsf.tid_ ? wsf.fieldName_ : static_cast<ripple::SField const&>(wsf).fieldName);
             }
         )
         ;
     py::class_<TWSF<ripple::STAccount>, WSF> TWSF_STAccount(sfieldModule, "SF_ACCOUNT", "An SField representing an Account type.");
     py::class_<TWSF<ripple::STAmount>, WSF> TWSF_STAmount(sfieldModule, "SF_AMOUNT", "An SField representing an Amount type.");
+    py::class_<TWSF<ripple::STCurrency>, WSF> TWSF_STCurrency(sfieldModule, "SF_CURRENCY", "An SField representing a Currency type.");
+    py::class_<TWSF<ripple::STIssue>, WSF> TWSF_STIssue(sfieldModule, "SF_ISSUE", "An SField representing an Issue type.");
     py::class_<TWSF<ripple::STUInt8>, WSF> TWSF_STUInt8(sfieldModule, "SF_UINT8", "An SField representing a uint8 type.");
     py::class_<TWSF<ripple::STUInt16>, WSF> TWSF_STUInt16(sfieldModule, "SF_UINT16", "An SField representing a uint16 type.");
     py::class_<TWSF<ripple::STUInt32>, WSF> TWSF_STUInt32(sfieldModule, "SF_UINT32", "An SField representing a uint32 type.");
@@ -479,6 +447,7 @@ PYBIND11_MODULE(rippled_py, m) {
     py::class_<TWSF<ripple::STBlob>, WSF> TWSF_STBlob(sfieldModule, "SF_VL", "An SField representing a variable length type.");
     py::class_<TWSF<ripple::STPluginType>, WSF> TWSF_STPluginType(sfieldModule, "SF_PLUGINTYPE", "An SField representing a type that has been imported via a plugin.");
     py::class_<TWSF<ripple::STVector256>, WSF> TWSF_STVector256(sfieldModule, "SF_VECTOR256", "An SField representing a 256-bit vector type.");
+    py::class_<TWSF<ripple::STXChainBridge>, WSF> TWSF_STXChainBridge(sfieldModule, "SF_XCHAINBRIDGE", "An SField representing an XChainBridge type.");
 
     py::module_ basicsModule = m.def_submodule("basic_types", "Basic/fundamental types.");
 
@@ -733,6 +702,9 @@ PYBIND11_MODULE(rippled_py, m) {
     py::class_<ripple::STPathSet, ripple::STBase> STPathSet(sTypeModule, "STPathSet", "A serializeable type representing a path set in a cross-currency payment.");
     py::class_<ripple::STPluginType, ripple::STBase> STPluginType(sTypeModule, "STPluginType", "A serializeable type that is imported at runtime via a plugin.");
     py::class_<ripple::STVector256, ripple::STBase> STVector256(sTypeModule, "STVector256", "A serializeable type representing a 256-bit vector.");
+    py::class_<ripple::STIssue, ripple::STBase> STIssue(sTypeModule, "STIssue", "A serializeable type representing an issued currency.");
+    py::class_<ripple::STXChainBridge, ripple::STBase> STXChainBridge(sTypeModule, "STXChainBridge", "A serializeable type representing a cross-chain bridge.");
+    py::class_<ripple::STCurrency, ripple::STBase> STCurrency(sTypeModule, "STCurrency", "A serializeable type representing a currency.");
 
     py::class_<ripple::STArray, ripple::STBase> STArray(sTypeModule, "STArray", "A serializeable type representing an array of other serialized types.");
     STArray
@@ -1260,7 +1232,8 @@ PYBIND11_MODULE(rippled_py, m) {
         .def("_create_new_sfield_STBlob", &wrappedNewSField<ripple::STBlob>)
         .def("_create_new_sfield_STPluginType", &wrappedNewSField<ripple::STPluginType>)
         .def("_create_new_sfield_STVector256", &wrappedNewSField<ripple::STVector256>)
-        .def("_create_new_sfield_STPluginType", &wrappedNewSField<ripple::STPluginType>)
+        .def("_create_new_sfield_STIssue", &wrappedNewSField<ripple::STIssue>)
+        .def("_create_new_sfield_STCurrency", &wrappedNewSField<ripple::STCurrency>)
         .def("_create_new_sfield_STArray", &wrappedNewUntypedSField<ripple::STArray>)
         .def("_create_new_sfield_STObject", &wrappedNewUntypedSField<ripple::STObject>)
         .def("construct_custom_sfield", &constructCustomWrappedSField)
@@ -1273,9 +1246,17 @@ PYBIND11_MODULE(rippled_py, m) {
 
     // SFields
 
+    sfieldModule.attr("sf_invalid") = WSF{(void *)&ripple::sfInvalid};
+    sfieldModule.attr("sf_generic") = WSF{(void *)&ripple::sfGeneric};
+    sfieldModule.attr("sf_ledger_entry") = WSF{(void *)&ripple::sfLedgerEntry};
+    sfieldModule.attr("sf_transaction") = WSF{(void *)&ripple::sfTransaction};
+    sfieldModule.attr("sf_validation") = WSF{(void *)&ripple::sfValidation};
+    sfieldModule.attr("sf_metadata") = WSF{(void *)&ripple::sfMetadata};
     sfieldModule.attr("sf_close_resolution") = TWSF<ripple::STUInt8>{(void *)&ripple::sfCloseResolution};
     sfieldModule.attr("sf_method") = TWSF<ripple::STUInt8>{(void *)&ripple::sfMethod};
     sfieldModule.attr("sf_transaction_result") = TWSF<ripple::STUInt8>{(void *)&ripple::sfTransactionResult};
+    sfieldModule.attr("sf_was_locking_chain_send") = TWSF<ripple::STUInt8>{(void *)&ripple::sfWasLockingChainSend};
+    sfieldModule.attr("sf_scale") = TWSF<ripple::STUInt8>{(void *)&ripple::sfScale};
     sfieldModule.attr("sf_tick_size") = TWSF<ripple::STUInt8>{(void *)&ripple::sfTickSize};
     sfieldModule.attr("sf_unl_modify_disabling") = TWSF<ripple::STUInt8>{(void *)&ripple::sfUNLModifyDisabling};
     sfieldModule.attr("sf_hook_result") = TWSF<ripple::STUInt8>{(void *)&ripple::sfHookResult};
@@ -1283,11 +1264,13 @@ PYBIND11_MODULE(rippled_py, m) {
     sfieldModule.attr("sf_transaction_type") = TWSF<ripple::STUInt16>{(void *)&ripple::sfTransactionType};
     sfieldModule.attr("sf_signer_weight") = TWSF<ripple::STUInt16>{(void *)&ripple::sfSignerWeight};
     sfieldModule.attr("sf_transfer_fee") = TWSF<ripple::STUInt16>{(void *)&ripple::sfTransferFee};
+    sfieldModule.attr("sf_trading_fee") = TWSF<ripple::STUInt16>{(void *)&ripple::sfTradingFee};
     sfieldModule.attr("sf_version") = TWSF<ripple::STUInt16>{(void *)&ripple::sfVersion};
     sfieldModule.attr("sf_hook_state_change_count") = TWSF<ripple::STUInt16>{(void *)&ripple::sfHookStateChangeCount};
     sfieldModule.attr("sf_hook_emit_count") = TWSF<ripple::STUInt16>{(void *)&ripple::sfHookEmitCount};
     sfieldModule.attr("sf_hook_execution_index") = TWSF<ripple::STUInt16>{(void *)&ripple::sfHookExecutionIndex};
     sfieldModule.attr("sf_hook_api_version") = TWSF<ripple::STUInt16>{(void *)&ripple::sfHookApiVersion};
+    sfieldModule.attr("sf_discounted_fee") = TWSF<ripple::STUInt16>{(void *)&ripple::sfDiscountedFee};
     sfieldModule.attr("sf_network_id") = TWSF<ripple::STUInt32>{(void *)&ripple::sfNetworkID};
     sfieldModule.attr("sf_flags") = TWSF<ripple::STUInt32>{(void *)&ripple::sfFlags};
     sfieldModule.attr("sf_source_tag") = TWSF<ripple::STUInt32>{(void *)&ripple::sfSourceTag};
@@ -1302,6 +1285,7 @@ PYBIND11_MODULE(rippled_py, m) {
     sfieldModule.attr("sf_wallet_size") = TWSF<ripple::STUInt32>{(void *)&ripple::sfWalletSize};
     sfieldModule.attr("sf_owner_count") = TWSF<ripple::STUInt32>{(void *)&ripple::sfOwnerCount};
     sfieldModule.attr("sf_destination_tag") = TWSF<ripple::STUInt32>{(void *)&ripple::sfDestinationTag};
+    sfieldModule.attr("sf_last_update_time") = TWSF<ripple::STUInt32>{(void *)&ripple::sfLastUpdateTime};
     sfieldModule.attr("sf_high_quality_in") = TWSF<ripple::STUInt32>{(void *)&ripple::sfHighQualityIn};
     sfieldModule.attr("sf_high_quality_out") = TWSF<ripple::STUInt32>{(void *)&ripple::sfHighQualityOut};
     sfieldModule.attr("sf_low_quality_in") = TWSF<ripple::STUInt32>{(void *)&ripple::sfLowQualityIn};
@@ -1333,7 +1317,9 @@ PYBIND11_MODULE(rippled_py, m) {
     sfieldModule.attr("sf_burned_nftokens") = TWSF<ripple::STUInt32>{(void *)&ripple::sfBurnedNFTokens};
     sfieldModule.attr("sf_hook_state_count") = TWSF<ripple::STUInt32>{(void *)&ripple::sfHookStateCount};
     sfieldModule.attr("sf_emit_generation") = TWSF<ripple::STUInt32>{(void *)&ripple::sfEmitGeneration};
+    sfieldModule.attr("sf_vote_weight") = TWSF<ripple::STUInt32>{(void *)&ripple::sfVoteWeight};
     sfieldModule.attr("sf_first_nftoken_sequence") = TWSF<ripple::STUInt32>{(void *)&ripple::sfFirstNFTokenSequence};
+    sfieldModule.attr("sf_oracle_document_id") = TWSF<ripple::STUInt32>{(void *)&ripple::sfOracleDocumentID};
     sfieldModule.attr("sf_index_next") = TWSF<ripple::STUInt64>{(void *)&ripple::sfIndexNext};
     sfieldModule.attr("sf_index_previous") = TWSF<ripple::STUInt64>{(void *)&ripple::sfIndexPrevious};
     sfieldModule.attr("sf_book_node") = TWSF<ripple::STUInt64>{(void *)&ripple::sfBookNode};
@@ -1351,6 +1337,10 @@ PYBIND11_MODULE(rippled_py, m) {
     sfieldModule.attr("sf_hook_instruction_count") = TWSF<ripple::STUInt64>{(void *)&ripple::sfHookInstructionCount};
     sfieldModule.attr("sf_hook_return_code") = TWSF<ripple::STUInt64>{(void *)&ripple::sfHookReturnCode};
     sfieldModule.attr("sf_reference_count") = TWSF<ripple::STUInt64>{(void *)&ripple::sfReferenceCount};
+    sfieldModule.attr("sf_xchain_claim_id") = TWSF<ripple::STUInt64>{(void *)&ripple::sfXChainClaimID};
+    sfieldModule.attr("sf_xchain_account_create_count") = TWSF<ripple::STUInt64>{(void *)&ripple::sfXChainAccountCreateCount};
+    sfieldModule.attr("sf_xchain_account_claim_count") = TWSF<ripple::STUInt64>{(void *)&ripple::sfXChainAccountClaimCount};
+    sfieldModule.attr("sf_asset_price") = TWSF<ripple::STUInt64>{(void *)&ripple::sfAssetPrice};
     sfieldModule.attr("sf_email_hash") = TWSF<ripple::STUInt128>{(void *)&ripple::sfEmailHash};
     sfieldModule.attr("sf_taker_pays_currency") = TWSF<ripple::STUInt160>{(void *)&ripple::sfTakerPaysCurrency};
     sfieldModule.attr("sf_taker_pays_issuer") = TWSF<ripple::STUInt160>{(void *)&ripple::sfTakerPaysIssuer};
@@ -1369,6 +1359,7 @@ PYBIND11_MODULE(rippled_py, m) {
     sfieldModule.attr("sf_emit_parent_txn_id") = TWSF<ripple::STUInt256>{(void *)&ripple::sfEmitParentTxnID};
     sfieldModule.attr("sf_emit_nonce") = TWSF<ripple::STUInt256>{(void *)&ripple::sfEmitNonce};
     sfieldModule.attr("sf_emit_hook_hash") = TWSF<ripple::STUInt256>{(void *)&ripple::sfEmitHookHash};
+    sfieldModule.attr("sf_amm_id") = TWSF<ripple::STUInt256>{(void *)&ripple::sfAMMID};
     sfieldModule.attr("sf_book_directory") = TWSF<ripple::STUInt256>{(void *)&ripple::sfBookDirectory};
     sfieldModule.attr("sf_invoice_id") = TWSF<ripple::STUInt256>{(void *)&ripple::sfInvoiceID};
     sfieldModule.attr("sf_nickname") = TWSF<ripple::STUInt256>{(void *)&ripple::sfNickname};
@@ -1396,13 +1387,23 @@ PYBIND11_MODULE(rippled_py, m) {
     sfieldModule.attr("sf_fee") = TWSF<ripple::STAmount>{(void *)&ripple::sfFee};
     sfieldModule.attr("sf_send_max") = TWSF<ripple::STAmount>{(void *)&ripple::sfSendMax};
     sfieldModule.attr("sf_deliver_min") = TWSF<ripple::STAmount>{(void *)&ripple::sfDeliverMin};
+    sfieldModule.attr("sf_amount2") = TWSF<ripple::STAmount>{(void *)&ripple::sfAmount2};
+    sfieldModule.attr("sf_e_price") = TWSF<ripple::STAmount>{(void *)&ripple::sfEPrice};
+    sfieldModule.attr("sf_bid_min") = TWSF<ripple::STAmount>{(void *)&ripple::sfBidMin};
+    sfieldModule.attr("sf_bid_max") = TWSF<ripple::STAmount>{(void *)&ripple::sfBidMax};
+    sfieldModule.attr("sf_price") = TWSF<ripple::STAmount>{(void *)&ripple::sfPrice};
+    sfieldModule.attr("sf_lp_token_balance") = TWSF<ripple::STAmount>{(void *)&ripple::sfLPTokenBalance};
     sfieldModule.attr("sf_minimum_offer") = TWSF<ripple::STAmount>{(void *)&ripple::sfMinimumOffer};
     sfieldModule.attr("sf_ripple_escrow") = TWSF<ripple::STAmount>{(void *)&ripple::sfRippleEscrow};
     sfieldModule.attr("sf_delivered_amount") = TWSF<ripple::STAmount>{(void *)&ripple::sfDeliveredAmount};
     sfieldModule.attr("sf_nftoken_broker_fee") = TWSF<ripple::STAmount>{(void *)&ripple::sfNFTokenBrokerFee};
+    sfieldModule.attr("sf_lp_token_out") = TWSF<ripple::STAmount>{(void *)&ripple::sfLPTokenOut};
+    sfieldModule.attr("sf_lp_token_in") = TWSF<ripple::STAmount>{(void *)&ripple::sfLPTokenIn};
     sfieldModule.attr("sf_base_fee_drops") = TWSF<ripple::STAmount>{(void *)&ripple::sfBaseFeeDrops};
     sfieldModule.attr("sf_reserve_base_drops") = TWSF<ripple::STAmount>{(void *)&ripple::sfReserveBaseDrops};
     sfieldModule.attr("sf_reserve_increment_drops") = TWSF<ripple::STAmount>{(void *)&ripple::sfReserveIncrementDrops};
+    sfieldModule.attr("sf_signature_reward") = TWSF<ripple::STAmount>{(void *)&ripple::sfSignatureReward};
+    sfieldModule.attr("sf_min_account_create_amount") = TWSF<ripple::STAmount>{(void *)&ripple::sfMinAccountCreateAmount};
     sfieldModule.attr("sf_public_key") = TWSF<ripple::STBlob>{(void *)&ripple::sfPublicKey};
     sfieldModule.attr("sf_message_key") = TWSF<ripple::STBlob>{(void *)&ripple::sfMessageKey};
     sfieldModule.attr("sf_signing_pub_key") = TWSF<ripple::STBlob>{(void *)&ripple::sfSigningPubKey};
@@ -1417,6 +1418,10 @@ PYBIND11_MODULE(rippled_py, m) {
     sfieldModule.attr("sf_memo_type") = TWSF<ripple::STBlob>{(void *)&ripple::sfMemoType};
     sfieldModule.attr("sf_memo_data") = TWSF<ripple::STBlob>{(void *)&ripple::sfMemoData};
     sfieldModule.attr("sf_memo_format") = TWSF<ripple::STBlob>{(void *)&ripple::sfMemoFormat};
+    sfieldModule.attr("sf_did_document") = TWSF<ripple::STBlob>{(void *)&ripple::sfDIDDocument};
+    sfieldModule.attr("sf_data") = TWSF<ripple::STBlob>{(void *)&ripple::sfData};
+    sfieldModule.attr("sf_asset_class") = TWSF<ripple::STBlob>{(void *)&ripple::sfAssetClass};
+    sfieldModule.attr("sf_provider") = TWSF<ripple::STBlob>{(void *)&ripple::sfProvider};
     sfieldModule.attr("sf_fulfillment") = TWSF<ripple::STBlob>{(void *)&ripple::sfFulfillment};
     sfieldModule.attr("sf_condition") = TWSF<ripple::STBlob>{(void *)&ripple::sfCondition};
     sfieldModule.attr("sf_master_signature") = TWSF<ripple::STBlob>{(void *)&ripple::sfMasterSignature};
@@ -1437,7 +1442,20 @@ PYBIND11_MODULE(rippled_py, m) {
     sfieldModule.attr("sf_nftoken_minter") = TWSF<ripple::STAccount>{(void *)&ripple::sfNFTokenMinter};
     sfieldModule.attr("sf_emit_callback") = TWSF<ripple::STAccount>{(void *)&ripple::sfEmitCallback};
     sfieldModule.attr("sf_hook_account") = TWSF<ripple::STAccount>{(void *)&ripple::sfHookAccount};
+    sfieldModule.attr("sf_other_chain_source") = TWSF<ripple::STAccount>{(void *)&ripple::sfOtherChainSource};
+    sfieldModule.attr("sf_other_chain_destination") = TWSF<ripple::STAccount>{(void *)&ripple::sfOtherChainDestination};
+    sfieldModule.attr("sf_attestation_signer_account") = TWSF<ripple::STAccount>{(void *)&ripple::sfAttestationSignerAccount};
+    sfieldModule.attr("sf_attestation_reward_account") = TWSF<ripple::STAccount>{(void *)&ripple::sfAttestationRewardAccount};
+    sfieldModule.attr("sf_locking_chain_door") = TWSF<ripple::STAccount>{(void *)&ripple::sfLockingChainDoor};
+    sfieldModule.attr("sf_issuing_chain_door") = TWSF<ripple::STAccount>{(void *)&ripple::sfIssuingChainDoor};
     sfieldModule.attr("sf_paths") = WSF{(void *)&ripple::sfPaths};
+    sfieldModule.attr("sf_base_asset") = TWSF<ripple::STCurrency>{(void *)&ripple::sfBaseAsset};
+    sfieldModule.attr("sf_quote_asset") = TWSF<ripple::STCurrency>{(void *)&ripple::sfQuoteAsset};
+    sfieldModule.attr("sf_asset") = TWSF<ripple::STIssue>{(void *)&ripple::sfAsset};
+    sfieldModule.attr("sf_asset2") = TWSF<ripple::STIssue>{(void *)&ripple::sfAsset2};
+    sfieldModule.attr("sf_locking_chain_issue") = TWSF<ripple::STIssue>{(void *)&ripple::sfLockingChainIssue};
+    sfieldModule.attr("sf_issuing_chain_issue") = TWSF<ripple::STIssue>{(void *)&ripple::sfIssuingChainIssue};
+    sfieldModule.attr("sf_xchain_bridge") = TWSF<ripple::STXChainBridge>{(void *)&ripple::sfXChainBridge};
     sfieldModule.attr("sf_indexes") = TWSF<ripple::STVector256>{(void *)&ripple::sfIndexes};
     sfieldModule.attr("sf_hashes") = TWSF<ripple::STVector256>{(void *)&ripple::sfHashes};
     sfieldModule.attr("sf_amendments") = TWSF<ripple::STVector256>{(void *)&ripple::sfAmendments};
@@ -1455,6 +1473,10 @@ PYBIND11_MODULE(rippled_py, m) {
     sfieldModule.attr("sf_nftoken") = WSF{(void *)&ripple::sfNFToken};
     sfieldModule.attr("sf_emit_details") = WSF{(void *)&ripple::sfEmitDetails};
     sfieldModule.attr("sf_hook") = WSF{(void *)&ripple::sfHook};
+    sfieldModule.attr("sf_vote_entry") = WSF{(void *)&ripple::sfVoteEntry};
+    sfieldModule.attr("sf_auction_slot") = WSF{(void *)&ripple::sfAuctionSlot};
+    sfieldModule.attr("sf_auth_account") = WSF{(void *)&ripple::sfAuthAccount};
+    sfieldModule.attr("sf_price_data") = WSF{(void *)&ripple::sfPriceData};
     sfieldModule.attr("sf_signer") = WSF{(void *)&ripple::sfSigner};
     sfieldModule.attr("sf_majority") = WSF{(void *)&ripple::sfMajority};
     sfieldModule.attr("sf_disabled_validator") = WSF{(void *)&ripple::sfDisabledValidator};
@@ -1463,6 +1485,10 @@ PYBIND11_MODULE(rippled_py, m) {
     sfieldModule.attr("sf_hook_definition") = WSF{(void *)&ripple::sfHookDefinition};
     sfieldModule.attr("sf_hook_parameter") = WSF{(void *)&ripple::sfHookParameter};
     sfieldModule.attr("sf_hook_grant") = WSF{(void *)&ripple::sfHookGrant};
+    sfieldModule.attr("sf_xchain_claim_proof_sig") = WSF{(void *)&ripple::sfXChainClaimProofSig};
+    sfieldModule.attr("sf_xchain_create_account_proof_sig") = WSF{(void *)&ripple::sfXChainCreateAccountProofSig};
+    sfieldModule.attr("sf_xchain_claim_attestation_collection_element") = WSF{(void *)&ripple::sfXChainClaimAttestationCollectionElement};
+    sfieldModule.attr("sf_xchain_create_account_attestation_collection_element") = WSF{(void *)&ripple::sfXChainCreateAccountAttestationCollectionElement};
     sfieldModule.attr("sf_signers") = WSF{(void *)&ripple::sfSigners};
     sfieldModule.attr("sf_signer_entries") = WSF{(void *)&ripple::sfSignerEntries};
     sfieldModule.attr("sf_template") = WSF{(void *)&ripple::sfTemplate};
@@ -1472,11 +1498,16 @@ PYBIND11_MODULE(rippled_py, m) {
     sfieldModule.attr("sf_memos") = WSF{(void *)&ripple::sfMemos};
     sfieldModule.attr("sf_nftokens") = WSF{(void *)&ripple::sfNFTokens};
     sfieldModule.attr("sf_hooks") = WSF{(void *)&ripple::sfHooks};
+    sfieldModule.attr("sf_vote_slots") = WSF{(void *)&ripple::sfVoteSlots};
+    sfieldModule.attr("sf_auth_accounts") = WSF{(void *)&ripple::sfAuthAccounts};
+    sfieldModule.attr("sf_price_data_series") = WSF{(void *)&ripple::sfPriceDataSeries};
     sfieldModule.attr("sf_majorities") = WSF{(void *)&ripple::sfMajorities};
     sfieldModule.attr("sf_disabled_validators") = WSF{(void *)&ripple::sfDisabledValidators};
     sfieldModule.attr("sf_hook_executions") = WSF{(void *)&ripple::sfHookExecutions};
     sfieldModule.attr("sf_hook_parameters") = WSF{(void *)&ripple::sfHookParameters};
     sfieldModule.attr("sf_hook_grants") = WSF{(void *)&ripple::sfHookGrants};
+    sfieldModule.attr("sf_xchain_claim_attestations") = WSF{(void *)&ripple::sfXChainClaimAttestations};
+    sfieldModule.attr("sf_xchain_create_account_attestations") = WSF{(void *)&ripple::sfXChainCreateAccountAttestations};
 
     // Amendments
     transactorModule.attr("fixMasterKeyAsRegularKey") = ripple::fixMasterKeyAsRegularKey;

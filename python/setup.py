@@ -145,7 +145,7 @@ class CMakeBuild(build_ext):
 
 setup(
     name="xrpl-plugin",
-    version="0.1.0",
+    version="0.2.1",
     author="Mayukha Vadari",
     author_email="mvadari@ripple.com",
     url="https://github.com/mvadari/xrpl-plugin",
