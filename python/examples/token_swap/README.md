@@ -48,6 +48,7 @@ A **`TokenSwapPropose`** transaction may have the following fields:
 | `AccountOther`             | ✔️         | `string`          | `ACCOUNT`       |
 | `Amount`                   | ✔️         | `Currency Amount` | `AMOUNT`        |
 | `AmountOther`              | ✔️         | `Currency Amount` | `AMOUNT`        |
+| `Memos`                    |           | `Array`           | `MEMO`          |
 
 ### TokenSwapAccept transaction
 
@@ -58,6 +59,7 @@ A **`TokenSwapAccept`** transaction may have the following fields:
 | `TokenSwapId`              | ✔️         | `string`          | `UINT64`        |
 | `Amount`                   | ✔️         | `Currency Amount` | `AMOUNT`        |
 | `AmountOther`              | ✔️         | `Currency Amount` | `AMOUNT`        |
+| `Memos`                    |           | `Array`           | `MEMO`          |
 
 ## Example requests
 
@@ -89,14 +91,14 @@ A **`TokenSwapAccept`** transaction may have the following fields:
     "AccountOther": "ratB3Rp7pcid4hzwSYTWiqWXYXFmWUFDv1",
     "TokenSwapId": "5",
     "Amount": {
-        "currency": "EUR",
-        "issuer": "rnz5f1MFcgbVxzYhU5hUKbKquEJHJady5K",
-        "value": "12"
-    },
-    "AmountOther": {
         "currency": "USD",
         "issuer": "rnz5f1MFcgbVxzYhU5hUKbKquEJHJady5K",
         "value": "33"
+    },
+    "AmountOther": {
+        "currency": "EUR",
+        "issuer": "rnz5f1MFcgbVxzYhU5hUKbKquEJHJady5K",
+        "value": "12"
     }
 }
 ```
