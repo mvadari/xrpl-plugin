@@ -99,7 +99,7 @@ ledger_objects = [
             (sf_expiration, soeREQUIRED),
         ],
         is_deletion_blocker=True,
-        # visit_entry_xrp_change=visit_entry_xrp_change_token_swap,
+        visit_entry_xrp_change=visit_entry_xrp_change_token_swap,
     )
 ]
 
@@ -194,7 +194,7 @@ def do_apply_accept(ctx, _mPriorBalance, _mSourceBalance):
 
     # Token that the initiator is willing to provide
     token_issuer_left_to_right = amount_other.issuer()
-    # amount.issuer() -> token that the initiator is willing to receive
+    # Token that the initiator is willing to receive
     token_issuer_right_to_left = amount.issuer()
 
     # Trustline for the token swap receiver account (account)
@@ -222,7 +222,7 @@ def do_apply_accept(ctx, _mPriorBalance, _mSourceBalance):
     slep = ctx.view().peek(token_swap_keylet)
 
     # Check swap id
-    if not slep: #or slep[sf_token_swap_id] != token_swap_id:
+    if not slep or slep[sf_token_swap_id] != token_swap_id:
         return temINVALID_TOKEN_SWAP_ID
 
     # Validate expiration
@@ -251,8 +251,6 @@ def do_apply_accept(ctx, _mPriorBalance, _mSourceBalance):
     # Delete token swap object on originating account
     ctx.view().dir_remove(owner_dir_keylet(account_other), page, token_swap_keylet, True)
     ctx.view().erase(slep)
-
-    #ctx.view().update(slep)
 
     # Adjust reserve count
     adjust_owner_count(ctx.view(), sle_b, -1, ctx.journal)
