@@ -109,6 +109,7 @@ sf_destination2 = construct_custom_sfield(STI_ACCOUNT2, "Destination2", 1)
 stypes = [
     SType(
         type_id=STI_ACCOUNT2,
+        type_name="STI_ACCOUNT2",
         parse_value=parse_account2,
         to_string=to_string,
         to_serializer=to_serializer,
@@ -197,7 +198,7 @@ def after(now, mark):
     return now.time_since_epoch() > mark
 
 
-temINVALID_FLAG2 = -256
+temINVALID_FLAG2 = -202
 ter_codes = [TERCode(temINVALID_FLAG2, "temINVALID_FLAG2", "Test code")]
 
 

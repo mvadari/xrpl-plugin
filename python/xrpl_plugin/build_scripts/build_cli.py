@@ -677,15 +677,39 @@ fromSerialIter(int typeId, SerialIter& st)
     }}
 }}
 
+struct STypeExportInternal {{
+    int typeId;
+    std::string typeName;
+    parsePluginValuePtr parsePtr;
+    toStringPtr toString;
+    toJsonPtr toJson;
+    toSerializerPtr toSerializer;
+    fromSerialIterPtr fromSerialIter;
+}};
+
+STypeExport
+mutateSType(STypeExportInternal const& stype)
+{{
+    return STypeExport{{
+        stype.typeId,
+        stype.typeName.c_str(),
+        stype.parsePtr,
+        stype.toString,
+        stype.toJson,
+        stype.toSerializer,
+        stype.fromSerialIter,
+    }};
+}}
+
 extern "C"
 Container<STypeExport>
 getSTypes()
 {{
-    static std::vector<STypeExport> const types = []{{
+    static std::vector<STypeExportInternal> const types = []{{
         CustomScopedInterpreter guard{{}}; // start the interpreter and keep it alive
         py::module_::import("sys").attr("path").attr("append")("{python_folder}");
         py::module_ module = py::module_::import("{module_name}");
-        std::vector<STypeExport> temp = {{}};
+        std::vector<STypeExportInternal> temp = {{}};
         if (!hasattr(module, "stypes")) {{
             return temp;
         }}
@@ -694,10 +718,12 @@ getSTypes()
         {{
             py::object stype = types[i];
             auto typeId = stype.attr("type_id").cast<int>();
+            auto typeName = stype.attr("type_name").cast<std::string>();
             sTypeToIndexMap.insert({{typeId, i}});
 
-            temp.emplace_back(STypeExport{{
+            temp.emplace_back(STypeExportInternal{{
                 typeId,
+                typeName,
                 parseValue,
                 toString,
                 stype.attr("to_json").is_none() ? nullptr : toJson,
@@ -706,7 +732,10 @@ getSTypes()
         }}
         return temp;
     }}();
-    return {{const_cast<STypeExport *>(types.data()), static_cast<int>(types.size())}};
+    static std::vector<STypeExport> output;
+    output.reserve(types.size());
+    std::transform(types.begin(), types.end(), std::back_inserter(output), mutateSType);
+    return {{const_cast<STypeExport *>(output.data()), static_cast<int>(output.size())}};
 }}
 
 // ----------------------------------------------------------------------------
@@ -1149,7 +1178,7 @@ def build_files(cpp_file, project_name):
             update_progress(progress)
         p.stdout.close()
         p.wait()
-        if p.returncode != 0:
+        if p.returncode == 0:
             print(f"\nPlugin generated: {output_dir}/{project_name}.xrplugin")
 
 
