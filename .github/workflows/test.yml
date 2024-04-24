@@ -44,7 +44,7 @@ jobs:
           mypy --strict --implicit-reexport xrpl_plugin examples
 
   unit-test:
-    name: Unit test
+    name: Install
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -68,3 +68,8 @@ jobs:
       - name: Install package
         run: |
           pip install ./python
+
+      - name: Test install
+        run: |
+          python -c "import xrpl_plugin"
+          python -c "from xrpl_plugin.sfields import sf_account"
