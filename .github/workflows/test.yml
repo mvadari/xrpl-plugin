@@ -1,0 +1,79 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  POETRY_VERSION: 1.4.2
+
+jobs:
+  # lint-and-type-check:
+  #   name: Lint and type-check
+  #   runs-on: ubuntu-latest
+
+  #   env:
+  #     PYTHON_VERSION: "3.8"
+
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+
+  #     - name: Install Python
+  #       uses: actions/setup-python@v4
+  #       with:
+  #         python-version: ${{ env.PYTHON_VERSION }}
+
+  #     - name: Display Python version
+  #       run: |
+  #         python -c "import sys; print(sys.version)"
+
+  #     - name: Install linter packages
+  #       run: |
+  #         pip install flake8 mypy
+
+  #     - name: Lint
+  #       run: |
+  #         cd python
+  #         flake8 xrpl_plugin examples
+
+  #     - name: Type-check
+  #       run: |
+  #         mypy --strict --implicit-reexport xrpl_plugin examples
+
+  unit-test:
+    name: Install
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Display Python version
+        run: |
+          python -c "import sys; print(sys.version)"
+
+      - name: Install package
+        run: |
+          pip install ./python
+
+      - name: Test install
+        run: |
+          python -c "import xrpl_plugin"
+          python -c "from xrpl_plugin.sfields import sf_account"
