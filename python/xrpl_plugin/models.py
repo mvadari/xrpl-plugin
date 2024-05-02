@@ -61,6 +61,7 @@ class SType:
     """
 
     type_id: int
+    type_name: str
     parse_value: Callable[
         [SField, str, str, SField, JsonValue], Union[Buffer, JsonValue]
     ]
