@@ -555,6 +555,20 @@ PYBIND11_MODULE(rippled_py, m) {
         );
 
     py::class_<ripple::Issue> Issue(basicsModule, "Issue", "A currency issued by an account.");
+    Issue
+        .def_property_readonly("currency",
+            [](const ripple::Issue &issue) {
+                return issue.currency;
+            },
+            "Currency issued by an account"
+        )
+        .def_property_readonly("account",
+            [](const ripple::Issue &issue) {
+                return issue.account;
+            },
+            "Account issuing the currency"
+        );
+        
     py::class_<ripple::Currency> Currency(basicsModule, "Currency", "A hash representing a specific currency.");
 
     py::class_<ripple::uint256> uint256(basicsModule, "uint256", "A 256-bit uint.");
