@@ -568,7 +568,7 @@ PYBIND11_MODULE(rippled_py, m) {
             },
             "Account issuing the currency"
         );
-        
+
     py::class_<ripple::Currency> Currency(basicsModule, "Currency", "A hash representing a specific currency.");
 
     py::class_<ripple::uint256> uint256(basicsModule, "uint256", "A 256-bit uint.");
@@ -674,6 +674,18 @@ PYBIND11_MODULE(rippled_py, m) {
         .def("xrp", &ripple::STAmount::xrp, "Converts the STAmount to an XRPAmount (if possible).")
         .def("iou", &ripple::STAmount::iou, "Converts the STAmount to an IOUAmount (if possible).")
         .def("native", &ripple::STAmount::native, "Returns True if the STAmount represents an XRP amount (the native currency).")
+        .def("get_text",
+            [](const ripple::STAmount &amt) {
+                return amt.getText();
+            },
+            "Returns the issue of a IOUAmount (if possible)"
+        )
+        .def("get_full_text",
+            [](const ripple::STAmount &amt) {
+                return amt.getFullText();
+            },
+            "Returns the issue of a IOUAmount (if possible)"
+        )
         .def(py::self += py::self)
         .def(py::self -= py::self)
         .def(py::self + py::self)
