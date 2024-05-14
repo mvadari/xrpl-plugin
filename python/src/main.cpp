@@ -649,6 +649,12 @@ PYBIND11_MODULE(rippled_py, m) {
             },
             "Get the associated SField."
         )
+        .def("get_full_text",
+            [](const ripple::STBase &obj) {
+                return obj.getFullText();
+            },
+            "Returns the the full text"
+        )
         .def("__repr__",
             [](const ripple::STBase &obj) {
                 return obj.getFullText();
@@ -678,13 +684,7 @@ PYBIND11_MODULE(rippled_py, m) {
             [](const ripple::STAmount &amt) {
                 return amt.getText();
             },
-            "Returns the issue of a IOUAmount (if possible)"
-        )
-        .def("get_full_text",
-            [](const ripple::STAmount &amt) {
-                return amt.getFullText();
-            },
-            "Returns the issue of a IOUAmount (if possible)"
+            "Returns the value of a STAmount"
         )
         .def(py::self += py::self)
         .def(py::self -= py::self)
