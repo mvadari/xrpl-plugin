@@ -649,11 +649,17 @@ PYBIND11_MODULE(rippled_py, m) {
             },
             "Get the associated SField."
         )
+        .def("get_text",
+            [](const ripple::STBase &obj) {
+                return obj.getText();
+            },
+            "Returns the result of the getText method of the parent type."
+        )
         .def("get_full_text",
             [](const ripple::STBase &obj) {
                 return obj.getFullText();
             },
-            "Returns the the full text"
+            "Returns a full text representation of the serialized object."
         )
         .def("__repr__",
             [](const ripple::STBase &obj) {
@@ -680,12 +686,6 @@ PYBIND11_MODULE(rippled_py, m) {
         .def("xrp", &ripple::STAmount::xrp, "Converts the STAmount to an XRPAmount (if possible).")
         .def("iou", &ripple::STAmount::iou, "Converts the STAmount to an IOUAmount (if possible).")
         .def("native", &ripple::STAmount::native, "Returns True if the STAmount represents an XRP amount (the native currency).")
-        .def("get_text",
-            [](const ripple::STAmount &amt) {
-                return amt.getText();
-            },
-            "Returns the value of a STAmount"
-        )
         .def(py::self += py::self)
         .def(py::self -= py::self)
         .def(py::self + py::self)
