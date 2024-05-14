@@ -653,7 +653,7 @@ PYBIND11_MODULE(rippled_py, m) {
             [](const ripple::STBase &obj) {
                 return obj.getFullText();
             },
-            "Returns the the full text"
+            "Returns a full text representation of the serialized object."
         )
         .def("__repr__",
             [](const ripple::STBase &obj) {
