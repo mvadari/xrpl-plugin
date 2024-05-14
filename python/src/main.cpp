@@ -568,7 +568,7 @@ PYBIND11_MODULE(rippled_py, m) {
             },
             "Account issuing the currency"
         );
-        
+
     py::class_<ripple::Currency> Currency(basicsModule, "Currency", "A hash representing a specific currency.");
 
     py::class_<ripple::uint256> uint256(basicsModule, "uint256", "A 256-bit uint.");
@@ -648,6 +648,18 @@ PYBIND11_MODULE(rippled_py, m) {
                 return TWSF<ripple::STPluginType>{(void *)&f};
             },
             "Get the associated SField."
+        )
+        .def("get_text",
+            [](const ripple::STBase &obj) {
+                return obj.getText();
+            },
+            "Returns the result of the getText method of the parent type."
+        )
+        .def("get_full_text",
+            [](const ripple::STBase &obj) {
+                return obj.getFullText();
+            },
+            "Returns a full text representation of the serialized object."
         )
         .def("__repr__",
             [](const ripple::STBase &obj) {
