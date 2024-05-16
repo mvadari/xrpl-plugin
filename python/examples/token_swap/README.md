@@ -62,6 +62,10 @@ A **`TokenSwapAccept`** transaction may have the following fields:
 | `Amount`                   | ✔️         | `Currency Amount` | `AMOUNT`        |
 | `AmountOther`              | ✔️         | `Currency Amount` | `AMOUNT`        |
 
+### Invariants
+
+A [TokensNetBalance](python/examples/token_swap/token_swap.py#L59) invariant check is applied before accepting the swap to make sure that the total amount of tokens in the trade remains the same.
+
 ## Example requests
 
 ### TokenSwapPropose
