@@ -51,7 +51,6 @@ A **`TokenSwapPropose`** transaction may have the following fields:
 | `Amount`                   | ✔️         | `Currency Amount` | `AMOUNT`        |
 | `AmountOther`              | ✔️         | `Currency Amount` | `AMOUNT`        |
 | `Expiration`               | ✔️         | `string`          | `UINT32`        |
-| `Memo`                     |           | `Array<Memo>`     | `ARRAY`         |
 
 ### TokenSwapAccept transaction
 
@@ -62,7 +61,6 @@ A **`TokenSwapAccept`** transaction may have the following fields:
 | `TokenSwapId`              | ✔️         | `string`          | `UINT64`        |
 | `Amount`                   | ✔️         | `Currency Amount` | `AMOUNT`        |
 | `AmountOther`              | ✔️         | `Currency Amount` | `AMOUNT`        |
-| `Memo`                     |           | `Array<Memo>`     | `ARRAY`         |
 
 ## Example requests
 
