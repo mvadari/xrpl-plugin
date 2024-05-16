@@ -86,7 +86,7 @@ NEW_TOKEN_SWAP_NAMESPACE = ord("w")
 
 temINVALID_TOKEN_SWAP_ID = -333
 ter_codes = [
-    TERCode(temINVALID_TOKEN_SWAP_ID, "temINVALID_TOKEN_SWAP_ID", "The token swap is incorrect or has ben accepted"),
+    TERCode(temINVALID_TOKEN_SWAP_ID, "temINVALID_TOKEN_SWAP_ID", "The token swap is incorrect or has already been accepted"),
 ]
 
 def new_token_swap_keylet(src, seq):
