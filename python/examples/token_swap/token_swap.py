@@ -63,7 +63,7 @@ class TokensNetBalance(InvariantCheck):
 
     def visit_entry(self, is_delete, before, after):
         if before is not None and before.get_type() == ltRIPPLE_STATE:
-            self.total += float(after[sf_balance].get_text()) - float(before[sf_balance].get_text())
+            self.total += abs(float(after[sf_balance].get_text())) - abs(float(before[sf_balance].get_text()))
 
     def finalize(self, tx, result, fee, view, j):
         if tx.get_txn_type() == 54:
@@ -121,7 +121,7 @@ amendments = [amendment]
 
 def preflight_propose(ctx):
 
-    print("Token Swap Create test preflight...", flush=True)
+    print("Token Swap Create test preflight...")
 
     tx_proposer_send_token = ctx.tx[sf_amount]
     tx_approver_send_token = ctx.tx[sf_amount_other] 
@@ -137,7 +137,7 @@ def preflight_propose(ctx):
 
 def do_apply_propose(ctx, _mPriorBalance, _mSourceBalance):
     
-    print("Token Swap Create test doApply...", flush=True)
+    print("Token Swap Create test doApply...")
 
     tx_approver_send_token = ctx.tx[sf_amount]
     tx_proposer_send_token = ctx.tx[sf_amount_other]
