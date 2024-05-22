@@ -124,14 +124,14 @@ def preflight_propose(ctx):
     print("Token Swap Create test preflight...")
 
     tx_prop_token = ctx.tx[sf_amount]
-    tx_appr_token = ctx.tx[sf_amount_other] 
+    tx_appr_token = ctx.tx[sf_amount_other]
+    tx_expiration = ctx.tx[sf_expiration] 
     
     if tx_appr_token.is_xrp() or tx_prop_token.is_xrp():
         return temBAD_AMOUNT
 
-    if not ctx.tx.is_field_present(sf_expiration):
+    if tx_expiration <= 0:
         return temBAD_EXPIRATION
-
 
     return preflight2(ctx)
 
