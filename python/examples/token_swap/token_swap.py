@@ -123,10 +123,10 @@ def preflight_propose(ctx):
 
     print("Token Swap Create test preflight...")
 
-    tx_proposer_send_token = ctx.tx[sf_amount]
-    tx_approver_send_token = ctx.tx[sf_amount_other] 
+    tx_prop_token = ctx.tx[sf_amount]
+    tx_appr_token = ctx.tx[sf_amount_other] 
     
-    if tx_approver_send_token.is_xrp() or tx_proposer_send_token.is_xrp():
+    if tx_appr_token.is_xrp() or tx_prop_token.is_xrp():
         return temBAD_AMOUNT
 
     if not ctx.tx.is_field_present(sf_expiration):
@@ -139,42 +139,43 @@ def do_apply_propose(ctx, _mPriorBalance, _mSourceBalance):
     
     print("Token Swap Create test doApply...")
 
-    tx_approver_send_token = ctx.tx[sf_amount]
-    tx_proposer_send_token = ctx.tx[sf_amount_other]
+    tx_appr_token = ctx.tx[sf_amount]
+    tx_prop_token = ctx.tx[sf_amount_other]
     tx_account = ctx.tx[sf_account]
-    tx_account_other = ctx.tx[sf_account_other]
+    tx_acc_other = ctx.tx[sf_account_other]
     tx_expiration = ctx.tx[sf_expiration]
 
-    account = ctx.view().peek(account_keylet(tx_account))
+    l_acc = ctx.view().peek(account_keylet(tx_account))
     acc_seq = int(str(ctx.tx.get_seq_proxy().value()), 16)
 
     # Token that the proposer is willing to receive
-    proposer_send_token_issue = tx_proposer_send_token.issuer()
+    prop_token_issue = tx_prop_token.issuer()
     # Token that the proposer is willing to provide
-    proposer_receive_token_issue = tx_approver_send_token.issuer()
+    appr_token_issue = tx_appr_token.issuer()
 
     close_time = ctx.view().info().parent_close_time
 
     if expired(tx_expiration, close_time):
         return tecEXPIRED
 
-    trustline_proposer_sending_token = ctx.view().peek(trustline_keylet(tx_account, proposer_send_token_issue))
-    trustline_receiving_sending_token = ctx.view().peek(trustline_keylet(tx_account, proposer_receive_token_issue))
-    trustline_approver_sending_token = ctx.view().peek(trustline_keylet(tx_account_other, proposer_receive_token_issue))
-    trustline_receiving_sending_token = ctx.view().peek(trustline_keylet(tx_account_other, proposer_send_token_issue))
+    # Trsutline Objects
+    tl_prop_send_token = ctx.view().peek(trustline_keylet(tx_account, prop_token_issue))
+    tl_prop_rec_token = ctx.view().peek(trustline_keylet(tx_account, appr_token_issue))
+    tl_appr_send_token = ctx.view().peek(trustline_keylet(tx_acc_other, appr_token_issue))
+    tl_appr_rec_token = ctx.view().peek(trustline_keylet(tx_acc_other, prop_token_issue))
 
     # Check trustlines exist
-    if not trustline_proposer_sending_token or not trustline_receiving_sending_token or not trustline_approver_sending_token or not trustline_receiving_sending_token:
+    if not tl_prop_send_token or not tl_prop_rec_token or not tl_appr_send_token or not tl_appr_rec_token:
         return tecNO_LINE
     
     token_swap_keylet = new_token_swap_keylet(tx_account, acc_seq)
 
     slep = make_sle(token_swap_keylet)
     slep[sf_account] = tx_account
-    slep[sf_amount] = tx_approver_send_token
+    slep[sf_amount] = tx_appr_token
     slep[sf_token_swap_id] = acc_seq
-    slep[sf_amount_other] = tx_proposer_send_token
-    slep[sf_account_other] = tx_account_other
+    slep[sf_amount_other] = tx_prop_token
+    slep[sf_account_other] = tx_acc_other
     slep[sf_expiration] = tx_expiration
 
     ctx.view().insert(slep)
@@ -186,7 +187,7 @@ def do_apply_propose(ctx, _mPriorBalance, _mSourceBalance):
     
     slep[sf_owner_node] = page
 
-    adjust_owner_count(ctx.view(), account, 1, ctx.journal)
+    adjust_owner_count(ctx.view(), l_acc, 1, ctx.journal)
 
     return tesSUCCESS
 
@@ -197,6 +198,7 @@ def preflight_accept(ctx):
     amount = ctx.tx[sf_amount]
     amountOther = ctx.tx[sf_amount_other]
 
+    # Only accept Token Swaps
     if amount.is_xrp() or amountOther.is_xrp():
         return temBAD_AMOUNT
     
@@ -206,38 +208,38 @@ def do_apply_accept(ctx, _mPriorBalance, _mSourceBalance):
 
     print("Token Swap Accept test doApply...")
 
-    tx_approver_send_token = ctx.tx[sf_amount]
-    tx_proposer_send_token = ctx.tx[sf_amount_other] 
+    tx_appr_token = ctx.tx[sf_amount]
+    tx_prop_token = ctx.tx[sf_amount_other] 
     tx_account = ctx.tx[sf_account]
-    tx_account_other = ctx.tx[sf_account_other]
+    tx_acc_other = ctx.tx[sf_account_other]
     tx_token_swap_id = ctx.tx[sf_token_swap_id]
     
+    l_acc = ctx.view().peek(account_keylet(tx_acc_other))
     close_time = ctx.view().info().parent_close_time
-    proposer_account = ctx.view().peek(account_keylet(tx_account_other))
 
     # Token that the initiator is willing to receive by accepting
-    approver_receive_token_issue = tx_proposer_send_token.issuer()
+    prop_token_issue = tx_prop_token.issuer()
     # Token that the initiator is willing to provide by accepting
-    proposer_receive_token_issue = tx_approver_send_token.issuer()
+    appr_token_issue = tx_appr_token.issuer()
 
-    # Trustline for the token swap approver account (account)
-    trustline_approver_sending_token = ctx.view().peek(trustline_keylet(tx_account, proposer_receive_token_issue))
-    trustline_approver_receiving_token = ctx.view().peek(trustline_keylet(tx_account, approver_receive_token_issue))
+    # Trustlines for the token swap approver account (account)
+    tl_appr_send_token = ctx.view().peek(trustline_keylet(tx_account, appr_token_issue))
+    tl_appr_rec_token = ctx.view().peek(trustline_keylet(tx_account, prop_token_issue))
 
-    # Trustline for the token swap proposer account (account_other)
-    trustline_proposer_sending_token = ctx.view().peek(trustline_keylet(tx_account_other, approver_receive_token_issue))
-    trustline_proposer_receiving_token = ctx.view().peek(trustline_keylet(tx_account_other, proposer_receive_token_issue))
+    # Trustlines for the token swap proposer account (account_other)
+    tl_prop_send_token = ctx.view().peek(trustline_keylet(tx_acc_other, prop_token_issue))
+    tl_prop_rec_token = ctx.view().peek(trustline_keylet(tx_acc_other, appr_token_issue))
     
-    token_swap_keylet = new_token_swap_keylet(tx_account_other, tx_token_swap_id)
+    token_swap_keylet = new_token_swap_keylet(tx_acc_other, tx_token_swap_id)
     slep = ctx.view().peek(token_swap_keylet)
 
-    approver_account = ctx.view().peek(account_keylet(tx_account))
+    appr_acc = ctx.view().peek(account_keylet(tx_account))
 
     # Check reserves
-    balance = STAmount(approver_account[sf_balance]).xrp()
-    reserve = ctx.view().fees.account_reserve(approver_account[sf_owner_count])
+    balance = STAmount(appr_acc[sf_balance]).xrp()
+    reserve = ctx.view().fees.account_reserve(appr_acc[sf_owner_count])
 
-    token_swap_keylet = new_token_swap_keylet(tx_account_other, tx_token_swap_id)
+    token_swap_keylet = new_token_swap_keylet(tx_acc_other, tx_token_swap_id)
     slep = ctx.view().peek(token_swap_keylet)
 
     if balance < reserve:
@@ -248,20 +250,20 @@ def do_apply_accept(ctx, _mPriorBalance, _mSourceBalance):
         return temINVALID_TOKEN_SWAP_ID
     
     # Check amounts
-    if slep[sf_amount] != tx_proposer_send_token or slep[sf_amount_other] != tx_approver_send_token:
+    if slep[sf_amount] != tx_prop_token or slep[sf_amount_other] != tx_appr_token:
         return temBAD_AMOUNT
 
     # Check trustlines exist
-    if not trustline_approver_sending_token or not trustline_approver_receiving_token or not trustline_proposer_sending_token or not trustline_proposer_receiving_token:
+    if not tl_appr_send_token or not tl_appr_rec_token or not tl_prop_send_token or not tl_prop_rec_token:
         return tecNO_LINE
     
     # TODO: more checks (frozen trustline...)
 
     # Balances
-    approver_token_balance_enough = trustline_approver_sending_token[sf_balance] >= tx_approver_send_token if trustline_approver_sending_token[sf_low_limit].issuer().account == tx_account else trustline_approver_sending_token[sf_balance] <= tx_approver_send_token
-    proposer_token_balance_enough = trustline_proposer_sending_token[sf_balance] >= tx_proposer_send_token if trustline_proposer_sending_token[sf_low_limit].issuer().account == tx_account_other else trustline_proposer_sending_token[sf_balance] <= tx_proposer_send_token
+    appr_token_bal = tl_appr_send_token[sf_balance] >= tx_appr_token if tl_appr_send_token[sf_low_limit].issuer().account == tx_account else tl_appr_send_token[sf_balance] <= tx_appr_token
+    prop_token_bal = tl_prop_send_token[sf_balance] >= tx_prop_token if tl_prop_send_token[sf_low_limit].issuer().account == tx_acc_other else tl_prop_send_token[sf_balance] <= tx_prop_token
 
-    if not approver_token_balance_enough or not proposer_token_balance_enough:
+    if not appr_token_bal or not prop_token_bal:
         return tecINSUFFICIENT_FUNDS
     
     # Validate expiration
@@ -272,71 +274,71 @@ def do_apply_accept(ctx, _mPriorBalance, _mSourceBalance):
     # If a RippleState entry shows a positive balance, the high account is the issuer.
     # If the balance is negative, the low account is the issuer.
 
-    print("trustline_approver_sending_token")
+    print("tl_appr_send_token")
     print("--------------------------------")
-    print(f"-> before {trustline_approver_sending_token[sf_balance]}")
+    print(f"-> before {tl_appr_send_token[sf_balance]}")
 
-    if trustline_approver_sending_token[sf_balance] < zero_amount:
-        trustline_approver_sending_token[sf_balance] = trustline_approver_sending_token[sf_balance] + tx_approver_send_token
+    if tl_appr_send_token[sf_balance] < zero_amount:
+        tl_appr_send_token[sf_balance] = tl_appr_send_token[sf_balance] + tx_appr_token
     else:
-        trustline_approver_sending_token[sf_balance] = trustline_approver_sending_token[sf_balance] - tx_approver_send_token
+        tl_appr_send_token[sf_balance] = tl_appr_send_token[sf_balance] - tx_appr_token
     
-    print(f"-> after {trustline_approver_sending_token[sf_balance]}")
+    print(f"-> after {tl_appr_send_token[sf_balance]}")
 
     print("\n\n")
 
-    print("trustline_approver_receiving_token")
+    print("tl_appr_rec_token")
     print("--------------------------------")
-    print(f"-> before {trustline_approver_receiving_token[sf_balance]}")
+    print(f"-> before {tl_appr_rec_token[sf_balance]}")
 
-    if trustline_approver_receiving_token[sf_balance] < zero_amount:
-        trustline_approver_receiving_token[sf_balance] = trustline_approver_receiving_token[sf_balance] - tx_proposer_send_token
+    if tl_appr_rec_token[sf_balance] < zero_amount:
+        tl_appr_rec_token[sf_balance] = tl_appr_rec_token[sf_balance] - tx_prop_token
     else:
-        trustline_approver_receiving_token[sf_balance] = trustline_approver_receiving_token[sf_balance] + tx_proposer_send_token
+        tl_appr_rec_token[sf_balance] = tl_appr_rec_token[sf_balance] + tx_prop_token
 
-    print(f"-> after {trustline_approver_receiving_token[sf_balance]}")
+    print(f"-> after {tl_appr_rec_token[sf_balance]}")
 
     print("\n\n")
 
-    print("trustline_proposer_sending_token")
+    print("tl_prop_send_token")
     print("--------------------------------")
-    print(f"-> before {trustline_proposer_sending_token[sf_balance]}")
+    print(f"-> before {tl_prop_send_token[sf_balance]}")
    
-    if trustline_proposer_sending_token[sf_balance] < zero_amount:
-        trustline_proposer_sending_token[sf_balance] = trustline_proposer_sending_token[sf_balance] + tx_proposer_send_token
+    if tl_prop_send_token[sf_balance] < zero_amount:
+        tl_prop_send_token[sf_balance] = tl_prop_send_token[sf_balance] + tx_prop_token
     else:
-        trustline_proposer_sending_token[sf_balance] = trustline_proposer_sending_token[sf_balance] - tx_proposer_send_token
+        tl_prop_send_token[sf_balance] = tl_prop_send_token[sf_balance] - tx_prop_token
 
-    print(f"-> after {trustline_proposer_sending_token[sf_balance]}")
+    print(f"-> after {tl_prop_send_token[sf_balance]}")
 
     print("\n\n")
 
-    print("trustline_proposer_receiving_token")
+    print("tl_prop_rec_token")
     print("----------------------------------")
-    print(f"-> before {trustline_proposer_receiving_token[sf_balance]}")
+    print(f"-> before {tl_prop_rec_token[sf_balance]}")
     
-    if trustline_proposer_receiving_token[sf_balance] < zero_amount:
-        trustline_proposer_receiving_token[sf_balance] = trustline_proposer_receiving_token[sf_balance] - tx_approver_send_token
+    if tl_prop_rec_token[sf_balance] < zero_amount:
+        tl_prop_rec_token[sf_balance] = tl_prop_rec_token[sf_balance] - tx_appr_token
     else:
-        trustline_proposer_receiving_token[sf_balance] = trustline_proposer_receiving_token[sf_balance] + tx_approver_send_token
+        tl_prop_rec_token[sf_balance] = tl_prop_rec_token[sf_balance] + tx_appr_token
     
-    print(f"-> after {trustline_proposer_receiving_token[sf_balance]}")
+    print(f"-> after {tl_prop_rec_token[sf_balance]}")
 
     print("\n\n")
 
-    ctx.view().update(trustline_approver_sending_token)
-    ctx.view().update(trustline_approver_receiving_token)
-    ctx.view().update(trustline_proposer_sending_token)
-    ctx.view().update(trustline_proposer_receiving_token)
+    ctx.view().update(tl_appr_send_token)
+    ctx.view().update(tl_appr_rec_token)
+    ctx.view().update(tl_prop_send_token)
+    ctx.view().update(tl_prop_rec_token)
 
     page = slep[sf_owner_node]
     
     # Delete token swap object on originating account
-    ctx.view().dir_remove(owner_dir_keylet(tx_account_other), page, token_swap_keylet, True)
+    ctx.view().dir_remove(owner_dir_keylet(tx_acc_other), page, token_swap_keylet, True)
     ctx.view().erase(slep)
 
     # Adjust reserve count
-    adjust_owner_count(ctx.view(), proposer_account, -1, ctx.journal)
+    adjust_owner_count(ctx.view(), l_acc, -1, ctx.journal)
 
     return tesSUCCESS
     
