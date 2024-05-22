@@ -71,13 +71,13 @@ class TokensNetBalance(InvariantCheck):
 
         return True
 
-sf_amount_other = create_new_sfield(STAmount, "AmountOther", 51)
-sf_account_other = create_new_sfield(STAccount, "AccountOther", 52)
+sf_amount_2 = create_new_sfield(STAmount, "Amount2", 51)
+sf_account_2 = create_new_sfield(STAccount, "Account2", 52)
 sf_token_swap_id = create_new_sfield(STUInt64, "TokenSwapId", 53)
 
 sfields = [
-    sf_amount_other,
-    sf_account_other,
+    sf_amount_2,
+    sf_account_2,
     sf_token_swap_id,
 ]
 
@@ -104,8 +104,8 @@ ledger_objects = [
             (sf_account, soeREQUIRED),
             (sf_amount, soeREQUIRED),
             (sf_token_swap_id, soeREQUIRED),
-            (sf_amount_other, soeREQUIRED),
-            (sf_account_other, soeREQUIRED),
+            (sf_amount_2, soeREQUIRED),
+            (sf_account_2, soeREQUIRED),
             (sf_owner_node, soeREQUIRED),
             (sf_expiration, soeREQUIRED),
         ],
@@ -124,7 +124,7 @@ def preflight_propose(ctx):
     print("Token Swap Create test preflight...")
 
     tx_prop_token = ctx.tx[sf_amount]
-    tx_appr_token = ctx.tx[sf_amount_other]
+    tx_appr_token = ctx.tx[sf_amount_2]
     tx_expiration = ctx.tx[sf_expiration] 
     
     if tx_appr_token.is_xrp() or tx_prop_token.is_xrp():
@@ -140,9 +140,9 @@ def do_apply_propose(ctx, _mPriorBalance, _mSourceBalance):
     print("Token Swap Create test doApply...")
 
     tx_appr_token = ctx.tx[sf_amount]
-    tx_prop_token = ctx.tx[sf_amount_other]
+    tx_prop_token = ctx.tx[sf_amount_2]
     tx_account = ctx.tx[sf_account]
-    tx_acc_other = ctx.tx[sf_account_other]
+    tx_acc_2 = ctx.tx[sf_account_2]
     tx_expiration = ctx.tx[sf_expiration]
 
     l_acc = ctx.view().peek(account_keylet(tx_account))
@@ -161,8 +161,8 @@ def do_apply_propose(ctx, _mPriorBalance, _mSourceBalance):
     # Trsutline Objects
     tl_prop_send_token = ctx.view().peek(trustline_keylet(tx_account, prop_token_issue))
     tl_prop_rec_token = ctx.view().peek(trustline_keylet(tx_account, appr_token_issue))
-    tl_appr_send_token = ctx.view().peek(trustline_keylet(tx_acc_other, appr_token_issue))
-    tl_appr_rec_token = ctx.view().peek(trustline_keylet(tx_acc_other, prop_token_issue))
+    tl_appr_send_token = ctx.view().peek(trustline_keylet(tx_acc_2, appr_token_issue))
+    tl_appr_rec_token = ctx.view().peek(trustline_keylet(tx_acc_2, prop_token_issue))
 
     # Check trustlines exist
     if not tl_prop_send_token or not tl_prop_rec_token or not tl_appr_send_token or not tl_appr_rec_token:
@@ -174,8 +174,8 @@ def do_apply_propose(ctx, _mPriorBalance, _mSourceBalance):
     slep[sf_account] = tx_account
     slep[sf_amount] = tx_appr_token
     slep[sf_token_swap_id] = acc_seq
-    slep[sf_amount_other] = tx_prop_token
-    slep[sf_account_other] = tx_acc_other
+    slep[sf_amount_2] = tx_prop_token
+    slep[sf_account_2] = tx_acc_2
     slep[sf_expiration] = tx_expiration
 
     ctx.view().insert(slep)
@@ -196,10 +196,10 @@ def preflight_accept(ctx):
     print("Token Swap Accept test preflight...")
 
     amount = ctx.tx[sf_amount]
-    amountOther = ctx.tx[sf_amount_other]
+    amount_2 = ctx.tx[sf_amount_2]
 
     # Only accept Token Swaps
-    if amount.is_xrp() or amountOther.is_xrp():
+    if amount.is_xrp() or amount_2.is_xrp():
         return temBAD_AMOUNT
     
     return preflight2(ctx)
@@ -209,12 +209,12 @@ def do_apply_accept(ctx, _mPriorBalance, _mSourceBalance):
     print("Token Swap Accept test doApply...")
 
     tx_appr_token = ctx.tx[sf_amount]
-    tx_prop_token = ctx.tx[sf_amount_other] 
+    tx_prop_token = ctx.tx[sf_amount_2] 
     tx_account = ctx.tx[sf_account]
-    tx_acc_other = ctx.tx[sf_account_other]
+    tx_acc_2 = ctx.tx[sf_account_2]
     tx_token_swap_id = ctx.tx[sf_token_swap_id]
     
-    l_acc = ctx.view().peek(account_keylet(tx_acc_other))
+    l_acc = ctx.view().peek(account_keylet(tx_acc_2))
     close_time = ctx.view().info().parent_close_time
 
     # Token that the initiator is willing to receive by accepting
@@ -226,11 +226,11 @@ def do_apply_accept(ctx, _mPriorBalance, _mSourceBalance):
     tl_appr_send_token = ctx.view().peek(trustline_keylet(tx_account, appr_token_issue))
     tl_appr_rec_token = ctx.view().peek(trustline_keylet(tx_account, prop_token_issue))
 
-    # Trustlines for the token swap proposer account (account_other)
-    tl_prop_send_token = ctx.view().peek(trustline_keylet(tx_acc_other, prop_token_issue))
-    tl_prop_rec_token = ctx.view().peek(trustline_keylet(tx_acc_other, appr_token_issue))
+    # Trustlines for the token swap proposer account (account_2)
+    tl_prop_send_token = ctx.view().peek(trustline_keylet(tx_acc_2, prop_token_issue))
+    tl_prop_rec_token = ctx.view().peek(trustline_keylet(tx_acc_2, appr_token_issue))
     
-    token_swap_keylet = new_token_swap_keylet(tx_acc_other, tx_token_swap_id)
+    token_swap_keylet = new_token_swap_keylet(tx_acc_2, tx_token_swap_id)
     slep = ctx.view().peek(token_swap_keylet)
 
     appr_acc = ctx.view().peek(account_keylet(tx_account))
@@ -239,7 +239,7 @@ def do_apply_accept(ctx, _mPriorBalance, _mSourceBalance):
     balance = STAmount(appr_acc[sf_balance]).xrp()
     reserve = ctx.view().fees.account_reserve(appr_acc[sf_owner_count])
 
-    token_swap_keylet = new_token_swap_keylet(tx_acc_other, tx_token_swap_id)
+    token_swap_keylet = new_token_swap_keylet(tx_acc_2, tx_token_swap_id)
     slep = ctx.view().peek(token_swap_keylet)
 
     if balance < reserve:
@@ -250,7 +250,7 @@ def do_apply_accept(ctx, _mPriorBalance, _mSourceBalance):
         return temINVALID_TOKEN_SWAP_ID
     
     # Check amounts
-    if slep[sf_amount] != tx_prop_token or slep[sf_amount_other] != tx_appr_token:
+    if slep[sf_amount] != tx_prop_token or slep[sf_amount_2] != tx_appr_token:
         return temBAD_AMOUNT
 
     # Check trustlines exist
@@ -261,7 +261,7 @@ def do_apply_accept(ctx, _mPriorBalance, _mSourceBalance):
 
     # Balances
     appr_token_bal = tl_appr_send_token[sf_balance] >= tx_appr_token if tl_appr_send_token[sf_low_limit].issuer().account == tx_account else tl_appr_send_token[sf_balance] <= tx_appr_token
-    prop_token_bal = tl_prop_send_token[sf_balance] >= tx_prop_token if tl_prop_send_token[sf_low_limit].issuer().account == tx_acc_other else tl_prop_send_token[sf_balance] <= tx_prop_token
+    prop_token_bal = tl_prop_send_token[sf_balance] >= tx_prop_token if tl_prop_send_token[sf_low_limit].issuer().account == tx_acc_2 else tl_prop_send_token[sf_balance] <= tx_prop_token
 
     if not appr_token_bal or not prop_token_bal:
         return tecINSUFFICIENT_FUNDS
@@ -334,7 +334,7 @@ def do_apply_accept(ctx, _mPriorBalance, _mSourceBalance):
     page = slep[sf_owner_node]
     
     # Delete token swap object on originating account
-    ctx.view().dir_remove(owner_dir_keylet(tx_acc_other), page, token_swap_keylet, True)
+    ctx.view().dir_remove(owner_dir_keylet(tx_acc_2), page, token_swap_keylet, True)
     ctx.view().erase(slep)
 
     # Adjust reserve count
@@ -348,8 +348,8 @@ transactors = [
         tx_type=53,
         tx_format=[
             (sf_amount, soeREQUIRED),
-            (sf_amount_other, soeREQUIRED),
-            (sf_account_other, soeREQUIRED),
+            (sf_amount_2, soeREQUIRED),
+            (sf_account_2, soeREQUIRED),
             (sf_expiration, soeREQUIRED),
         ],
         consequences_factory_type=ConsequencesFactoryType.Normal,
@@ -361,8 +361,8 @@ transactors = [
         tx_type=54,
         tx_format=[
             (sf_amount, soeREQUIRED),
-            (sf_amount_other, soeREQUIRED),
-            (sf_account_other, soeREQUIRED),
+            (sf_amount_2, soeREQUIRED),
+            (sf_account_2, soeREQUIRED),
             (sf_token_swap_id, soeREQUIRED),
         ],
         consequences_factory_type=ConsequencesFactoryType.Normal,
