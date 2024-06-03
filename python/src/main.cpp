@@ -762,6 +762,9 @@ PYBIND11_MODULE(rippled_py, m) {
         .def("__getitem__", [](const ripple::STObject &obj, TWSF<ripple::STBlob> sf) {
             return obj[static_cast<ripple::TypedField<ripple::STBlob> const&>(sf)];
         }, py::return_value_policy::move)
+        .def("__getitem__", [](const ripple::STObject &obj, const WSF& sf) {
+            return obj.getFieldObject(sf);
+        }, py::return_value_policy::move)
         .def("__getitem__", [](const ripple::STObject &obj, TWSF<ripple::STPluginType> sf) {
             return obj[static_cast<ripple::TypedField<ripple::STPluginType> const&>(sf)];
         }, py::return_value_policy::move) // TODO: avoid doing a memory allocation every time this is called
@@ -782,6 +785,9 @@ PYBIND11_MODULE(rippled_py, m) {
         })
         .def("__setitem__", [](ripple::STObject &obj, TWSF<ripple::STBlob> sf, ripple::STBlob::value_type value) {
             obj[static_cast<ripple::TypedField<ripple::STBlob> const&>(sf)] = value;
+        })
+        .def("__setitem__", [](ripple::STObject &obj, const WSF& sf, ripple::STObject value) {
+            obj.setFieldObject(sf, value);
         })
         .def("__setitem__", [](ripple::STObject &obj, TWSF<ripple::STPluginType> sf, ripple::STPluginType::value_type value) {
             obj[static_cast<ripple::TypedField<ripple::STPluginType> const&>(sf)] = value;
@@ -1194,7 +1200,10 @@ PYBIND11_MODULE(rippled_py, m) {
     sTypeModule
         // TODO: replace `indexHash` with a native Python implementation
         .def("index_hash", &indexHash<>, "Hash the provided values together.")
-        .def("index_hash", &indexHash<ripple::AccountID, std::uint32_t>);
+        .def("index_hash", &indexHash<ripple::AccountID, std::uint32_t>)
+        .def("index_hash", &indexHash<ripple::AccountID, ripple::uint256>)
+        .def("index_hash", &indexHash<ripple::uint256>)
+    ;
 
     basicsModule
         .def("parse_base58", py::overload_cast<std::string const&>(&ripple::parseBase58<ripple::AccountID>))
