@@ -305,6 +305,12 @@ def bid_doapply(ctx, _m_prior_balance, _m_source_balance):
     keylet = auction_keylet(ctx.tx[sf_nftoken_id])
     sle_auction = ctx.view().peek(keylet)
 
+    # Ensure that the expiration time hasn't already passed
+    close_time = ctx.view().info().parent_close_time
+    if after(close_time, sle_auction[sf_expiration]):
+        print("Expiration is not after the last ledger close")
+        return tecNO_PERMISSION
+
     # Ensure that the bid is the highest bid
     if (
         sle_auction.is_field_present(sf_highest_bid)
@@ -319,7 +325,15 @@ def bid_doapply(ctx, _m_prior_balance, _m_source_balance):
     ):
         return tecALREADY_BID
 
-    # TODO: add check to ensure the auction isn't over
+    # Refund the previous highest bidder
+    if sle_auction.is_field_present(sf_highest_bidder):
+        sle_prev_bidder = ctx.view().peek(
+            account_keylet(sle_auction[sf_highest_bidder])
+        )
+        sle_prev_bidder[sf_balance] = (
+            sle_prev_bidder[sf_balance] + sle_auction[sf_highest_bid]
+        )
+        ctx.view().update(sle_prev_bidder)
 
     # Set the account as the highest bidder, Store their bid in the auction object
     sle_auction[sf_highest_bidder] = account
