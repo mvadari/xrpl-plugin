@@ -19,35 +19,27 @@ RUN npm install --global xrpl
 
 WORKDIR /answer
 RUN npm link xrpl
-COPY ./auction_create.py solution.py
+COPY ./auction_create.py auction_bid.py
 RUN rm -rf /usr/local/lib/python3.10/dist-packages/xrpl_plugin/build_scripts/build
-RUN plugin-build solution.py
-RUN rm Solution.cpp
+RUN plugin-build auction_bid.py
+RUN rm AuctionBid.cpp
+COPY ./rippled_bid.cfg ./rippled.cfg
+COPY ./auction_bid.js run.js
 RUN echo "./rippled -a --conf rippled.cfg >debug.log & sleep 1 && node run.js; ./rippled -a --conf rippled.cfg stop" > run.sh
 RUN chmod 777 run.sh
 
 RUN ln -s /opt/build/rippled ./rippled
 
-COPY ./rippled_answer.cfg ./rippled.cfg
-COPY ./nftoken_escrow.js run.js
-
 WORKDIR /apex
 RUN npm link xrpl
-COPY ./template.py ./nftoken_escrow.py
-RUN plugin-build nftoken_escrow.py
-RUN rm Auction.cpp
+COPY ./auction_create.py ./auction_create.py
+RUN plugin-build auction_create.py
+RUN rm AuctionCreate.cpp
 
 RUN ln -s /opt/build/rippled ./rippled
 
-COPY ./rippled.cfg .
-COPY ./template_run.js ./run.js
-COPY ./nftoken_escrow.js /answer/run.js
+COPY ./rippled_create.cfg .
+COPY ./auction_create.js ./run.js
 
-
-RUN cp /answer/run.sh ./run.sh
-RUN chmod 777 run.sh
 
 RUN rm -rf ~/.conan/data
-
-
-
