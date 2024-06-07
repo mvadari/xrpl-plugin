@@ -44,6 +44,7 @@ async function test() {
     TransactionType: 'AuctionCreate',
     Account: "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
     NFTokenID: nftoken_id,
+    MinBid: "1000000",
     Expiration: 999999999,
   }, seed)
   console.log(response2)
@@ -52,10 +53,9 @@ async function test() {
   const response3 = await submit({
     TransactionType: 'AuctionBid',
     Account: wallet.address,
-    MinBid: "1000000",
+    Bid: "1000000",
     NFTokenID: nftoken_id,
-    Expiration: 999999999,
-  }, seed)
+  }, wallet.seed)
   console.log(response3)
   console.log(JSON.stringify(response3.result, null, 4))
 

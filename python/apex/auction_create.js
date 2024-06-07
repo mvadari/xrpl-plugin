@@ -44,6 +44,7 @@ async function test() {
     TransactionType: 'AuctionCreate',
     Account: "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh",
     NFTokenID: nftoken_id,
+    MinBid: "1000000",
     Expiration: 999999999,
   }, seed)
   console.log(response)
