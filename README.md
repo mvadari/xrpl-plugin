@@ -17,6 +17,10 @@ cd language-of-choice
 
 See the individual per-language folders for more information about how to run plugins written in that language.
 
+### Python
+
+Details about the Python plugin implementation are available [here](python/).
+
 ## Debugging
 
 ### Import Error
