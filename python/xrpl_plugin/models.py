@@ -42,7 +42,7 @@ class Transactor:
     name: str
     tx_type: int
     tx_format: List[Tuple[SField, SOEStyle]]
-    consequences_factory_type: ConsequencesFactoryType
+    consequences_factory_type: ConsequencesFactoryType = ConsequencesFactoryType.Normal
     make_tx_consequences: Optional[Callable[[PreflightContext], TxConsequences]] = None
     calculate_base_fee: Optional[Callable[[ReadView, STTx], XRPAmount]] = None
     preflight: Optional[Callable[[PreflightContext], NotTEC]] = None
@@ -78,8 +78,8 @@ class Amendment:
     """
 
     name: str
-    supported: bool
-    vote: VoteBehavior
+    supported: bool = True
+    vote: VoteBehavior = VoteBehavior.DEFAULT_NO
 
 
 @dataclass(frozen=True)
