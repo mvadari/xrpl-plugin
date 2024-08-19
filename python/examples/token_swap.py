@@ -1,5 +1,5 @@
 '''
-Token swaps are useful when two users agree on an exchange of two tokens offchain and we need to reflect the swap onchain.
+Token swaps are helpful when two users agree to exchange two tokens off-chain, and we need to reflect the swap chain.
 
 In this example, the swap is a 2-step process:
 
